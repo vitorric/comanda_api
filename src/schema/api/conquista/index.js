@@ -1,20 +1,6 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index');
+    conn = require('../../../conn/mongo/index');
 
-/**
- * @desc Definition of Avatar Schema
- * @name avatar
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {string} password - Password is used as a login
- * @property {boolean} status - Flag indicating whether the document is active or not
- * @property {string} nome - 
- * @property {string} apelido - 
- * @property {string} cpf - 
- * @property {date} dataNascimento - 
- * @property {Object} endereco - 
- * @property {ObjectId} avatar - 
-*/
 const ConquistaSchema = new Schema(
     {
         nome: {
@@ -22,11 +8,11 @@ const ConquistaSchema = new Schema(
             required: true
         },
         descricao:{
-            type: String            
+            type: String
         },
         icon:{
             type:String,
-            default: "defaultIcon.png"
+            default: 'defaultIcon.png'
         },
         premio:{
             type:Number,
@@ -36,8 +22,8 @@ const ConquistaSchema = new Schema(
             type:Date,
             required: true
         },
-        status:{            
-            type:Number, 
+        status:{
+            type:Number,
             default: 0
         },
         objetivo:{
@@ -52,12 +38,12 @@ const ConquistaSchema = new Schema(
             },
             produto:{
                 type: Schema.Types.ObjectId,
-                ref: "produto"
+                ref: 'produto'
             }
         },
         estabelecimento:{
             type: Schema.Types.ObjectId,
-            ref: "estabelecimento"
+            ref: 'estabelecimento'
         }
     }, {
         collection: 'conquista',

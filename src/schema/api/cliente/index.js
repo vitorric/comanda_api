@@ -1,21 +1,7 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index'),
-    bcrypt = require("bcryptjs");
+    conn = require('../../../conn/mongo/index'),
+    bcrypt = require('bcryptjs');
 
-/**
- * @desc Definition of Profile Schema
- * @name cliente
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {string} password - Password is used as a login
- * @property {boolean} status - Flag indicating whether the document is active or not
- * @property {string} nome - 
- * @property {string} apelido - 
- * @property {string} cpf - 
- * @property {date} dataNascimento - 
- * @property {Object} endereco - 
- * @property {ObjectId} avatar - 
-*/
 const ClienteSchema = new Schema(
     {
         email: {
@@ -62,9 +48,9 @@ const ClienteSchema = new Schema(
             default:0
         },
         goldPorEstabelecimento:[{
-            estabelecimento:{                
+            estabelecimento:{
                 type: Schema.Types.ObjectId,
-                ref: "estabelecimento"
+                ref: 'estabelecimento'
             },
             gold:{
                 type:Number,
@@ -110,20 +96,20 @@ const ClienteSchema = new Schema(
             },
             estabelecimento:{
                 type: Schema.Types.ObjectId,
-                ref: "estabelecimento"
+                ref: 'estabelecimento'
             },
             nomeEstabelecimento: {
                 type: String
-            }, 
+            },
             comanda: {
                 type: Schema.Types.ObjectId,
-                ref: "comanda"
+                ref: 'comanda'
             }
         },
         conquistas:[{
             conquista:{
                 type: Schema.Types.ObjectId,
-                ref: "conquista"
+                ref: 'conquista'
             },
             quantidadeParaObter:{
                 type: Number,
@@ -131,7 +117,7 @@ const ClienteSchema = new Schema(
             },
             estabelecimento:{
                 type: Schema.Types.ObjectId,
-                ref: "estabelecimento"
+                ref: 'estabelecimento'
             },
             concluido:{
                 type:Boolean,
@@ -143,7 +129,7 @@ const ClienteSchema = new Schema(
         }],
         avatar: {
             type: Schema.Types.ObjectId,
-            ref: "avatar"
+            ref: 'avatar'
         }
     }, {
         collection: 'cliente',
@@ -151,7 +137,7 @@ const ClienteSchema = new Schema(
     }
 );
 
-ClienteSchema.pre("save", async function(next){
+ClienteSchema.pre('save', async function(next){
     try{
         // Generate a salt
         const salt = await bcrypt.genSalt(10);
@@ -166,36 +152,36 @@ ClienteSchema.pre("save", async function(next){
 });
 
 ClienteSchema.methods.isValidPassword = async function(newPassword){
-   try{
-       return await bcrypt.compare(newPassword, this.password);
-   }catch(error){
-       throw new Error(error);
-   }
-}
+    try{
+        return await bcrypt.compare(newPassword, this.password);
+    }catch(error){
+        throw new Error(error);
+    }
+};
 
 ClienteSchema.methods.recuperarSenha = async function(){
     try{
-        var randPassword = Array(10).fill("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz").map(function(x) { return x[Math.floor(Math.random() * x.length)] }).join('');
+        var randPassword = Array(10).fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').map(function(x) { return x[Math.floor(Math.random() * x.length)]; }).join('');
 
         // Generate a salt
         const salt = await bcrypt.genSalt(10);
         // Gerenate a password hash (salt + hash)
-        const passwordHash = await bcrypt.hash(randPassword, salt);      
+        const passwordHash = await bcrypt.hash(randPassword, salt);
         this.password = passwordHash;
 
         return randPassword;
     }catch(error){
         throw new Error(error);
     }
-}
+};
 
 ClienteSchema.methods.diminuirDinheiroNoEstabelecimento = function(objIdEstabelecimento, precoItem){
-    
-    this.goldPorEstabelecimento.map(function(value) {        
+
+    this.goldPorEstabelecimento.map(function(value) {
         if (value.estabelecimento == objIdEstabelecimento){
             value.gold -= precoItem;
         }
     });
-}
+};
 
-exports.schemaCliente =  conn.model('cliente', ClienteSchema);
+exports.schemaCliente =  conn.model('cliente', ClienteSchema, 'cliente');

@@ -1,16 +1,7 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index'),
-    bcrypt = require("bcryptjs");
-//  ObjectId = Schema.ObjectId;
+    conn = require('../../../conn/mongo/index'),
+    bcrypt = require('bcryptjs');
 
-/**
- * @desc Definition of Profile Schema
- * @name used
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {ObjectId} profile - Profile Schema Reference
- * @property {boolean} status - Flag indicating whether the document is active or not
-*/
 const UserSchema = new Schema(
     {
         nome: {
@@ -37,7 +28,7 @@ const UserSchema = new Schema(
     }
 );
 
-UserSchema.pre("save", async function(next){
+UserSchema.pre('save', async function(next){
     try{
         // Generate a salt
         const salt = await bcrypt.genSalt(10);
@@ -52,11 +43,11 @@ UserSchema.pre("save", async function(next){
 });
 
 UserSchema.methods.isValidPassword = async function(newPassword){
-   try{
-       return await bcrypt.compare(newPassword, this.password);
-   }catch(error){
-       throw new Error(error);
-   }
-}
+    try{
+        return await bcrypt.compare(newPassword, this.password);
+    }catch(error){
+        throw new Error(error);
+    }
+};
 
 exports.schemaUser =  conn.model('user', UserSchema);

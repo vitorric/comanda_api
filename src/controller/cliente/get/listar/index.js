@@ -3,5 +3,5 @@ const { ListarClientes } = require('../../../../service/api/cliente/listar'),
 
 module.exports = () => (req, res) => {
     ListarClientes().then(result => resJsonP(res, 200, result.status, !result.msg ? result.resulObj : res.__(result.msg)))
-    .catch(err => resJsonP(res, 200, false, res.__(err.message)));
+        .catch(err => resJsonP(res, 200, false,null, res.__(err.message)));
 };

@@ -1,14 +1,6 @@
-const server = require('./server'),
-    port = process.env.PORT || 3000;
+const server = require('./server');
 
-/**
- * @description inicia o modulo de passaport jwt
- */
-require('./src/service/passaport')();
-
-require('./src/router')(server);
-
-
-server.listen(port, () => {
-    console.log('Server running on port %d', port);
+server.listen(server.get('port'), () => {
+    console.log('Server running on port %d', server.get('port'));
 });
+

@@ -1,11 +1,10 @@
 const express = require('express'),
-    bodyParser = require('body-parser'),
     morgan = require('morgan'),
+    bodyParser = require('body-parser'),
     i18n = require('i18n'),
     app = express();
 
-
-app.all('*', (req, res, next) => {    
+app.all('*', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -15,6 +14,19 @@ app.all('*', (req, res, next) => {
 
     next();
 });
+
+require('./src/conn/mongo');
+
+/**
+ * @description inicia o modulo de passaport jwt
+ */
+require('./src/service/passaport')();
+
+
+/**
+ * @description inicia os servicos de mongo watch
+ */
+//require('./src/service/watch').iniciarWatch();
 
 i18n.configure({
     locales: ['br', 'en'],
@@ -30,8 +42,8 @@ app.use(
     bodyParser.urlencoded({ extended: true })
 );
 
+require('./src/router')(app);
 
-
+app.set('port', 3000);
 
 module.exports = app;
-

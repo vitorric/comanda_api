@@ -6,7 +6,7 @@ module.exports = {
         'MONGO_USER': '',
         'MONGO_PWD': '',
         'MONGO_DB': 'comanda',
-        'MONGO_AUTH_SOURCE': ''
+        'MONGO_AUTH_SOURCE': 'comanda'
     },
     test: {
         'PORT': 3000,

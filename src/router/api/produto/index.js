@@ -1,10 +1,10 @@
-const passport = require("passport"),
-      passportJWT = passport.authenticate("estabelecimentoAuth", {session:false}),
-      router = require('express').Router();
+const passport = require('passport'),
+    passportJWT = passport.authenticate('estabelecimentoAuth', {session:false}),
+    router = require('express').Router();
 
 module.exports = () => {
 
-    
+
     /**
  * @api {post} /rgister/user find user post
  * @apiName findpost
@@ -55,10 +55,10 @@ module.exports = () => {
  *            "retorno": " E-mail already registered "
  *       }
 **/
-    const cadastrarProdutoController = require('../../../controller/produto/post/cadastrar')();
+    const cadastrarProdutoController = require('../../../controller/produto/cadastrar')();
     router.post('/cadastrar/produto', passportJWT, cadastrarProdutoController);
 
-       /**
+    /**
  * @api {post} /rgister/user find user post
  * @apiName findpost
  * @apiGroup Find
@@ -108,8 +108,8 @@ module.exports = () => {
  *            "retorno": " E-mail already registered "
  *       }
 **/
-const listarProdutoController = require('../../../controller/produto/get/listar')();
-router.get('/listar/produto', passportJWT, listarProdutoController);
+    const listarProdutoController = require('../../../controller/produto/get/listar')();
+    router.get('/listar/produto', passportJWT, listarProdutoController);
 
-   return router;
+    return router;
 };

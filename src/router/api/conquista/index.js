@@ -1,10 +1,10 @@
-const passport = require("passport"),
-      passportJWT = passport.authenticate("estabelecimentoAuth", {session:false}),
-      router = require('express').Router();
+const passport = require('passport'),
+    passportJWT = passport.authenticate('estabelecimentoAuth', {session:false}),
+    router = require('express').Router();
 
 module.exports = () => {
 
-    
+
     /**
  * @api {post} /rgister/user find user post
  * @apiName findpost
@@ -55,8 +55,8 @@ module.exports = () => {
  *            "retorno": " E-mail already registered "
  *       }
 **/
-    const cadastrarConquistaController = require('../../../controller/conquista/post/cadastrar')();
+    const cadastrarConquistaController = require('../../../controller/conquista/cadastrar')();
     router.post('/cadastrar/conquista', passportJWT, cadastrarConquistaController);
 
-   return router;
+    return router;
 };

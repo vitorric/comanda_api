@@ -1,20 +1,6 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index');
+    conn = require('../../../conn/index');
 
-/**
- * @desc Definition of Avatar Schema
- * @name avatar
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {string} password - Password is used as a login
- * @property {boolean} status - Flag indicating whether the document is active or not
- * @property {string} nome - 
- * @property {string} apelido - 
- * @property {string} cpf - 
- * @property {date} dataNascimento - 
- * @property {Object} endereco - 
- * @property {ObjectId} avatar - 
-*/
 const EstabelecimentoUsuariosSchema = new Schema(
     {
         nome: {
@@ -33,13 +19,13 @@ const EstabelecimentoUsuariosSchema = new Schema(
             type: Number,
             default: 1
         },
-        roles:{            
+        roles:{
             type: Schema.Types.ObjectId,
-            ref: "role"
+            ref: 'role'
         },
-        estabelecimento:{            
+        estabelecimento:{
             type: Schema.Types.ObjectId,
-            ref: "estabelecimento"
+            ref: 'estabelecimento'
         }
     }, {
         collection: 'estabelecimentoUsuarios',

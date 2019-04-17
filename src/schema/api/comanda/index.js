@@ -1,22 +1,9 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index');
+    conn = require('../../../conn/mongo/index');
 
-/**
- * @desc Definition of Avatar Schema
- * @name avatar
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {string} password - Password is used as a login
- * @property {boolean} status - Flag indicating whether the document is active or not
- * @property {string} nome - 
- * @property {string} apelido - 
- * @property {string} cpf - 
- * @property {date} dataNascimento - 
- * @property {Object} endereco - 
- * @property {ObjectId} avatar - 
-*/
+
 const ComandaSchema = new Schema(
-    {       
+    {
         dataEntrada:{
             type:Date,
             required: true
@@ -24,22 +11,22 @@ const ComandaSchema = new Schema(
         dataSaida:{
             type: Date
         },
-        status:{            
-            type:Number, 
+        status:{
+            type:Number,
             default: 0
         },
         estabelecimento:{
             type: Schema.Types.ObjectId,
-            ref: "estabelecimento"
+            ref: 'estabelecimento'
         },
         valorTotal:{
             type: Number,
             default: 0
         },
-        grupo:[{            
+        grupo:[{
             cliente:{
                 type: Schema.Types.ObjectId,
-                ref: "cliente"
+                ref: 'cliente'
             },
             valorPago:{
                 type: Number,
@@ -57,7 +44,7 @@ const ComandaSchema = new Schema(
             },
             produto:{
                 type: Schema.Types.ObjectId,
-                ref: "produto"
+                ref: 'produto'
             },
             precoTotal:{
                 type:Number,

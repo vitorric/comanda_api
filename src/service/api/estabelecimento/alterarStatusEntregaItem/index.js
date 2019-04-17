@@ -1,15 +1,7 @@
 const { alterarStatusEntregaItem } = require('../../../../repository/api/estabelecimento');
-/**
-* @description makes the call of the register function and does the treatment that will return to the route
-* @author jaffar cardoso <jaffa.cardoso@gmail.com>
-* @async
-* @function cadastrarCliente
-* @param {Object} obj - receives an object with the fields to be saved
-* @returns {Promise.<Object>} The cadastrarCliente
-* @throws Will throw an error if the argument is null.
-*/
+
 exports.AlterarStatusEntregaItem = async (obj) => {
-    return await alterarStatusEntregaItem(obj).then(result => {     
+    return await alterarStatusEntregaItem(obj).then(result => {
         let resulObj = result;
         return { status: !result ? false : true, resulObj };
     }).catch(err => {

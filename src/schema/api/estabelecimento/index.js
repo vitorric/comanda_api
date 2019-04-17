@@ -1,21 +1,7 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index'),
-    bcrypt = require("bcryptjs");
+    conn = require('../../../conn/mongo/index'),
+    bcrypt = require('bcryptjs');
 
-/**
- * @desc Definition of Profile Schema
- * @name cliente
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {string} password - Password is used as a login
- * @property {boolean} status - Flag indicating whether the document is active or not
- * @property {string} nome - 
- * @property {string} apelido - 
- * @property {string} cpf - 
- * @property {date} dataNascimento - 
- * @property {Object} endereco - 
- * @property {ObjectId} avatar - 
-*/
 const EstabelecimentoSchema = new Schema(
     {
         email: {
@@ -97,21 +83,21 @@ const EstabelecimentoSchema = new Schema(
             },
             clientesNoLocal:[{
                 type: Schema.Types.ObjectId,
-                ref: "cliente"
+                ref: 'cliente'
             }]
         },
         conquistas:[{
             type: Schema.Types.ObjectId,
-            ref: "conquista"
+            ref: 'conquista'
         }],
-        produtos:[{            
+        produtos:[{
             type: Schema.Types.ObjectId,
-            ref: "produto"
-        }],        
+            ref: 'produto'
+        }],
         itensLoja:[{
             item:{
                 type: Schema.Types.ObjectId,
-                ref: "itemLoja"
+                ref: 'itemLoja'
             },
             quantidadeVendida:{
                 type: Number,
@@ -120,7 +106,7 @@ const EstabelecimentoSchema = new Schema(
             hotSale:{
                 type: Boolean,
                 default: false
-            },  
+            },
             quantidadeDisponivel:{
                 type: Number,
                 default: 1
@@ -129,13 +115,13 @@ const EstabelecimentoSchema = new Schema(
                 type:Date
             }
         }],
-        roles:[{            
+        roles:[{
             type: Schema.Types.ObjectId,
-            ref: "role"
+            ref: 'role'
         }],
-        estabelecimentoUsuarios: [{   
+        estabelecimentoUsuarios: [{
             type: Schema.Types.ObjectId,
-            ref: "estabelecimentoUsuario"
+            ref: 'estabelecimentoUsuario'
         }]
     }, {
         collection: 'estabelecimento',
@@ -143,7 +129,7 @@ const EstabelecimentoSchema = new Schema(
     }
 );
 
-EstabelecimentoSchema.pre("save", async function(next){
+EstabelecimentoSchema.pre('save', async function(next){
     try{
         // Generate a salt
         const salt = await bcrypt.genSalt(10);
@@ -158,28 +144,28 @@ EstabelecimentoSchema.pre("save", async function(next){
 });
 
 EstabelecimentoSchema.methods.isValidPassword = async function(newPassword){
-   try{
-       return await bcrypt.compare(newPassword, this.password);
-   }catch(error){
-       throw new Error(error);
-   }
-}
+    try{
+        return await bcrypt.compare(newPassword, this.password);
+    }catch(error){
+        throw new Error(error);
+    }
+};
 
 EstabelecimentoSchema.methods.recuperarSenha = async function(){
     try{
-        var randPassword = Array(10).fill("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz").map(function(x) { return x[Math.floor(Math.random() * x.length)] }).join('');
+        var randPassword = Array(10).fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').map(function(x) { return x[Math.floor(Math.random() * x.length)]; }).join('');
 
         // Generate a salt
         const salt = await bcrypt.genSalt(10);
         // Gerenate a password hash (salt + hash)
-        const passwordHash = await bcrypt.hash(randPassword, salt);      
+        const passwordHash = await bcrypt.hash(randPassword, salt);
         this.password = passwordHash;
 
         return randPassword;
     }catch(error){
         throw new Error(error);
     }
-}
+};
 
 
 exports.schemaEstabelecimento =  conn.model('estabelecimento', EstabelecimentoSchema);

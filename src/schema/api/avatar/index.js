@@ -1,5 +1,5 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index');
+    conn = require('../../../conn/mongo/index');
 
 const AvatarSchema = new Schema(
     {

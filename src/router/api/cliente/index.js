@@ -1,37 +1,22 @@
-const passport = require("passport"),
-      passportJWT = passport.authenticate("clienteAuth", {session:false}),
-      router = require('express').Router();
+const passport = require('passport'),
+    passportJWT = passport.authenticate('clienteAuth', {session:false}),
+    router = require('express').Router();
 
 module.exports = () => {
 
-    
+
     /**
- * @api {post} /cadastrar/cliente find user post
- * @apiName asdasdsad
- * @apiGroup Find
+ * @api {post} http://93.188.164.122:3000/api/cadastrar/cliente Cria login do cliente no aplicativo
+ * @apiSampleRequest http://93.188.164.122:3000/api/alterar/cliente/avatar
+ * @apiName alterar_avatar_cliente
+ * @apiGroup Avatar
  * @apiVersion 1.0.0
- * @apiDescription find user for id
- * @apiSampleRequest http://192.168.10.129:3001/astromaker/sync/school
- * @apiHeaderExample {json} Header-Example:
- *     {
- *       content-type: 'application/json',
- *       Authorization : "JWT token"
- *     }
+ * @apiDescription Alterar o avatar do cliente
  * @apiHeader Authorization Basic Access Authentication token.
- * @apiHeader Content-Type application/json
  * @apiSuccess {Object} sucesso <code>true</code>
  * @apiSuccess {string} retorno User successfully registered
  * @apiError {Object} sucesso <code>false</code>
  * @apiError {string} retorno  There was an error in registering || E-mail already registered
- * @apiExample {curl} Example utilizando plugin Testing API:
- *   {
- *       method: 'GET',
- *       url: 'http://localhost:5000/api/register/user',
- *       requestHeader: {
- *           'content-type': 'application/json',
- *           Authorization : "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
- *       }
- *   }
  * @apiSuccessExample {json} Success-Response:
  *     HTTP/1.1 200 OK
  *       {
@@ -56,7 +41,7 @@ module.exports = () => {
  *            "retorno": " E-mail already registered "
  *       }
 **/
-    const cadastrarClienteController = require('../../../controller/cliente/post/cadastrar')();
+    const cadastrarClienteController = require('../../../controller/cliente/cadastrar')();
     router.post('/cadastrar/cliente', cadastrarClienteController);
 
 
@@ -110,63 +95,8 @@ module.exports = () => {
  *            "retorno": " E-mail already registered "
  *       }
 **/
-    const alterarClienteConfigAppController = require('../../../controller/cliente/post/alterarConfigApp')();
-    router.post('/alterarConfigApp/cliente',passportJWT, alterarClienteConfigAppController);    
-
-  
-    /**
- * @api {post} /rgister/user find user post
- * @apiName findpost
- * @apiGroup Find
- * @apiVersion 1.0.0
- * @apiDescription find user for id
- * @apiHeaderExample {json} Header-Example:
- *     {
- *       content-type: 'application/json',
- *       Authorization : "JWT token"
- *     }
- * @apiHeader Authorization Basic Access Authentication token.
- * @apiHeader Content-Type application/json
- * @apiSuccess {Object} sucesso <code>true</code>
- * @apiSuccess {string} retorno User successfully registered
- * @apiError {Object} sucesso <code>false</code>
- * @apiError {string} retorno  There was an error in registering || E-mail already registered
- * @apiExample {curl} Example utilizando plugin Testing API:
- *   {
- *       method: 'GET',
- *       url: 'http://localhost:5000/api/register/user',
- *       requestHeader: {
- *           'content-type': 'application/json',
- *           Authorization : "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
- *       }
- *   }
- * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *       {
- *           "sucesso": true,
- *            "retorno": " User successfully registered"
- *       }
- * @apiErrorExample {json} Token-Invalido:
- *     HTTP/1.1 404 Not Found
- *     {
- *       Unauthorized
- *     }
- * @apiErrorExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *       {
- *           "sucesso": false,
- *            "retorno": "There was an error in registering "
- *       }
- * @apiErrorExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *       {
- *           "sucesso": false,
- *            "retorno": " E-mail already registered "
- *       }
-**/
-const sairDoEstabelecimentoController = require('../../../controller/cliente/post/sairDoEstabelecimento')();
-router.post('/sairestabelecimento/cliente',passportJWT, sairDoEstabelecimentoController);
-
+    const alterarClienteConfigAppController = require('../../../controller/cliente/alterarConfigApp')();
+    router.post('/alterarConfigApp/cliente',passportJWT, alterarClienteConfigAppController);
 
 
     /**
@@ -219,8 +149,9 @@ router.post('/sairestabelecimento/cliente',passportJWT, sairDoEstabelecimentoCon
  *            "retorno": " E-mail already registered "
  *       }
 **/
-const entrarNoEstabelecimentoController = require('../../../controller/cliente/post/entrarNoEstabelecimento')();
-router.post('/entrarestabelecimento/cliente',passportJWT, entrarNoEstabelecimentoController);
+    const sairDoEstabelecimentoController = require('../../../controller/cliente/sairDoEstabelecimento')();
+    router.post('/sairestabelecimento/cliente',passportJWT, sairDoEstabelecimentoController);
+
 
 
     /**
@@ -273,8 +204,62 @@ router.post('/entrarestabelecimento/cliente',passportJWT, entrarNoEstabeleciment
  *            "retorno": " E-mail already registered "
  *       }
 **/
-const alterarCliente = require('../../../controller/cliente/post/alterar')();
-router.post('/alterar/cliente', passportJWT, alterarCliente);
+    const entrarNoEstabelecimentoController = require('../../../controller/cliente/entrarNoEstabelecimento')();
+    router.post('/entrarestabelecimento/cliente',passportJWT, entrarNoEstabelecimentoController);
+
+
+    /**
+ * @api {post} /rgister/user find user post
+ * @apiName findpost
+ * @apiGroup Find
+ * @apiVersion 1.0.0
+ * @apiDescription find user for id
+ * @apiHeaderExample {json} Header-Example:
+ *     {
+ *       content-type: 'application/json',
+ *       Authorization : "JWT token"
+ *     }
+ * @apiHeader Authorization Basic Access Authentication token.
+ * @apiHeader Content-Type application/json
+ * @apiSuccess {Object} sucesso <code>true</code>
+ * @apiSuccess {string} retorno User successfully registered
+ * @apiError {Object} sucesso <code>false</code>
+ * @apiError {string} retorno  There was an error in registering || E-mail already registered
+ * @apiExample {curl} Example utilizando plugin Testing API:
+ *   {
+ *       method: 'GET',
+ *       url: 'http://localhost:5000/api/register/user',
+ *       requestHeader: {
+ *           'content-type': 'application/json',
+ *           Authorization : "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+ *       }
+ *   }
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *       {
+ *           "sucesso": true,
+ *            "retorno": " User successfully registered"
+ *       }
+ * @apiErrorExample {json} Token-Invalido:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       Unauthorized
+ *     }
+ * @apiErrorExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *       {
+ *           "sucesso": false,
+ *            "retorno": "There was an error in registering "
+ *       }
+ * @apiErrorExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *       {
+ *           "sucesso": false,
+ *            "retorno": " E-mail already registered "
+ *       }
+**/
+    const alterarCliente = require('../../../controller/cliente/alterar')();
+    router.post('/alterar/cliente', passportJWT, alterarCliente);
 
     /**
      * @api {post} /login faz o login
@@ -326,11 +311,11 @@ router.post('/alterar/cliente', passportJWT, alterarCliente);
      *            "retorno": " E-mail already registered "
      *       }
     **/
-    const loginController = require('../../../controller/cliente/post/login')();
-    router.post('/login/cliente', passport.authenticate("cliente", {session: false}), loginController);
-      
+    const loginController = require('../../../controller/cliente/login')();
+    router.post('/login/cliente', passport.authenticate('cliente', {session: false}), loginController);
 
-   /**
+
+    /**
      * @api {post} /login faz o login
      * @apiName findget
      * @apiGroup login
@@ -380,11 +365,11 @@ router.post('/alterar/cliente', passportJWT, alterarCliente);
      *            "retorno": " E-mail already registered "
      *       }
     **/
-   const recuperarSenhaController = require('../../../controller/cliente/post/recuperarSenha')();
-   router.post('/recuperarSenha/cliente', recuperarSenhaController);
+    const recuperarSenhaController = require('../../../controller/cliente/recuperarSenha')();
+    router.post('/recuperarSenha/cliente', recuperarSenhaController);
 
 
-       /**
+    /**
      * @api {get} /find/user/:id find user get
      * @apiName findget
      * @apiGroup Find
@@ -434,11 +419,11 @@ router.post('/alterar/cliente', passportJWT, alterarCliente);
      *            "retorno": " E-mail already registered "
      *       }
     **/
-   const findGetUserController = require('../../../controller/cliente/get/listar')();
-   router.get('/listar/cliente',passportJWT, findGetUserController);
+    const findGetUserController = require('../../../controller/cliente/get/listar')();
+    router.get('/listar/cliente',passportJWT, findGetUserController);
 
-  
-        /**
+
+    /**
      * @api {post} /rgister/user find user post
      * @apiName findpost
      * @apiGroup Find
@@ -488,10 +473,10 @@ router.post('/alterar/cliente', passportJWT, alterarCliente);
      *            "retorno": " E-mail already registered "
      *       }
     **/
-    const comprarItemLojaController = require('../../../controller/cliente/post/comprarItemLoja')();
+    const comprarItemLojaController = require('../../../controller/cliente/comprarItemLoja')();
     router.post('/compraritem/cliente', passportJWT, comprarItemLojaController);
 
-         /**
+    /**
      * @api {get} /find/user/:id find user get
      * @apiName findget
      * @apiGroup Find
@@ -541,11 +526,11 @@ router.post('/alterar/cliente', passportJWT, alterarCliente);
      *            "retorno": " E-mail already registered "
      *       }
     **/
-   const listarHistoricoCompraController = require('../../../controller/cliente/get/listarHistoricoCompra')();
-   router.get('/listar/cliente/historico/compra',passportJWT, listarHistoricoCompraController);
+    const listarHistoricoCompraController = require('../../../controller/cliente/listarHistoricoCompra')();
+    router.post('/listar/cliente/historico/compra',passportJWT, listarHistoricoCompraController);
 
-   
-         /**
+
+    /**
      * @api {get} /find/user/:id find user get
      * @apiName findget
      * @apiGroup Find
@@ -595,8 +580,8 @@ router.post('/alterar/cliente', passportJWT, alterarCliente);
      *            "retorno": " E-mail already registered "
      *       }
     **/
-   const listarClienteConquistasController = require('../../../controller/cliente/get/listarClienteConquistas')();
-   router.get('/listar/cliente/conquistas',passportJWT, listarClienteConquistasController);
+    const listarClienteConquistasController = require('../../../controller/cliente/listarClienteConquistas')();
+    router.post('/listar/cliente/conquistas',passportJWT, listarClienteConquistasController);
 
-   return router;
+    return router;
 };

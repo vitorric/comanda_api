@@ -1,6 +1,6 @@
 const passport = require('passport'),
-      passportJWT = passport.authenticate('clienteAuth', {session:false}),
-      router = require('express').Router();
+    passportJWT = passport.authenticate('clienteAuth', {session:false}),
+    router = require('express').Router();
 
 module.exports = () => {
     /**
@@ -39,8 +39,8 @@ module.exports = () => {
  *            "retorno": " E-mail already registered "
  *       }
 **/
-const alterarAvatarController = require('../../../controller/avatar/alterarAvatar')();
-router.post('/alterar/cliente/avatar',passportJWT, alterarAvatarController);
+    const alterarAvatarController = require('../../../controller/avatar/alterarAvatar')();
+    router.post('/alterar/cliente/avatar',passportJWT, alterarAvatarController);
 
-return router;
-}
+    return router;
+};

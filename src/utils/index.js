@@ -15,9 +15,12 @@ exports.ObjectIdCast = mongoose.mongo.ObjectId;
 * @param {number} code [código que será enviado na resposta]
 * @param {boolean} sucesso [true/false que será enviado na resposta]
 * @param {object} retorno [Objeto, texto ou erro que será enviado no retorno da resposta]
+* @param {string} msg [Mensagem que será enviada]
 * @return resposta da requisição (res.status....)
 */
-exports.resJsonP = (res, code, sucesso, retorno, msg) => res.status(code).jsonp({ success: sucesso, obj: retorno, msg });
+exports.resJsonP = (res, code, sucesso, retorno, msg) => {
+    return res.status(code).jsonp({ sucesso: sucesso, retorno: retorno, msg });
+};
 
 /**
 * Função The Default Error Handler para tratar error do mongodb

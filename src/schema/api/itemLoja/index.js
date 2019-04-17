@@ -1,20 +1,6 @@
 const { Schema } = require('mongoose'),
-    conn = require('../../../connection/index');
+    conn = require('../../../conn/mongo/index');
 
-/**
- * @desc Definition of Avatar Schema
- * @name avatar
- * @memberof documents/Schema#
- * @property {string} email - Email is used as a login
- * @property {string} password - Password is used as a login
- * @property {boolean} status - Flag indicating whether the document is active or not
- * @property {string} nome - 
- * @property {string} apelido - 
- * @property {string} cpf - 
- * @property {date} dataNascimento - 
- * @property {Object} endereco - 
- * @property {ObjectId} avatar - 
-*/
 const ItemLojaSchema = new Schema(
     {
         nome: {
@@ -22,27 +8,27 @@ const ItemLojaSchema = new Schema(
             required: true
         },
         descricao:{
-            type: String            
+            type: String
         },
         icon:{
             type:String,
-            default: "defaultIcon.png"
+            default: 'defaultIcon.png'
         },
         preco:{
             type:Number,
             default: 0
         },
-        status:{            
-            type:Number, 
+        status:{
+            type:Number,
             default: 0
         },
         estabelecimento:{
             type: Schema.Types.ObjectId,
-            ref: "estabelecimento"
+            ref: 'estabelecimento'
         },
         produtoRef:{
             type: Schema.Types.ObjectId,
-            ref: "produto"
+            ref: 'produto'
         }
     }, {
         collection: 'itemLoja',

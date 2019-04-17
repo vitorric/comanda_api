@@ -1,6 +1,6 @@
-const passport = require("passport"),
-      passportJWT = passport.authenticate("usuarioAuth", {session:false}),
-      router = require('express').Router();
+const passport = require('passport'),
+    passportJWT = passport.authenticate('usuarioAuth', {session:false}),
+    router = require('express').Router();
 
 module.exports = () => {
 
@@ -55,7 +55,7 @@ module.exports = () => {
      *       }
     **/
     const loginController = require('../../../controller/user/post/login')();
-    router.post('/login', passport.authenticate("usuario", {session: false}), loginController);
+    router.post('/login', passport.authenticate('usuario', {session: false}), loginController);
 
 
     /**
