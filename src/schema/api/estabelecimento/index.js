@@ -98,21 +98,6 @@ const EstabelecimentoSchema = new Schema(
             item:{
                 type: Schema.Types.ObjectId,
                 ref: 'itemLoja'
-            },
-            quantidadeVendida:{
-                type: Number,
-                default: 0
-            },
-            hotSale:{
-                type: Boolean,
-                default: false
-            },
-            quantidadeDisponivel:{
-                type: Number,
-                default: 1
-            },
-            tempoDisponivel:{
-                type:Date
             }
         }],
         roles:[{

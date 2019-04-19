@@ -175,6 +175,144 @@ exports.listarParaClientes = async (obj) => {
     }
 };
 
+exports.listarParaFirebase = async (obj) => {
+    const nomeEstabelecimento = (!obj.nome) ? '' : obj.nome;
+
+    try {
+        db.estabelecimento.aggregate([
+            {
+                $match:
+                {
+                    status: true,
+                    nome: {'$regex' : nomeEstabelecimento, '$options' : 'i'}
+                }
+            },
+            {
+                $lookup:
+                    {
+                        from: 'itemLoja',
+                        let: { itemID: '$itensLoja.item'},
+                        pipeline: [
+                            {
+                                $match: {
+                                    $and: [
+                                        {
+                                            $expr: {
+                                                $in: [ '$_id', '$$itemID'],
+                                            }
+                                        },
+                                        {
+                                            $or:[
+                                                { 'status': 1 },
+                                                { 'status': null }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                $project: {
+                                    'icon': 1, 'preco': 1, 'nome': 1, 'descricao': 1, 'quantidadeVendida': 1, 'hotSale': 1, 'quantidadeDisponivel': 1, 'tempoDisponivel': 1
+                                }
+                            },
+                            { $sort : { 'hotSale': 1,'tempoDisponivel' : 1, 'quantidadeDisponivel' : 1 } },
+                            {
+                                '$group': {
+                                    '_id': 'null',
+                                    'data': { '$push': { 'k': { '$toString': '$_id' }, 'v': '$$ROOT'} }
+                                }
+
+                            },
+                            {
+                                $replaceRoot: {
+                                    'newRoot': {
+                                        '$arrayToObject': '$data'
+                                    }
+                                }
+                            }
+
+                        ],
+                        as: 'itensLoja'
+                    }
+            },
+            { $unwind : { 'path': '$itensLoja' , 'preserveNullAndEmptyArrays': true} },
+            {
+                $lookup:
+                    {
+                        from: 'conquista',
+                        let: { conquistaID: '$conquistas'},
+                        pipeline: [
+                            {
+                                $match: {
+                                    $and: [
+                                        {
+                                            $expr: {
+                                                $in: [ '$_id', '$$conquistaID'],
+                                            }
+                                        },
+                                        {
+                                            $or:[
+                                                { 'status': 1 },
+                                                { 'status': null }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                $project: {
+                                    'descricao':1, 'icon': 1, 'nome':1, 'objetivo':1, 'premio':1, 'tempoDuracao':1
+                                },
+                            },
+                            { $sort : { 'tempoDuracao' : -1 } },
+                            {
+                                '$group': {
+                                    '_id': 'null',
+                                    'data': { '$push': { 'k': { '$toString': '$_id' }, 'v': '$$ROOT'} }
+                                }
+
+                            },
+                            {
+                                $replaceRoot: {
+                                    'newRoot': {
+                                        '$arrayToObject': '$data'
+                                    }
+                                }
+                            }
+
+                        ],
+                        as: 'conquistas'
+                    }
+            },
+            { $unwind : { 'path': '$conquistas' , 'preserveNullAndEmptyArrays': true} },
+            {
+                $project: {
+                    'status': 1,'nome': 1,'tipo':1,'descricao':1,'horarioAtendimentoInicio':1,'horarioAtendimentoFim':1,'celular':1,'telefone':1,'emailContato':1, 'itensLoja': 1,
+                    'endereco': 1, 'configEstabelecimentoAtual': 1, 'conquistas': 1
+                }
+            },
+            { $sort : { 'configEstabelecimentoAtual.estaAberta' : -1, 'configEstabelecimentoAtual.clientesNoLocal' : -1 } },
+            {
+                '$group': {
+                    '_id': 'null',
+                    'data': { '$push': { 'k': { '$toString': '$_id' }, 'v': '$$ROOT'} }
+                }
+
+            },
+            {
+                $replaceRoot: {
+                    'newRoot': {
+                        '$arrayToObject': '$data'
+                    }
+                }
+            }
+        ]);
+    } catch (error) {
+        console.log('erro na listagem do estabelcimento ' + error);
+        throw responseHandler(error);
+    }
+};
+
 exports.listarParaAdmin= async () => {
     try {
         return await schemaEstabelecimento.find({}, {nome: 1, celular: 1, telefone: 1, email: 1, status: 1});
@@ -352,13 +490,16 @@ exports.adicionarClienteAoEstabelecimento = async (obj) => {
 
     if (estabelecimento.configEstabelecimentoAtual.estaAberta){
 
-        return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(() => {
+        return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(async () => {
             estabelecimento.configEstabelecimentoAtual.clientesNoLocal.push(obj._idCliente);
-            return schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento).then(() => {
-                return {status: true, msg: 'NOVO_CLIENTE_ADICIONADO'};
-            }).catch(err => {
+            try {
+                await schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento);
+
+                return { status: true, msg: 'NOVO_CLIENTE_ADICIONADO' };
+            }
+            catch (err) {
                 throw responseHandler(err);
-            });
+            }
         }).catch(err => {
             throw responseHandler(err);
         });

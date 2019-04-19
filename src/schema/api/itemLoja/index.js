@@ -22,6 +22,21 @@ const ItemLojaSchema = new Schema(
             type:Number,
             default: 0
         },
+        quantidadeVendida:{
+            type: Number,
+            default: 0
+        },
+        hotSale:{
+            type: Boolean,
+            default: false
+        },
+        quantidadeDisponivel:{
+            type: Number,
+            default: 1
+        },
+        tempoDisponivel:{
+            type:Date
+        },
         estabelecimento:{
             type: Schema.Types.ObjectId,
             ref: 'estabelecimento'

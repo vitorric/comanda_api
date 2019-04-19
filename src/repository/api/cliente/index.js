@@ -2,6 +2,7 @@
 const { schemaCliente } = require('../../../schema/api/cliente'),
     { cadastrarAvatar, alterarAvatar } = require('../avatar'),
     { responseHandler, ObjectIdCast } = require('../../../utils'),
+    { schemaEstabelecimento } = require('../../../schema/api/estabelecimento'),
     { schemaHistoricoCompraLojas } = require('../../../schema/api/historicoCompraLojas'),
     firebaseCliente = require('../../../service/firebase/cliente'),
     JWT = require('jsonwebtoken'),
@@ -209,9 +210,6 @@ exports.listar = async () => {
 };
 
 exports.comprarItemLoja = async (obj) => {
-
-    const { schemaEstabelecimento } = require('../../../schema/api/estabelecimento');
-
     const cliente = await schemaCliente.findById(ObjectIdCast(obj.cliente));
 
     const estabelecimento = await schemaEstabelecimento.findById(ObjectIdCast(obj.estabelecimento));
@@ -325,26 +323,33 @@ exports.listarClienteConquistas = async (query) => {
 };
 
 exports.entrarNoEstabelecimento = async (obj) => {
-    const { schemaEstabelecimento } = require('../../../schema/api/estabelecimento');
+
     const estabelecimento = await schemaEstabelecimento.findById(obj._idEstabelecimento);
-    const cliente = await schemaCliente.findById(obj._idCliente);
 
-    if (cliente.configClienteAtual.estaEmUmEstabelecimento)
-        return {status: true, msg: 'CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP'};
+    if (estabelecimento.configEstabelecimentoAtual.estaAberta) {
 
-    cliente.configClienteAtual.estaEmUmEstabelecimento = true;
-    cliente.configClienteAtual.estabelecimento = estabelecimento._id;
-    cliente.configClienteAtual.nomeEstabelecimento = estabelecimento.nome;
+        const cliente = await schemaCliente.findById(obj._idCliente);
 
-    if (estabelecimento.configEstabelecimentoAtual.estaAberta){
+        console.log(cliente.configClienteAtual.estaEmUmEstabelecimento);
 
-        return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(() => {
+        if (cliente.configClienteAtual.estaEmUmEstabelecimento)
+            return {status: true, msg: 'CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP'};
+
+        cliente.configClienteAtual.estaEmUmEstabelecimento = true;
+        cliente.configClienteAtual.estabelecimento = estabelecimento._id;
+        cliente.configClienteAtual.nomeEstabelecimento = estabelecimento.nome;
+
+
+        return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(async () => {
             estabelecimento.configEstabelecimentoAtual.clientesNoLocal.push(obj._idCliente);
-            return schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento).then(() => {
-                return {status: true, msg: 'BEM_VINDO_CLIENTE', nomeEstabelecimento: estabelecimento.nome};
-            }).catch(err => {
+            try {
+                schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento);
+                await firebaseCliente.StatusEstaEmEstabelecimento(obj._idCliente, true, obj._idEstabelecimento, estabelecimento.nome);
+                return { status: true, msg: 'BEM_VINDO_CLIENTE', nomeEstabelecimento: estabelecimento.nome };
+            }
+            catch (err) {
                 throw responseHandler(err);
-            });
+            }
         }).catch(err => {
             throw responseHandler(err);
         });
@@ -354,7 +359,6 @@ exports.entrarNoEstabelecimento = async (obj) => {
 };
 
 exports.sairDoEstabelecimento = async (obj) => {
-    const { schemaEstabelecimento } = require('../../../schema/api/estabelecimento');
     const estabelecimento = await schemaEstabelecimento.findById(obj._idEstabelecimento);
     const cliente = await schemaCliente.findById(obj._idCliente);
 
