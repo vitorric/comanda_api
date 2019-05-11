@@ -18,6 +18,11 @@ const ClienteSchema = new Schema(
             required: false,
             default: 1
         },
+        chaveAmigavel: {
+            type: String,
+            required: true,
+            unique: true
+        },
         nome:{
             type: String,
             required: true
@@ -27,13 +32,10 @@ const ClienteSchema = new Schema(
             required: true
         },
         cpf:{
-            type: String,
-            unique: true,
-            required: true
+            type: String
         },
         dataNascimento:{
-            type: Date,
-            required: true
+            type: Date
         },
         sexo:{
             type: String,
@@ -57,26 +59,6 @@ const ClienteSchema = new Schema(
                 default:0
             }
         }],
-        endereco:{
-            rua:{
-                type: String
-            },
-            numero:{
-                type: Number
-            },
-            bairro:{
-                type: String
-            },
-            cidade:{
-                type: String
-            },
-            cep:{
-                type: String
-            },
-            estado:{
-                type: String
-            }
-        },
         configApp:{
             somFundo:{
                 type:Number,
@@ -91,6 +73,10 @@ const ClienteSchema = new Schema(
         },
         configClienteAtual:{
             estaEmUmEstabelecimento:{
+                type:Boolean,
+                default:false
+            },
+            conviteEstabPendente: {
                 type:Boolean,
                 default:false
             },

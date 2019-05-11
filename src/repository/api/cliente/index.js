@@ -30,8 +30,6 @@ exports.cadastrarCliente = async (obj) => {
     ]).exec();
 
     if (foundCliente.length > 0){
-        if (foundCliente[0].cpf === post.cpf)
-            return {msg: 'REGISTRATION_ERROR_CPF'};
         if (foundCliente[0].email === post.email)
             return {msg: 'REGISTRATION_ERROR_EMAIL'};
         if (foundCliente[0].apelido === post.apelido)
@@ -333,19 +331,20 @@ exports.entrarNoEstabelecimento = async (obj) => {
         console.log(cliente.configClienteAtual.estaEmUmEstabelecimento);
 
         if (cliente.configClienteAtual.estaEmUmEstabelecimento)
-            return {status: true, msg: 'CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP'};
+            return {status: false, msg: 'CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP'};
 
         cliente.configClienteAtual.estaEmUmEstabelecimento = true;
         cliente.configClienteAtual.estabelecimento = estabelecimento._id;
         cliente.configClienteAtual.nomeEstabelecimento = estabelecimento.nome;
-
+        cliente.configClienteAtual.conviteEstabPendente = false;
 
         return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(async () => {
             estabelecimento.configEstabelecimentoAtual.clientesNoLocal.push(obj._idCliente);
             try {
                 schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento);
-                await firebaseCliente.StatusEstaEmEstabelecimento(obj._idCliente, true, obj._idEstabelecimento, estabelecimento.nome);
-                return { status: true, msg: 'BEM_VINDO_CLIENTE', nomeEstabelecimento: estabelecimento.nome };
+                await firebaseCliente.EntrarNoEstabelecimento(obj._idCliente, obj._idEstabelecimento, estabelecimento.nome).then(() => {
+                    return { status: true, msg: 'BEM_VINDO_CLIENTE', nomeEstabelecimento: estabelecimento.nome };
+                });
             }
             catch (err) {
                 throw responseHandler(err);
@@ -372,10 +371,34 @@ exports.sairDoEstabelecimento = async (obj) => {
         estabelecimento.configEstabelecimentoAtual.clientesNoLocal.splice(index,1);
 
         return schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento).then(() => {
-            return {status: true, msg: 'CLIENTE_SAIU'};
+
+            return firebaseCliente.RecusarSairDoEstabelecimento(cliente._id).then((res) => {
+                console.log(res);
+                return {status: true, msg: 'CLIENTE_SAIU'};
+            });
         }).catch(err => {
             throw responseHandler(err);
         });
+    }).catch(err => {
+        throw responseHandler(err);
+    });
+};
+
+exports.recusarConviteEstabelecimento = async (obj) => {
+    const cliente = await schemaCliente.findById(obj._idCliente);
+
+    cliente.configClienteAtual.estaEmUmEstabelecimento = false;
+    cliente.configClienteAtual.estabelecimento = null;
+    cliente.configClienteAtual.nomeEstabelecimento = null;
+    cliente.configClienteAtual.conviteEstabPendente = false;
+
+    return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(async () => {
+
+        return await firebaseCliente.RecusarSairDoEstabelecimento(cliente._id).then((res) => {
+            console.log(res);
+            return { status: true, msg: 'CLIENTE_RECUSOU_CONVITE' };
+        });
+
     }).catch(err => {
         throw responseHandler(err);
     });

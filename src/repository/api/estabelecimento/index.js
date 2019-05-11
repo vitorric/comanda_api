@@ -4,6 +4,7 @@ const { schemaEstabelecimento } = require('../../../schema/api/estabelecimento')
     { schemaRole } = require('../../../schema/api/role'),
     { responseHandler, ObjectIdCast } = require('../../../utils'),
     JWT = require('jsonwebtoken'),
+    firebaseEstabelecimento = require('../../../service/firebase/estabelecimento'),
     {JWT_SECRET} = require('../../../../config');
 
 signTokenEstabelecimento = estabelecimento => {
@@ -485,22 +486,35 @@ exports.adicionarClienteAoEstabelecimento = async (obj) => {
     if (cliente.configClienteAtual.estaEmUmEstabelecimento)
         return {status: true, msg: 'CLIENTE_JA_ESTA_NO_ESTABELECIMENTO'};
 
-    cliente.configClienteAtual.estaEmUmEstabelecimento = true;
+    if (cliente.configClienteAtual.conviteEstabPendente)
+        return {status: true, msg: 'CLIENTE_JA_TEM_CONVITE'};
+
+    //cliente.configClienteAtual.estaEmUmEstabelecimento = true;
+    cliente.configClienteAtual.conviteEstabPendente = true;
     cliente.configClienteAtual.estabelecimento = estabelecimento._id;
+    cliente.configClienteAtual.nomeEstabelecimento = estabelecimento.nome;
 
-    if (estabelecimento.configEstabelecimentoAtual.estaAberta){
-
+    if (estabelecimento.configEstabelecimentoAtual.estaAberta)
+    {
         return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(async () => {
             estabelecimento.configEstabelecimentoAtual.clientesNoLocal.push(obj._idCliente);
-            try {
-                await schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento);
 
+            return await firebaseEstabelecimento.AdicionarClienteAoEstabelecimento(cliente._id, estabelecimento._id, estabelecimento.nome).then((res) => {
+                console.log(res);
                 return { status: true, msg: 'NOVO_CLIENTE_ADICIONADO' };
-            }
-            catch (err) {
-                throw responseHandler(err);
-            }
+            });
+
+
+            // try {
+            //     await schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento);
+
+            //     return { status: true, msg: 'NOVO_CLIENTE_ADICIONADO' };
+            // }
+            // catch (err) {
+            //     throw responseHandler(err);
+            // }
         }).catch(err => {
+            console.log(err);
             throw responseHandler(err);
         });
     }

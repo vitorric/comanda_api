@@ -1,12 +1,22 @@
-// const connFb = require('../../../conn/firebase');
+const connFb = require('../../../conn/firebase');
 
-// exports.Criar = async (estabelecimentos) => {
-//     try
-//     {
-//         return await connFb.database().ref('estabelecimentos').child(cliente._id).set(cliente);
-//     }
-//     catch(err)
-//     {
-//         console.log(err);
-//     }
-// };
+exports.AdicionarClienteAoEstabelecimento = async (_idCliente, _idEstabelecimento, nomeEstabelecimento) => {
+    try
+    {
+        let configAtualCliente = {
+            estaEmUmEstabelecimento: false,
+            conviteEstabPendente: true,
+            estabelecimento: _idEstabelecimento,
+            nomeEstabelecimento: nomeEstabelecimento
+        };
+
+        var updates = {};
+        updates['/clientes/' + _idCliente + '/configClienteAtual'] = configAtualCliente;
+        console.log(updates);
+        return await connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
+};

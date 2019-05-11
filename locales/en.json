@@ -31,5 +31,7 @@
 	"AVATAR_ALTERADO": "Avatar alterado com sucesso",
 	"CLIENTE_SAIU": "Você saiu do estabelecimento!",
 	"CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO": "O cliente não está no estabelecimento!",
-	"CLIENTE_JA_TEM_COMANDA": "O cliente já tem uma comanda!"
+	"CLIENTE_JA_TEM_COMANDA": "O cliente já tem uma comanda!",
+	"CLIENTE_JA_TEM_CONVITE": "Este cliente já foi convidado por um estabelecimento!",
+	"CLIENTE_RECUSOU_CONVITE": "Cliente recusou o convite!"
 }
