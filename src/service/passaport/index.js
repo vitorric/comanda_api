@@ -69,11 +69,11 @@ module.exports = () => {
     }, async(payload,done) => {
 
         try{
-            if (!payload.cliente)
+            if (!payload.user)
                 return done(null, false);
 
             // Find the user specified in token
-            const cliente = await schemaCliente.findById(payload.cliente._id);
+            const cliente = await schemaCliente.findById(payload.user._id);
 
             //If user doesn't exists, handle it
             if(!cliente){

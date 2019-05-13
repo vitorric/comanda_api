@@ -31,4 +31,4 @@ const AvatarSchema = new Schema(
     }
 );
 
-exports.schemaAvatar =  conn.model('avatar', AvatarSchema);
+exports.avatarSchema =  conn.model('avatar', AvatarSchema);

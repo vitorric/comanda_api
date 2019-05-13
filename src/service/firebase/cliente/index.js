@@ -3,7 +3,6 @@ const connFb = require('../../../conn/firebase');
 exports.Criar = async (cliente) => {
     try
     {
-        console.log(cliente);
         return await connFb.database().ref('clientes').child(cliente._id).set(cliente);
     }
     catch(err)

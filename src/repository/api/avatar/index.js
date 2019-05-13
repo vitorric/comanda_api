@@ -1,40 +1,109 @@
-const { schemaAvatar } = require('../../../schema/api/avatar'),
-    { responseHandler } = require('../../../utils');
+const { avatarSchema } = require('../../../schema/api/avatar'),
+    { ObjectIdCast } = require('../../../utils');
 
 
-exports.cadastrarAvatar = async (obj) => {
+exports.cadastrarAvatar = async (avatar) => {
+    try
+    {
+        let novoAvatar = new avatarSchema(avatar);
 
-    try{
-        let post = new schemaAvatar(obj);
-        return await post.save().then(() => {
-            return post;
-        }).catch(error => {
-            console.log(error);
-            throw responseHandler(error);
+        return await avatarSchema.create(novoAvatar).catch(err => {
+            console.log(err);
+            throw err;
         });
-    }catch(error){
+    }
+    catch(error)
+    {
         console.log(error);
-        throw responseHandler(error);
+        throw error;
     }
 };
 
-exports.obterAvatar = async (obj) => {
-    try {
-        return await schemaAvatar.findById(obj._id);
-    } catch (error) {
+exports.obterAvatar = async (_id) => {
+    try
+    {
+        return await avatarSchema.findOne(
+            {
+                _id: ObjectIdCast(_id)
+            });
+    }
+    catch (error)
+    {
         console.log(error);
-        throw responseHandler(error);
+        throw error;
     }
 };
 
-exports.alterarAvatar = async (obj) => {
+exports.alterarAvatar = (avatar) => {
+    try
+    {
+        let avatarAlterado = avatarSchema.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(avatar._idCliente)
+            },
+            {
+                $set: {
+                    corpo: avatar.corpo,
+                    cabeca: avatar.cabeca,
+                    nariz: avatar.nariz,
+                    olhos: avatar.olhos,
+                    boca: avatar.boca,
+                    roupa: avatar.roupa,
+                    cabeloTraseiro: avatar.cabeloTraseiro,
+                    cabeloFrontal: avatar.cabeloFrontal,
+                    barba: avatar.barba,
+                    sombrancelhas: avatar.sombrancelhas,
+                    orelha: avatar.orelha,
+                    corPele: avatar.corPele,
+                    corCabelo: avatar.corCabelo,
+                    corBarba: avatar.corBarba
+                }
 
-    const avatar = new schemaAvatar(JSON.parse(obj.avatar));
+            })
+            .exec();
 
-    return await schemaAvatar.findByIdAndUpdate(avatar._id, avatar).then(() => {
-        return {status: true, msg: 'AVATAR_ALTERADO'};
-    }).catch(err => {
-        console.log(err);
-        throw responseHandler(err);
-    });
+        if (!avatarAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('Error alterarAvatar: ', error);
+        throw error;
+    }
+
+};
+
+
+exports.alterarExp = async (avatarId, exp, level) => {
+
+    try
+    {
+        let avatarAlterado = avatarSchema.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(avatarId)
+            },
+            {
+                $set: {
+                    exp: exp,
+                    level: level
+                }
+
+            })
+            .exec();
+
+        if (!avatarAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('Error alterarAvatar: ', error);
+        throw error;
+    }
+
 };

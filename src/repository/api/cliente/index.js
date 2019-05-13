@@ -1,73 +1,40 @@
 /* eslint-disable no-undef */
 const { schemaCliente } = require('../../../schema/api/cliente'),
-    { cadastrarAvatar, alterarAvatar } = require('../avatar'),
-    { responseHandler, ObjectIdCast } = require('../../../utils'),
+    { alterarAvatar } = require('../avatar'),
+    { ObjectIdCast } = require('../../../utils'),
     { schemaEstabelecimento } = require('../../../schema/api/estabelecimento'),
     { schemaHistoricoCompraLojas } = require('../../../schema/api/historicoCompraLojas'),
-    firebaseCliente = require('../../../service/firebase/cliente'),
-    JWT = require('jsonwebtoken'),
-    {JWT_SECRET} = require('../../../../config');
+    firebaseCliente = require('../../../service/firebase/cliente');
 
-signToken = cliente => {
-    try{
-        return 'jwt ' + JWT.sign({
-            issuer: 'Comanda',
-            cliente,
-            exp: Math.floor(Date.now() / 1000) + (60 * 60)
-        },JWT_SECRET);
-    }catch(error){
-        console.log(error);
-    }
-};
+exports.cadastrarCliente = async (cliente) => {
+    try
+    {
+        let novoCliente = new schemaCliente(cliente);
 
-
-exports.cadastrarCliente = async (obj) => {
-
-    let post = new schemaCliente(obj);
-
-    let foundCliente = await schemaCliente.aggregate([
-        { $match: { $or: [{ email: post.email }, { cpf: post.cpf }, {apelido: post.apelido}] } }
-    ]).exec();
-
-    if (foundCliente.length > 0){
-        if (foundCliente[0].email === post.email)
-            return {msg: 'REGISTRATION_ERROR_EMAIL'};
-        if (foundCliente[0].apelido === post.apelido)
-            return {msg: 'REGISTRATION_ERROR_APELIDO'};
-    }
-
-    let novoAvatar = await cadastrarAvatar(JSON.parse(obj.avatar));
-
-    post.avatar = novoAvatar._id;
-
-    await schemaCliente.create(post).catch(err => {
-        console.log(err);
-        throw responseHandler(err);
-    });
-
-    return await obterCliente(post._id).then(async (res) => {
-
-        return await firebaseCliente.Criar(res).then(() => {
-
-            // Generate the token
-            const token = signToken({ _id: res._id });
-
-            // Respond with token
-            return { token, _id: post._id };
-
-        }).catch(err => {
+        return await schemaCliente.create(novoCliente).catch(err => {
             console.log(err);
-            throw responseHandler(err);
+            throw err;
         });
-
-    }).catch(err => {
-        console.log(err);
-        throw responseHandler(err);
-    });
+    }
+    catch(error)
+    {
+        console.log(error);
+        throw error;
+    }
 };
 
-obterCliente = async (idCliente) => {
+exports.obterClienteParaCadastro = async( email, apelido) => {
+    try {
+        return await schemaCliente.aggregate([
+            { $match: { $or: [{ email: email }, {apelido: apelido}] } }
+        ]).exec().then(items => items[0]);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
 
+exports.obterCliente = async (idCliente) => {
     try {
         return await schemaCliente.aggregate([
             {
@@ -133,22 +100,49 @@ obterCliente = async (idCliente) => {
                     configClienteAtual: 1
                 }
             }
-        ]).then(items => items[0]);
+        ]).exec().then(items => items[0]);
     } catch (error) {
         console.log(error);
-        throw responseHandler(error);
+        throw error;
     }
 };
 
-exports.alterarConfigApp = async (obj) => {
-    const cliente = await schemaCliente.findById(obj._id);
+//----------------------------------------------------------------------
 
-    cliente.configApp = JSON.parse(obj.configApp);
-    return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(() => {
-        return {status: true, msg: 'REGISTRO_ALTERADO'};
-    }).catch(err => {
-        throw responseHandler(err);
-    });
+exports.alterarClienteConfigApp = async (idCliente, somFundo, somGeral) => {
+
+    try
+    {
+        let clienteAlterado = schemaCliente.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(idCliente)
+            },
+            {
+                $set: {
+                    'configApp.somFundo': somFundo,
+                    'configApp.somGeral': somGeral
+                }
+            })
+            .exec();
+
+        if (!clienteAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('Error alterarAvatar: ', error);
+        throw error;
+    }
+
+    // cliente.configApp = JSON.parse(obj.configApp);
+    // return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(() => {
+    //     return false;
+    // }).catch(err => {
+    //     throw err;
+    // });
 };
 
 exports.alterar = async (obj) => {
@@ -161,10 +155,10 @@ exports.alterar = async (obj) => {
             return { status: true, msg: 'REGISTRO_ALTERADO' };
         }
         catch (err) {
-            throw responseHandler(err);
+            throw err;
         }
     }).catch(err => {
-        throw responseHandler(err);
+        throw err;
     });
 };
 
@@ -174,7 +168,7 @@ exports.loginCliente = async (cliente) => {
         return { token, _id: cliente._id };
     } catch (error) {
         console.log(error);
-        throw responseHandler(error);
+        throw error;
     }
 };
 
@@ -195,7 +189,7 @@ exports.recuperarSenha = async (obj) => {
 
         return {status: false, msg: 'NO_FOUND_USER'};
     } catch (error) {
-        throw responseHandler(error);
+        throw error;
     }
 };
 
@@ -203,7 +197,7 @@ exports.listar = async () => {
     try {
         return await schemaCliente.find().select({ __v: 0 }).exec();
     } catch (error) {
-        throw responseHandler(error);
+        throw error;
     }
 };
 
@@ -239,7 +233,7 @@ exports.comprarItemLoja = async (obj) => {
         idItemLoja = item._id;
         precoItem = item.preco;
     }).catch(err => {
-        throw responseHandler(err);
+        throw err;
     });
 
     return await schemaCliente.findByIdAndUpdate(cliente._id, cliente).then(() => {
@@ -253,7 +247,7 @@ exports.comprarItemLoja = async (obj) => {
         return {status: true, msg: 'ITEM_COMPRADO'};
     }).catch(err => {
         console.log(err);
-        throw responseHandler(err);
+        throw err;
     });
 
 };
@@ -294,7 +288,7 @@ exports.listarHistoricoCompra = async (query) => {
         ]);
 
     } catch (error) {
-        throw responseHandler(error);
+        throw error;
     }
 };
 
@@ -316,7 +310,7 @@ exports.listarClienteConquistas = async (query) => {
         ]);
 
     } catch (error) {
-        throw responseHandler(error);
+        throw error;
     }
 };
 
@@ -347,10 +341,10 @@ exports.entrarNoEstabelecimento = async (obj) => {
                 });
             }
             catch (err) {
-                throw responseHandler(err);
+                throw err;
             }
         }).catch(err => {
-            throw responseHandler(err);
+            throw err;
         });
     }
 
@@ -377,10 +371,10 @@ exports.sairDoEstabelecimento = async (obj) => {
                 return {status: true, msg: 'CLIENTE_SAIU'};
             });
         }).catch(err => {
-            throw responseHandler(err);
+            throw err;
         });
     }).catch(err => {
-        throw responseHandler(err);
+        throw err;
     });
 };
 
@@ -400,6 +394,6 @@ exports.recusarConviteEstabelecimento = async (obj) => {
         });
 
     }).catch(err => {
-        throw responseHandler(err);
+        throw err;
     });
 };

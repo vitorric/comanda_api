@@ -22,6 +22,12 @@ exports.resJsonP = (res, code, sucesso, retorno, msg) => {
     return res.status(code).jsonp({ sucesso: sucesso, retorno: retorno, msg });
 };
 
+exports.gerarChaveAmigavel = () =>
+{
+    let chaveAmigavel = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
+    return chaveAmigavel.toUpperCase();
+};
+
 /**
 * Função The Default Error Handler para tratar error do mongodb
 * @param {object} error object com lista de erro

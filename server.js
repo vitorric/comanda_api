@@ -22,6 +22,8 @@ require('./src/conn/mongo');
  */
 require('./src/service/passaport')();
 
+global.Mensagens = require('./locales/br.json');
+
 
 /**
  * @description inicia os servicos de mongo watch
