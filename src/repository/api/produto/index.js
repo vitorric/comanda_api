@@ -1,40 +1,34 @@
-const { schemaEstabelecimento } = require('../../../schema/api/estabelecimento'),
-    { schemaProduto } = require('../../../schema/api/produto'),
-    { responseHandler, ObjectIdCast } = require('../../../utils');
+const { schemaProduto } = require('../../../schema/api/produto'),
+    { ObjectIdCast } = require('../../../utils');
 
-exports.cadastrarProduto = async (obj) => {
+exports.cadastrarProduto = async produto => {
+    try
+    {
+        let produtoNovo = new schemaProduto(produto);
 
-    let post = new schemaProduto(obj);
-
-    const estabelecimento = await schemaEstabelecimento.findById(post.estabelecimento);
-
-    return await post.save().then(() => {
-        estabelecimento.produtos.push(post._id);
-        return schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento).then(() => {
-            return post;
-        }).catch(err => {
-            throw responseHandler(err);
-        });
-    }).catch(err => {
-        throw responseHandler(err);
-    });
+        return await schemaProduto.create(produtoNovo);
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarProduto:', error);
+    }
 };
 
-exports.listarProdutos = async (obj) => {
-    const nomeProd = (!obj.nome) ? '' : obj.nome;
-    const idEstabelecimento = obj.idEstabelecimento;
+exports.listarProdutos = async (estabelecimentoId, nomeProd) => {
 
-    try {
+    try
+    {
         return await schemaProduto.aggregate([
             {
                 $match: {
-                    estabelecimento: ObjectIdCast(idEstabelecimento),
+                    estabelecimento: ObjectIdCast(estabelecimentoId),
                     status: { $lt: 2 } ,
                     nome: {'$regex' : nomeProd, '$options' : 'i'}
                 }
             }
-        ]);
-    } catch (error) {
-        throw responseHandler(error);
+        ]).exec();
+    }
+    catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarProdutos:', error);
     }
 };

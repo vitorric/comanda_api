@@ -3,28 +3,26 @@ module.exports = () => {
         JwtStrategy = require('passport-jwt').Strategy,
         ExtractJwt = require('passport-jwt').ExtractJwt,
         LocalStrategy = require('passport-local').Strategy,
-        { JWT_SECRET } = require('../../../config'),
+        { JWT_SECRET } = require('../../../../config'),
         { schemaCliente } = require('../../../schema/api/cliente');
 
     passport.use('clienteAuth', new JwtStrategy({
-        jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: JWT_SECRET
     }, async(payload,done) => {
 
         try{
-            if (!payload.user)
+            if (!payload.auth)
                 return done(null, false);
 
-            // Find the user specified in token
-            const cliente = await schemaCliente.findById(payload.user._id);
+            const cliente = await schemaCliente.findById(payload.auth._id);
 
-            //If user doesn't exists, handle it
             if(!cliente){
                 return done(null, false);
             }
 
             // Otherwise, return the user
-            done(null, cliente);
+            done(null, {clienteId: cliente._id, avatarId: cliente.avatar._id });
         }catch(error){
             done(error,false);
         }
@@ -34,13 +32,14 @@ module.exports = () => {
     passport.use('cliente', new LocalStrategy({
         usernameField: 'email'
     }, async (email, password, done) => {
+        
         try{
             // Find the user given the email
             const cliente = await schemaCliente.findOne({email});
-
+            
             // If not, handle it
             if (!cliente){
-                return done(null, {msg: 'NO_FOUND_USER'});
+                return done(null, null);
             }
 
             // Check if the password is corret
@@ -48,11 +47,11 @@ module.exports = () => {
 
             // If not, handle it
             if (!isMatch){
-                return done(null, {msg: 'NO_FOUND_USER'});
+                return done(null, null);
             }
 
             // Otherwise, return the cliente
-            done(null, cliente);
+            done(null, cliente._id);
 
         }catch(error){
             done(error, false);

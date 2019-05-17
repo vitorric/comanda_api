@@ -2,44 +2,39 @@ const { avatarSchema } = require('../../../schema/api/avatar'),
     { ObjectIdCast } = require('../../../utils');
 
 
-exports.cadastrarAvatar = async (avatar) => {
+exports.cadastrarAvatar = async avatar => {
     try
     {
         let novoAvatar = new avatarSchema(avatar);
 
-        return await avatarSchema.create(novoAvatar).catch(err => {
-            console.log(err);
-            throw err;
-        });
+        return await avatarSchema.create(novoAvatar);
     }
     catch(error)
     {
-        console.log(error);
-        throw error;
+        console.log('\x1b[31m%s\x1b[0m', 'Erro em cadastrarAvatar:', error);
     }
 };
 
-exports.obterAvatar = async (_id) => {
+exports.obterAvatar = (_id) => {
     try
     {
-        return await avatarSchema.findOne(
+        return avatarSchema.findOne(
             {
                 _id: ObjectIdCast(_id)
-            });
+            }).exec();
     }
     catch (error)
     {
-        console.log(error);
-        throw error;
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterAvatar:', error);
     }
 };
 
-exports.alterarAvatar = (avatar) => {
+exports.alterarAvatar = async (avatarId, avatar) => {
     try
     {
-        let avatarAlterado = avatarSchema.findOneAndUpdate(
+        let avatarAlterado = await avatarSchema.findOneAndUpdate(
             {
-                _id: ObjectIdCast(avatar._idCliente)
+                _id: ObjectIdCast(avatarId)
             },
             {
                 $set: {
@@ -59,8 +54,7 @@ exports.alterarAvatar = (avatar) => {
                     corBarba: avatar.corBarba
                 }
 
-            })
-            .exec();
+            }).exec();
 
         if (!avatarAlterado){
             return false;
@@ -70,14 +64,13 @@ exports.alterarAvatar = (avatar) => {
     }
     catch(error)
     {
-        console.log('Error alterarAvatar: ', error);
-        throw error;
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarAvatar:', error);
     }
 
 };
 
 
-exports.alterarExp = async (avatarId, exp, level) => {
+exports.alterarExp = (avatarId, exp, level) => {
 
     try
     {
@@ -91,8 +84,7 @@ exports.alterarExp = async (avatarId, exp, level) => {
                     level: level
                 }
 
-            })
-            .exec();
+            }).exec();
 
         if (!avatarAlterado){
             return false;
@@ -102,8 +94,7 @@ exports.alterarExp = async (avatarId, exp, level) => {
     }
     catch(error)
     {
-        console.log('Error alterarAvatar: ', error);
-        throw error;
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarExp:', error);
     }
 
 };

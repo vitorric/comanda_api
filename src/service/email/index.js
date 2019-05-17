@@ -1,4 +1,4 @@
-module.exports = (cliente, novaSenha) => {
+module.exports = (emailCliente, nomeCliente, novaSenha) => {
 
     var nodemailer = require('nodemailer');
     const { EMAIL, EMAIL_SENHA } = require('../../../config');
@@ -18,9 +18,9 @@ module.exports = (cliente, novaSenha) => {
     // para enviarmos, para isso basta criar um objeto com algumas configurações
     var email = {
         from: EMAIL, // Quem enviou este e-mail
-        to: cliente.email, // Quem receberá
+        to: emailCliente, // Quem receberá
         subject: 'Recuperação de Senha',  // Um assunto bacana :-)
-        html: 'Olá '+cliente.nome+',<br/> Conforme solicitado, segue sua nova senha: <strong>'+novaSenha+'</strong> <br/>' // O conteúdo do e-mail
+        html: 'Olá '+nomeCliente+',<br/> Conforme solicitado, segue sua nova senha: <strong>'+novaSenha+'</strong> <br/>' // O conteúdo do e-mail
     };
 
     // Pronto, tudo em mãos, basta informar para o transporte

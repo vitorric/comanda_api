@@ -1,10 +1,27 @@
 {
+	"DADOS_INVALIDOS": "Dados inválidos!",
+	"SOLICITACAO_INVALIDA": "Solicitação inválida, tenta novamente!",
 	"AVATAR_CADASTRAR_ERRO": "Erro ao cadastrar o avatar!",
 	"AVATAR_ALTERAR_ERRO": "Erro ao alterar o avatar!",
 	"CLIENTE_CADASTRAR_ERRO": "Erro ao cadastrar o cliente!",
 	"CLIENTE_CADASTRAR_EMAIL": "Este email já está em uso!",
 	"CLIENTE_CADASTRAR_APELIDO": "Este apelido já está em uso!",
 	"CLIENTE_ALTERAR_CONFIG_ERRO": "Erro ao alterar a configuração do aplicativo!",
+	"CLIENTE_ALTERAR_ERRO": "Erro ao alterar o cliente!",
+	"LOGIN_NAO_ENCONTRADO": "Usuário ou senha inválido!",
+	"ESTABELECIMENTO_CADASTRAR_ERRO": "Erro ao cadastrar o estabelecimento!",
+	"ESTABELECIMENTO_CADASTRAR_EMAIL": "Email já cadastrado!",
+	"ESTABELECIMENTO_CADASTRAR_CNPJ": "CNPJ já cadastrado!",
+	"ESTABELECIMENTO_NAO_ENCONTRADO": "Estabelecimento não encontrado!",
+	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP": "Você já está em um estabelecimento!",
+	"ESTABELECIMENTO_FECHADO": "Estabelecimento está fechado!",
+	"CLIENTE_ERRO_ENTRAR_ESTABELECIMENTO": "Erro ao entrar no estabelecimento!",
+	"CLIENTE_ERRO_SAIR_ESTABELECIMENTO": "Erro ao sair do estabelecimento!",
+	"USUARIO_NAO_ENCONTRADO": "Usuário não encontrado!",
+	"SENHA_RECUPERADA": "Uma nova senha de acesso foi enviada para seu email!",
+	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO": "O cliente já está ativo em um estabelecimento",
+	"CLIENTE_JA_TEM_CONVITE": "Este cliente já foi convidado por um estabelecimento!",
+	"ESTABELECIMENTO_CLIENTE_ADICIONAR_ERRO": "Erro ao adicionar o cliente no estabelecimento!",
 
 
 
@@ -16,6 +33,7 @@
 
 
 
+	"ESTABELECIMENTO_ABERTO": "Estabelecimento está aberto!",
 	"USER_SUCCESSFULLY": "User successfully registered",
 	"REGISTRATION_ERROR_USER": "There was an error in registering",
 	"REGISTRATION_ERROR_EMAIL": "E-mail already registered",
@@ -27,15 +45,11 @@
 	"obj is not defined": "obj is not defined",
 	"REGISTRATION_ERROR_CPF": "CPF already registered",
 	"REGISTRATION_ERROR_APELIDO": "Apelido already registered",
-	"SENHA_RECUPERADA": "Uma nova senha de acesso foi enviada para seu email!",
 	"Cannot read property 'msg' of undefined": "Cannot read property 'msg' of undefined",
 	"resultmsg is not defined": "resultmsg is not defined",
 	"REGISTRO_ALTERADO": "Registro alterado com sucesso!",
 	"cadastrar is not defined": "cadastrar is not defined",
-	"ESTABELECIMENTO_ABERTO": "Estabelecimento está aberto!",
-	"ESTABELECIMENTO_FECHADO": "Estabelecimento está fechado!",
 	"NOVO_CLIENTE_ADICIONADO": "Um novo cliente entrou no estabelecimento!",
-	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO": "O cliente já está ativo em um estabelecimento",
 	"Cannot read property 'status' of undefined": "Cannot read property 'status' of undefined",
 	"listarProdutos is not a function": "listarProdutos is not a function",
 	"ITEM_LOJA_SEM_ESTOQUE": "Estoque esgotado!",
@@ -43,12 +57,9 @@
 	"ITEM_NAO_ENCONTRADO": "O item não foi encontrado!",
 	"ITEM_COMPRADO": "Item comprado com sucesso!",
 	"ITEM_ENTREGUE": "Item marcado como entregue!",
-	"BEM_VINDO_CLIENTE": "Bem vindo ao estabelecimento ",
-	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP": "Você já está em um estabelecimento!",
 	"AVATAR_ALTERADO": "Avatar alterado com sucesso",
 	"CLIENTE_SAIU": "Você saiu do estabelecimento!",
 	"CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO": "O cliente não está no estabelecimento!",
 	"CLIENTE_JA_TEM_COMANDA": "O cliente já tem uma comanda!",
-	"CLIENTE_JA_TEM_CONVITE": "Este cliente já foi convidado por um estabelecimento!",
 	"CLIENTE_RECUSOU_CONVITE": "Cliente recusou o convite!"
 }

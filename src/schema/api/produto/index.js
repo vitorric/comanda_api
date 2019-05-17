@@ -15,7 +15,8 @@ const ProdutoSchema = new Schema(
             default: 'defaultIcon.png'
         },
         custo: {
-            type: Number
+            type: Number,
+            default: 0
         },
         estoque: {
             type: Number,
@@ -31,7 +32,7 @@ const ProdutoSchema = new Schema(
         },
         status:{
             type:Number,
-            default: 0
+            default: 1
         }
     }, {
         collection: 'produto',

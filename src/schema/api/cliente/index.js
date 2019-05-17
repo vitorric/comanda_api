@@ -145,22 +145,6 @@ ClienteSchema.methods.isValidPassword = async function(newPassword){
     }
 };
 
-ClienteSchema.methods.recuperarSenha = async function(){
-    try{
-        var randPassword = Array(10).fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').map(function(x) { return x[Math.floor(Math.random() * x.length)]; }).join('');
-
-        // Generate a salt
-        const salt = await bcrypt.genSalt(10);
-        // Gerenate a password hash (salt + hash)
-        const passwordHash = await bcrypt.hash(randPassword, salt);
-        this.password = passwordHash;
-
-        return randPassword;
-    }catch(error){
-        throw new Error(error);
-    }
-};
-
 ClienteSchema.methods.diminuirDinheiroNoEstabelecimento = function(objIdEstabelecimento, precoItem){
 
     this.goldPorEstabelecimento.map(function(value) {

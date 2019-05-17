@@ -1,6 +1,6 @@
 const connFb = require('../../../conn/firebase');
 
-exports.Criar = async (cliente) => {
+exports.FBCriarCliente = async (cliente) => {
     try
     {
         return await connFb.database().ref('clientes').child(cliente._id).set(cliente);
@@ -11,7 +11,7 @@ exports.Criar = async (cliente) => {
     }
 };
 
-exports.EntrarNoEstabelecimento = async (_idCliente, _idEstabelecimento, nomeEstabelecimento) => {
+exports.FBEntrarNoEstabelecimento = async (_idCliente, _idEstabelecimento, nomeEstabelecimento) => {
     try
     {
 
@@ -33,7 +33,7 @@ exports.EntrarNoEstabelecimento = async (_idCliente, _idEstabelecimento, nomeEst
     }
 };
 
-exports.RecusarSairDoEstabelecimento = async (_idCliente) => {
+exports.FBRecusarSairDoEstabelecimento = async (_idCliente) => {
     try
     {
 

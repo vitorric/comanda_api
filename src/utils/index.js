@@ -4,7 +4,9 @@
  * @module Library/Utils
  */
 const mongoose = require('mongoose'),
-    request = require('request');
+    request = require('request'),
+    bcrypt = require('bcryptjs'),
+    crypto = require('crypto');
 
 
 exports.ObjectIdCast = mongoose.mongo.ObjectId;
@@ -18,8 +20,8 @@ exports.ObjectIdCast = mongoose.mongo.ObjectId;
 * @param {string} msg [Mensagem que será enviada]
 * @return resposta da requisição (res.status....)
 */
-exports.resJsonP = (res, code, sucesso, retorno, msg) => {
-    return res.status(code).jsonp({ sucesso: sucesso, retorno: retorno, msg });
+exports.resJsonP = (res, code, sucesso, retorno, mensagem) => {
+    return res.status(code).jsonp({ sucesso: sucesso, retorno: retorno, mensagem: mensagem });
 };
 
 exports.gerarChaveAmigavel = () =>
@@ -27,6 +29,26 @@ exports.gerarChaveAmigavel = () =>
     let chaveAmigavel = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
     return chaveAmigavel.toUpperCase();
 };
+
+exports.getMD5 = (password) => crypto.createHash('md5').update(password, 'utf-8').digest('hex');
+
+exports.recuperarSenha = async () => {
+    try{
+        let randPassword = Array(10).fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').map(function(x) { return x[Math.floor(Math.random() * x.length)]; }).join('');
+
+        let md5Password = await crypto.createHash('md5').update(randPassword, 'utf-8').digest('hex');
+        console.log(md5Password);
+        // Generate a salt
+        let salt = await bcrypt.genSalt(10);
+        // Gerenate a password hash (salt + hash)
+        let passwordHash = await bcrypt.hash(md5Password, salt);
+
+        return { novaSenha: randPassword, novaSenhaBanco: passwordHash };
+    }catch(error){
+        throw new Error(error);
+    }
+};
+
 
 /**
 * Função The Default Error Handler para tratar error do mongodb
