@@ -1,67 +1,98 @@
 const { schemaComanda } = require('../../../schema/api/comanda'),
-    { schemaCliente } = require('../../../schema/api/cliente'),
-    { responseHandler } = require('../../../utils');
+    { ObjectIdCast } = require('../../../utils');
 
-exports.cadastrarComanda = async (obj) => {
+exports.cadastrarComanda = async comanda => {
+    try
+    {
+        let novaComanda = new schemaComanda(comanda);
 
-    let post = new schemaComanda(obj);
-
-    const cliente = await schemaCliente.findById(obj.cliente);
-
-    post.dataEntrada = new Date().getDate();
-    post.grupo.push(obj);
-
-    if (cliente.configClienteAtual.estabelecimento != obj.estabelecimento)
-        return {status: true, msg: 'CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO'};
-    else if (cliente.configClienteAtual.comanda != null)
-        return {status: true, msg: 'CLIENTE_JA_TEM_COMANDA'};
-
-    return await post.save().then(async () => {
-        cliente.configClienteAtual.comanda = post._id;
-        await schemaCliente.findByIdAndUpdate(cliente._id, cliente);
-        return post;
-    }).catch(err => {
-        throw responseHandler(err);
-    });
+        return await schemaComanda.create(novaComanda);
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarComanda:', error);
+    }
 };
 
-exports.cadastrarItemComanda = async (obj) => {
-
-    const { schemaProduto } = require('../../../schema/api/produto');
-
-    const comanda = await schemaComanda.findById(obj.comanda);
-    const produto = await schemaProduto.findById(obj.produto);
-
-    if (produto.estoque < obj.quantidade)
-        return {status: true, msg : 'ITEM_LOJA_SEM_ESTOQUE'};
-
-    let index = -1;
-    for (let i = 0; i < comanda.produtos.length; i++){
-        if (comanda.produtos[i].produto.toString() == produto._id.toString()) {
-            index = i;
-            break;
-        }
+exports.obterComandaLider = clienteId => {
+    try {
+        return schemaComanda.findOne(
+            {
+                grupo:
+                {
+                    $elemMatch: {
+                        cliente: ObjectIdCast(clienteId),
+                        lider: true
+                    }
+                }
+            }
+        ).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterComandaLider:', error);
     }
+};
 
-    if (index > -1) {
-        comanda.produtos[index].preco = produto.preco;
-        comanda.produtos[index].quantidade += obj.quantidade;
-        comanda.produtos[index].precoTotal += obj.quantidade * produto.preco;
-    }else{
-        obj.preco = produto.preco;
-        comanda.produtos.push(obj);
+exports.obterComanda = comandaId => {
+    try {
+        return schemaComanda.findOne(
+            {
+                _id: comandaId
+            }
+        ).exec();
+    }catch(error){
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterComanda:', error);
     }
+};
 
-    obj.precoTotal = obj.quantidade * produto.preco;
+exports.alterarGrupoComanda = async (comandaId, grupo) => {
 
-    produto.estoque -= obj.quantidade;
-    comanda.valorTotal += obj.precoTotal;
+    try {
 
-    return await schemaComanda.findByIdAndUpdate(comanda._id, comanda).then(async () => {
-        await schemaProduto.findByIdAndUpdate(produto._id, produto);
-        return comanda;
-    }).catch(err => {
-        throw responseHandler(err);
-    });
+        let comandaAlterada = await schemaComanda.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(comandaId)
+            },
+            {
+                $set: {
+                    grupo: grupo
+                }
+            }).exec();
 
+        if (!comandaAlterada)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarGrupoComanda:', error);
+        return false;
+    }
+};
+
+exports.cadastrarItemComanda = async (comandaId, produtos, valorTotal) => {
+
+    try {
+
+        let comandaAlterada = await schemaComanda.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(comandaId)
+            },
+            {
+                $set: {
+                    produtos: produtos,
+                    valorTotal: valorTotal
+                }
+            }).exec();
+
+        if (!comandaAlterada)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarItemComanda:', error);
+        return false;
+    }
 };

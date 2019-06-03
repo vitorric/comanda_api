@@ -15,9 +15,9 @@ exports.cadastrarEstabelecimento = async estabelecimento => {
     }
 };
 
-exports.listarParaClientes = nome => {
 
-    const nomeEstabelecimento = (!nome) ? '' : nome;
+
+exports.listarParaClientes = nome => {
 
     try {
         return schemaEstabelecimento.aggregate([
@@ -25,7 +25,48 @@ exports.listarParaClientes = nome => {
                 $match:
                 {
                     status: true,
-                    nome: {'$regex' : nomeEstabelecimento, '$options' : 'i'}
+                    nome: {'$regex' : nome, '$options' : 'i'}
+                }
+            },
+            {
+                $sort :
+                {
+                    'configEstabelecimentoAtual.estaAberta' : -1,
+                    'configEstabelecimentoAtual.clientesNoLocal' : -1
+                }
+            },
+            {
+                $project:
+                {
+                    configEstabelecimentoAtual: 1,
+                    emailContato: 1,
+                    tipo: 1,
+                    nome:1,
+                    cnpj:1,
+                    horarioAtendimentoInicio:1,
+                    horarioAtendimentoFim: 1,
+                    endereco: 1,
+                    descricao: 1,
+                    telefone:1,
+                    celular: 1,
+                }
+            }
+        ]).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarParaClientes:', error);
+        throw error;
+    }
+};
+
+exports.listarParaClientesCompleto = nome => {
+
+    try {
+        return schemaEstabelecimento.aggregate([
+            {
+                $match:
+                {
+                    status: true,
+                    nome: {'$regex' : nome, '$options' : 'i'}
                 }
             },
             { $unwind : { 'path': '$itensLoja' ,
@@ -51,29 +92,29 @@ exports.listarParaClientes = nome => {
                 }
             },
             { $sort : { 'itensLoja.hotSale': 1,'itensLoja.tempoDisponivel' : 1, 'itensLoja.quantidadeDisponivel' : 1 } },
-            { $unwind : { 'path': '$conquistas' ,
+            { $unwind : { 'path': '$desafios' ,
                 'preserveNullAndEmptyArrays': true} },
             {
                 $lookup:
                     {
-                        from: 'conquista',
-                        localField: 'conquistas',
+                        from: 'desafio',
+                        localField: 'desafios',
                         foreignField: '_id',
-                        as: 'conquistas'
+                        as: 'desafios'
                     }
             },
-            { $unwind : { 'path': '$conquistas' ,
+            { $unwind : { 'path': '$desafios' ,
                 'preserveNullAndEmptyArrays': true} },
             {
                 $match: {
                     $or:[
-                        { 'conquistas.status': 1 },
-                        { 'conquistas.status': null, }
+                        { 'desafios.status': 1 },
+                        { 'desafios.status': null, }
                     ]
 
                 }
             },
-            { $sort : { 'conquistas.tempoDuracao' : -1 } },
+            { $sort : { 'desafios.tempoDuracao' : -1 } },
             {
                 $group: { '_id': '$_id',
                     'status': { '$first': '$status' },
@@ -98,8 +139,8 @@ exports.listarParaClientes = nome => {
                             'estaAberta': '$configEstabelecimentoAtual.estaAberta',
                             'clientesNoLocal': '$configEstabelecimentoAtual.clientesNoLocal'
                         }},
-                    'conquistas': {
-                        '$addToSet':'$conquistas'
+                    'desafios': {
+                        '$addToSet':'$desafios'
                     },
                     'itensLoja': {
                         '$addToSet':{
@@ -175,29 +216,29 @@ exports.obterParaClientes = async estabelecimentoId => {
                 }
             },
             { $sort : { 'itensLoja.hotSale': 1,'itensLoja.tempoDisponivel' : 1, 'itensLoja.quantidadeDisponivel' : 1 } },
-            { $unwind : { 'path': '$conquistas' ,
+            { $unwind : { 'path': '$desafios' ,
                 'preserveNullAndEmptyArrays': true} },
             {
                 $lookup:
                     {
-                        from: 'conquista',
-                        localField: 'conquistas',
+                        from: 'desafio',
+                        localField: 'desafios',
                         foreignField: '_id',
-                        as: 'conquistas'
+                        as: 'desafios'
                     }
             },
-            { $unwind : { 'path': '$conquistas' ,
+            { $unwind : { 'path': '$desafios' ,
                 'preserveNullAndEmptyArrays': true} },
             {
                 $match: {
                     $or:[
-                        { 'conquistas.status': 1 },
-                        { 'conquistas.status': null, }
+                        { 'desafios.status': 1 },
+                        { 'desafios.status': null, }
                     ]
 
                 }
             },
-            { $sort : { 'conquistas.tempoDuracao' : -1 } },
+            { $sort : { 'desafios.tempoDuracao' : -1 } },
             {
                 $group: { '_id': '$_id',
                     'status': { '$first': '$status' },
@@ -222,8 +263,8 @@ exports.obterParaClientes = async estabelecimentoId => {
                             'estaAberta': '$configEstabelecimentoAtual.estaAberta',
                             'clientesNoLocal': '$configEstabelecimentoAtual.clientesNoLocal'
                         }},
-                    'conquistas': {
-                        '$addToSet':'$conquistas'
+                    'desafios': {
+                        '$addToSet':'$desafios'
                     },
                     'itensLoja': {
                         '$addToSet':{
@@ -339,9 +380,57 @@ exports.adicionarProdutoAoEstabelecimento = async (estabelecimentoId, produtos) 
     }
 };
 
+exports.adicionarItemNaLojaDoEstabelecimento = async (estabelecimentoId, itens) => {
+
+    try{
+        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(estabelecimentoId)
+            },
+            {
+                $set: {
+                    itensLoja: itens
+                }
+            }).exec();
+
+        if (!estabelcimentoAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in adicionarItemNaLojaDoEstabelecimento:', error);
+        return false;
+    }
+};
+
+exports.adicionarDesafiosAoEsabelecimento = async (estabelecimentoId, desafios) => {
+
+    try{
+        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(estabelecimentoId)
+            },
+            {
+                $set: {
+                    desafios: desafios
+                }
+            }).exec();
+
+        if (!estabelcimentoAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in adicionarDesafiosAoEsabelecimento:', error);
+        return false;
+    }
+};
+
 //---------------------------------------------------------------------- REFAZER PRA BAIXO
-
-
 
 exports.listarParaFirebase = async (obj) => {
     const nomeEstabelecimento = (!obj.nome) ? '' : obj.nome;
@@ -407,15 +496,15 @@ exports.listarParaFirebase = async (obj) => {
             {
                 $lookup:
                     {
-                        from: 'conquista',
-                        let: { conquistaID: '$conquistas'},
+                        from: 'desafio',
+                        let: { desafioID: '$desafios'},
                         pipeline: [
                             {
                                 $match: {
                                     $and: [
                                         {
                                             $expr: {
-                                                $in: [ '$_id', '$$conquistaID'],
+                                                $in: [ '$_id', '$$desafioID'],
                                             }
                                         },
                                         {
@@ -449,14 +538,14 @@ exports.listarParaFirebase = async (obj) => {
                             }
 
                         ],
-                        as: 'conquistas'
+                        as: 'desafios'
                     }
             },
-            { $unwind : { 'path': '$conquistas' , 'preserveNullAndEmptyArrays': true} },
+            { $unwind : { 'path': '$desafios' , 'preserveNullAndEmptyArrays': true} },
             {
                 $project: {
                     'status': 1,'nome': 1,'tipo':1,'descricao':1,'horarioAtendimentoInicio':1,'horarioAtendimentoFim':1,'celular':1,'telefone':1,'emailContato':1, 'itensLoja': 1,
-                    'endereco': 1, 'configEstabelecimentoAtual': 1, 'conquistas': 1
+                    'endereco': 1, 'configEstabelecimentoAtual': 1, 'desafios': 1
                 }
             },
             { $sort : { 'configEstabelecimentoAtual.estaAberta' : -1, 'configEstabelecimentoAtual.clientesNoLocal' : -1 } },
@@ -479,33 +568,4 @@ exports.listarParaFirebase = async (obj) => {
         console.log('erro na listagem do estabelcimento ' + error);
         throw error;
     }
-};
-
-exports.alterarStatusEntregaItem = async (obj) => {
-
-    const { schemaHistoricoCompraLojas } = require('../../../schema/api/historicoCompraLojas');
-
-    const historicoCompra = await schemaHistoricoCompraLojas.findById(obj.idHistoricoCompra);
-
-    historicoCompra.infoEntrega.jaEntregue = true;
-    historicoCompra.infoEntrega.dataEntrega = new Date();
-
-    return await schemaHistoricoCompraLojas.findByIdAndUpdate(historicoCompra._id, historicoCompra).then(() => {
-        return {status: true, msg: 'ITEM_ENTREGUE'};
-    }).catch(err => {
-        throw err;
-    });
-};
-
-exports.inserirItemNaLojaDoEstabelecimento = async (obj) => {
-
-    const estabelecimento = await schemaEstabelecimento.findById(obj.idEstabelecimento);
-
-    estabelecimento.itensLoja.push({item: obj.idItemLoja, quantidadeDisponivel: obj.quantidade, tempoDisponivel: obj.tempoDisponivel});
-
-    return schemaEstabelecimento.findByIdAndUpdate(estabelecimento._id, estabelecimento).then(() => {
-        return estabelecimento;
-    }).catch(err => {
-        throw err;
-    });
 };

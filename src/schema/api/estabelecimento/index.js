@@ -25,6 +25,9 @@ const EstabelecimentoSchema = new Schema(
             type: String,
             required: true
         },
+        icon:{
+            type: String
+        },
         descricao:{
             type: String
         },
@@ -86,9 +89,9 @@ const EstabelecimentoSchema = new Schema(
                 ref: 'cliente'
             }]
         },
-        conquistas:[{
+        desafios:[{
             type: Schema.Types.ObjectId,
-            ref: 'conquista'
+            ref: 'desafio'
         }],
         produtos:[{
             type: Schema.Types.ObjectId,

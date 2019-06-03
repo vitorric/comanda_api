@@ -35,13 +35,14 @@ const ItemLojaSchema = new Schema(
             default: 1
         },
         tempoDisponivel:{
-            type:Date
+            type:Date,
+            required: true
         },
         estabelecimento:{
             type: Schema.Types.ObjectId,
             ref: 'estabelecimento'
         },
-        produtoRef:{
+        produto:{
             type: Schema.Types.ObjectId,
             ref: 'produto'
         }

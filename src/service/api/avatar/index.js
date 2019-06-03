@@ -1,4 +1,5 @@
-const { alterarAvatar, cadastrarAvatar } = require('../../../repository/api/avatar');
+const { alterarAvatar, cadastrarAvatar } = require('../../../repository/api/avatar'),
+    { FBAlterarAvatar } = require('../../firebase/avatar');
 
 exports.CadastrarAvatar = async (avatar) => {
 
@@ -26,33 +27,43 @@ exports.CadastrarAvatar = async (avatar) => {
     });
 };
 
-exports.AlterarAvatar = async (avatarId, avatar) => {
+exports.AlterarAvatar = async (clienteId, avatarId, avatar) => {
 
-    if (!avatarId ||
-        !avatar.corpo ||
-        !avatar.cabeca ||
-        !avatar.nariz ||
-        !avatar.olhos ||
-        !avatar.boca ||
-        !avatar.roupa ||
-        !avatar.cabeloTraseiro ||
-        !avatar.cabeloFrontal ||
-        !avatar.barba ||
-        !avatar.sombrancelhas ||
-        !avatar.orelha ||
-        !avatar.corPele ||
-        !avatar.corCabelo ||
-        !avatar.corBarba)
-    {
-        // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.AVATAR_ALTERAR_ERRO };
+    try{
+
+        if (!avatarId ||
+            !avatar.corpo ||
+            !avatar.cabeca ||
+            !avatar.nariz ||
+            !avatar.olhos ||
+            !avatar.boca ||
+            !avatar.roupa ||
+            !avatar.cabeloTraseiro ||
+            !avatar.cabeloFrontal ||
+            !avatar.barba ||
+            !avatar.sombrancelhas ||
+            !avatar.orelha ||
+            !avatar.corPele ||
+            !avatar.corCabelo ||
+            !avatar.corBarba)
+        {
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+        }
+
+        let avatarAlterado = await alterarAvatar(avatarId, avatar);
+
+        if (!avatarAlterado)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+
+        FBAlterarAvatar(clienteId, avatar);
+        return {status: true};
     }
+    catch(error){
 
-    return await alterarAvatar(avatarId, avatar).then((result) => {
-        return { status: !result ? false : true };
-    }).catch((error) => {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarAvatar:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.AVATAR_ALTERAR_ERRO };
-    });
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
 };

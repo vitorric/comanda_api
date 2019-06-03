@@ -28,6 +28,10 @@ const ComandaSchema = new Schema(
                 type: Schema.Types.ObjectId,
                 ref: 'cliente'
             },
+            lider: {
+                type: Boolean,
+                default: false
+            },
             valorPago:{
                 type: Number,
                 default: 0

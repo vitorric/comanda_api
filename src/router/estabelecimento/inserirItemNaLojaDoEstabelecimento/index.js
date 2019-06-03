@@ -1,7 +1,11 @@
-const { InserirItemNaLojaDoEstabelecimento } = require('../../../service/api/estabelecimento'),
+const { CadastrarItemLoja } = require('../../../service/api/itemLoja'),
     { resJsonP } = require('../../../utils');
 
 module.exports = () => (req, res) => {
-    const obj = req.body;
-    InserirItemNaLojaDoEstabelecimento(obj).then((result) => result.resulObj.msg ? resJsonP(res, 200, false, null,  res.__(result.resulObj.msg) ) : resJsonP(res, 200, result.status, !result.msg ? result.resulObj : res.__(result.msg))).catch((err) => resJsonP(res, 200, false,null, res.__(err.message)));
+    CadastrarItemLoja(req.user.estabelecimentoId, req.body).then((result) => resJsonP(res, 200, result.status, result.objeto, result.mensagem))
+        .catch((error) => {
+            console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarItemLoja:', error);
+            // eslint-disable-next-line no-undef
+            resJsonP(res, 200, false, null, Mensagens.SOLICITACAO_INVALIDA);
+        });
 };

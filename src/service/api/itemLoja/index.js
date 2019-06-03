@@ -1,20 +1,107 @@
-const { cadastrarItemLoja, listarItemLoja } = require('../../../repository/api/itemLoja');
+const   { cadastrarItemLoja,
+        listarItemLoja,
+        alterarItemLoja } = require('../../../repository/api/itemLoja'),
+    { obterEstabelecimento, adicionarItemNaLojaDoEstabelecimento } = require('../../../repository/api/estabelecimento'),
+    { AdicionarItemEstabelecimento } = require('../../firebase/estabelecimento');
 
-exports.CadastrarItemLoja = async (obj) => {
-    return await cadastrarItemLoja(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        return { status: false, msg: err === 0 ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
+exports.CadastrarItemLoja = async (estabelecimentoId, item) =>
+{
+    try
+    {
+        if (!estabelecimentoId ||
+            !item.nome ||
+            !item.produto ||
+            !item.tempoDisponivel)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+        let estabelecimento = await obterEstabelecimento(estabelecimentoId);
+
+        if (!estabelecimento)
+        // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+        item.estabelecimento = estabelecimentoId;
+
+        let novoItem = await cadastrarItemLoja(item);
+
+        if (!novoItem){
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+        }
+
+        estabelecimento.itensLoja.push(novoItem._id);
+
+        let itemAdicionado = await adicionarItemNaLojaDoEstabelecimento(estabelecimentoId, estabelecimento.itensLoja);
+
+        if (!itemAdicionado)
+        {
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+        }
+
+        AdicionarItemEstabelecimento(estabelecimentoId, novoItem);
+
+        return { status: true , objeto: novoItem};
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarItemLoja:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
 };
 
-exports.ListarItemLoja = async (obj) => {
-    return await listarItemLoja(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        console.log('registerUser errr:', err);
-        return { status: false, msg: !err ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
+exports.AlterarItemLoja = async (item) =>
+{
+    try
+    {
+        if (!item._id ||
+            !item.nome ||
+            !item.tempoDisponivel)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+        let itemAlterado = await alterarItemLoja(item);
+
+        if (!itemAlterado)
+        {
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+        }
+
+        return { status: true };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarItemLoja:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+
+exports.ListarItemLoja = async (estabelecimentoId, nomeItem) => {
+    try
+    {
+        if (!estabelecimentoId)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+        let itens = await listarItemLoja(estabelecimentoId, (!nomeItem) ? '' : nomeItem);
+
+        if (!itens)
+        {
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+        }
+
+        return { status: true, objeto: itens} ;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarItemLoja:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
 };

@@ -36,7 +36,7 @@
   "scripts": {
     "test": "NODE_ENV=test istanbul cover -x ./  --report text --report lcov jasmine test/**/**/*_[sS]pec.js",
     "start": "nodemon index.js",
-    "gen-doc": "apidoc -i src/ -o apidoc/ && jsdoc -c ./jsdoc_conf.json"
+    "gen-doc": "apidoc -i src/ -o apidoc/"
   },
   "author": "Vitor Ricardo",
   "license": "ISC"

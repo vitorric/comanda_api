@@ -15,6 +15,11 @@ const HistoricoCompraLojas = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'itemLoja'
         },
+        chaveUnica:{
+            type: String,
+            unique: true,
+            required: true
+        },
         precoItem:{
             type: Number,
             required: true

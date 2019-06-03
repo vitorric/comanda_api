@@ -87,23 +87,37 @@ const ClienteSchema = new Schema(
             nomeEstabelecimento: {
                 type: String
             },
+            convitesComanda: [{
+                liderComanda: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'cliente'
+                },
+                comanda: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'comanda'
+                }
+            }],
             comanda: {
                 type: Schema.Types.ObjectId,
                 ref: 'comanda'
             }
         },
-        conquistas:[{
-            conquista:{
+        desafios:[{
+            desafio:{
                 type: Schema.Types.ObjectId,
-                ref: 'conquista'
+                ref: 'desafio'
             },
-            quantidadeParaObter:{
+            progresso:{
                 type: Number,
                 default: 0
             },
             estabelecimento:{
                 type: Schema.Types.ObjectId,
                 ref: 'estabelecimento'
+            },
+            resgatouPremio:{
+                type: Boolean,
+                default: false
             },
             concluido:{
                 type:Boolean,
@@ -143,15 +157,6 @@ ClienteSchema.methods.isValidPassword = async function(newPassword){
     }catch(error){
         throw new Error(error);
     }
-};
-
-ClienteSchema.methods.diminuirDinheiroNoEstabelecimento = function(objIdEstabelecimento, precoItem){
-
-    this.goldPorEstabelecimento.map(function(value) {
-        if (value.estabelecimento == objIdEstabelecimento){
-            value.gold -= precoItem;
-        }
-    });
 };
 
 exports.schemaCliente =  conn.model('cliente', ClienteSchema, 'cliente');

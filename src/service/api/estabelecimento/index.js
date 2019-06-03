@@ -1,21 +1,17 @@
 const { cadastrarEstabelecimento,
-        obterEstabelecimentoViaToken,
-        obterParaAdmin,
         obterEstabelecimentoEmail,
         obterParaClientes,
         obterEstabelecimento,
-        alterarStatusEntregaItem,
         alterarStatusEstabOnline,
-        inserirItemNaLojaDoEstabelecimento,
-        listarParaAdmin,
         listarParaClientes } = require('../../../repository/api/estabelecimento'),
     { obterCliente, alterarConfigClienteAtual, removerTodosOsClientesDeUmEstabelecimento } = require('../../../repository/api/cliente'),
+    { obterHistoricoCompra, alterarStatusEntregaItem } = require('../../../repository/api/historicoCompraLojas'),
     { cadastrarRole } = require('../../../repository/api/role'),
     { criarToken } = require('../../passaport/criarToken'),
     { FBAdicionarClienteAoEstabelecimento } = require('../../firebase/estabelecimento');
 
-//ok
-exports.CadastrarEstabelecimento = async (estabelecimento) => {
+
+exports.CadastrarEstabelecimento = async estabelecimento => {
 
     try
     {
@@ -83,7 +79,7 @@ exports.CadastrarEstabelecimento = async (estabelecimento) => {
     }
 };
 
-//ok
+
 exports.ObterParaClientes = async estabelecimentoId => {
     try
     {
@@ -104,11 +100,12 @@ exports.ObterParaClientes = async estabelecimentoId => {
     }
 };
 
-//ok
-exports.ListarParaClientes = async (nome) => {
+
+exports.ListarParaClientes = async nome => {
+
     try
     {
-        let estabelecimentos = await listarParaClientes(nome);
+        let estabelecimentos = await listarParaClientes((!nome) ? '' : nome);
         return { status: true, objeto: estabelecimentos };
     }
     catch(error)
@@ -119,8 +116,8 @@ exports.ListarParaClientes = async (nome) => {
     }
 };
 
-//ok
-exports.LoginEstabelecimento = async (user) => {
+
+exports.LoginEstabelecimento = async user => {
     try
     {
         if (user == null)
@@ -152,7 +149,7 @@ exports.LoginEstabelecimento = async (user) => {
     }
 };
 
-//ok
+
 exports.AdicionarClienteAoEstabelecimento = async (estabelecimentoId, clienteId) => {
 
     try
@@ -198,7 +195,7 @@ exports.AdicionarClienteAoEstabelecimento = async (estabelecimentoId, clienteId)
     }
 };
 
-//ok
+
 exports.AlterarStatusEstabOnline = async (estabelecimentoId, status) => {
 
     try
@@ -219,7 +216,8 @@ exports.AlterarStatusEstabOnline = async (estabelecimentoId, status) => {
             return {status: true};
         }
 
-        return {status: false};
+        // eslint-disable-next-line no-undef
+        return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
     }
     catch(error)
     {
@@ -228,51 +226,61 @@ exports.AlterarStatusEstabOnline = async (estabelecimentoId, status) => {
     }
 };
 
-exports.AlterarStatusEntregaItem = async (obj) => {
-    return await alterarStatusEntregaItem(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        return { status: false, msg: err === 0 ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
+exports.AlterarStatusEstabOnline = async (estabelecimentoId, status) => {
+
+    try
+    {
+        let estabelecimento = await obterEstabelecimento(estabelecimentoId);
+
+        if (!status)
+        {
+            await removerTodosOsClientesDeUmEstabelecimento(estabelecimento.configEstabelecimentoAtual.clientesNoLocal);
+
+            estabelecimento.configEstabelecimentoAtual.clientesNoLocal = [];
+        }
+
+        let alterado = await alterarStatusEstabOnline(estabelecimentoId, status, estabelecimento.configEstabelecimentoAtual.clientesNoLocal);
+
+        if (alterado)
+        {
+            return {status: true};
+        }
+
+        // eslint-disable-next-line no-undef
+        return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarStatusEstabOnline:', error);
+        return {status: false};
+    }
 };
 
-exports.InserirItemNaLojaDoEstabelecimento = async (obj) => {
-    return await inserirItemNaLojaDoEstabelecimento(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        return { status: false, msg: err === 0 ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
-};
+exports.AlterarStatusEntregaItem = async (estabelecimentoId, clienteId, chaveUnica, status) => {
 
-exports.ListarParaAdmin = async (obj) => {
-    return await listarParaAdmin(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        console.log('registerUser errr:', err);
-        return { status: false, msg: !err ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
-};
+    try
+    {
+        let historico = await obterHistoricoCompra(estabelecimentoId, clienteId, chaveUnica);
 
+        if (!historico)
+        {
+            // eslint-disable-next-line no-undef
+            return { status: false, mensagem: Mensagens.DADOS_INVALIDOS};
+        }
 
-exports.ObterEstabelecimentoViaToken = async (obj) => {
-    return await obterEstabelecimentoViaToken(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        console.log('registerUser errr:', err);
-        return { status: false, msg: !err };
-    });
-};
+        let alterado = await alterarStatusEntregaItem(estabelecimentoId, clienteId, status, new Date());
 
-exports.ObterParaAdmin = async (obj) => {
-    return await obterParaAdmin(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        console.log('registerUser errr:', err);
-        return { status: false, msg: !err ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
+        if (alterado)
+        {
+            return {status: true};
+        }
+
+        // eslint-disable-next-line no-undef
+        return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarStatusEntregaItem:', error);
+        return {status: false};
+    }
 };

@@ -8,10 +8,28 @@ exports.FBCriarCliente = async (cliente) => {
     catch(err)
     {
         console.log(err);
+        throw err;
     }
 };
 
-exports.FBEntrarNoEstabelecimento = async (_idCliente, _idEstabelecimento, nomeEstabelecimento) => {
+exports.FBAlterarCliente = async (clienteId, cliente) => {
+    try
+    {
+        var updates = {};
+        updates['/clientes/' + clienteId + '/nome'] = cliente.nome;
+        updates['/clientes/' + clienteId + '/cpf'] = cliente.cpf;
+        updates['/clientes/' + clienteId + '/dataNascimento'] = cliente.dataNascimento;
+
+        connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
+exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEstabelecimento) => {
     try
     {
 
@@ -23,17 +41,18 @@ exports.FBEntrarNoEstabelecimento = async (_idCliente, _idEstabelecimento, nomeE
         };
 
         var updates = {};
-        updates['/clientes/' + _idCliente + '/configClienteAtual'] = configAtualCliente;
+        updates['/clientes/' + clienteId + '/configClienteAtual'] = configAtualCliente;
 
         return await connFb.database().ref().update(updates);
     }
     catch(err)
     {
         console.log(err);
+        throw err;
     }
 };
 
-exports.FBRecusarSairDoEstabelecimento = async (_idCliente) => {
+exports.FBRecusarSairDoEstabelecimento = async (clienteId) => {
     try
     {
 
@@ -42,12 +61,29 @@ exports.FBRecusarSairDoEstabelecimento = async (_idCliente) => {
         };
 
         var updates = {};
-        updates['/clientes/' + _idCliente + '/configClienteAtual'] = configAtualCliente;
+        updates['/clientes/' + clienteId + '/configClienteAtual'] = configAtualCliente;
 
         return await connFb.database().ref().update(updates);
     }
     catch(err)
     {
         console.log(err);
+        throw err;
+    }
+};
+
+exports.FBAlterarConfigApp = (clienteId, configApp) => {
+    try
+    {
+        var updates = {};
+        updates['/clientes/' + clienteId + '/configApp/somFundo'] = configApp.somFundo;
+        updates['/clientes/' + clienteId + '/configApp/somGeral'] = configApp.somGeral;
+
+        connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
     }
 };

@@ -86,6 +86,8 @@ exports.obterCliente = clienteId => {
                     },
                     apelido: 1,
                     sexo: 1,
+                    email: 1,
+                    chaveAmigavel: 1,
                     cpf: 1,
                     nome: 1,
                     status: 1,
@@ -102,12 +104,56 @@ exports.obterCliente = clienteId => {
     }
 };
 
-exports.obterClienteEmail = email => {
+exports.obterClienteCompleto = clienteId => {
     try {
-        return schemaCliente.findOne({ email: email }).exec();
+        return schemaCliente.findOne({_id: clienteId}).exec();
     } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteCompleto:', error);
+    }
+};
+
+exports.obterClienteChaveUnica = chaveAmigavel => {
+    try {
+        return schemaCliente.findOne({chaveAmigavel: chaveAmigavel}).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteChaveUnica:', error);
+    }
+};
+
+exports.obterClienteEmail = email => {
+    try
+    {
+        return schemaCliente.findOne({ email: email }).exec();
+    }
+    catch (error)
+    {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteEmail:', error);
     }
+};
+
+exports.listarClientesParaDesafios = async clientes =>
+{
+    try {
+        return await schemaCliente.aggregate([
+            {
+                $match:
+                {
+                    _id: {$in: clientes}
+                }
+            },
+
+            {
+                $project: {
+                    desafios: 1,
+                    goldGeral:1,
+                    pontos: 1,
+                    goldPorEstabelecimento: 1
+                }
+            }]).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarClientesParaDesafios:', error);
+    }
+
 };
 
 exports.alterarClienteConfigApp = async (clienteId, somFundo, somGeral) => {
@@ -148,12 +194,9 @@ exports.alterarCliente = async (clienteId, cliente) => {
             },
             {
                 $set: {
-                    status: cliente.status,
                     nome: cliente.nome,
                     cpf: cliente.cpf,
-                    dataNascimento: cliente.dataNascimento,
-                    pontos: cliente.pontos,
-                    goldGeral: cliente.goldGeral
+                    dataNascimento: cliente.dataNascimento
                 }
 
             }).exec();
@@ -209,7 +252,6 @@ exports.listarClientes = async () => {
     }
 };
 
-
 exports.alterarConfigClienteAtual = async (clienteId, configClienteAtual) => {
 
     try{
@@ -235,6 +277,84 @@ exports.alterarConfigClienteAtual = async (clienteId, configClienteAtual) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in entrarNoEstabelecimento:', error);
+        return false;
+    }
+};
+
+exports.alterarConfigClienteAtualComanda = async (clienteId, comandaId) => {
+
+    try{
+        let clienteAlterado = await schemaCliente.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    'configClienteAtual.comanda': comandaId,
+                    'configClienteAtual.convitesComanda': []
+                }
+            }).exec();
+
+        if (!clienteAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarConfigClienteAtualComanda:', error);
+        return false;
+    }
+};
+
+exports.alterarConfigClienteAtualConvitesComanda = async (clienteId, convitesComanda) => {
+
+    try
+    {
+        let clienteAlterado = await schemaCliente.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    'configClienteAtual.convitesComanda': convitesComanda
+                }
+            }).exec();
+
+        if (!clienteAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarConfigClienteAtualComanda:', error);
+        return false;
+    }
+
+};
+
+exports.alterarGoldsEstabelecimento = async (clienteId, goldPorEstabelecimento) => {
+
+    try{
+        let clienteAlterado = await schemaCliente.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    goldPorEstabelecimento: goldPorEstabelecimento
+                }
+            }).exec();
+
+        if (!clienteAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarGoldsEstabelecimento:', error);
         return false;
     }
 };
@@ -265,21 +385,48 @@ exports.removerTodosOsClientesDeUmEstabelecimento = async clientes => {
     }
 };
 
+exports.alterarClienteParaDesafio = async (clienteId, cliente) => {
+
+    try
+    {
+        let clienteAlterado = await schemaCliente.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    desafios: cliente.desafios,
+                    pontos: cliente.pontos
+                }
+            }).exec();
+
+        if (!clienteAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarClienteParaDesafio:', error);
+        return false;
+    }
+};
+
 //---------------------------------------------------------------------- REFAZER PRA BAIXO
 
-exports.listarClienteConquistas = async (query) => {
+exports.listarClienteDesafios = async (query) => {
     try {
         return await schemaCliente.aggregate([
             {
                 $match:
                 {
-                    'conquistas.estabelecimento': ObjectIdCast(query._idEstabelecimento),
+                    'desafios.estabelecimento': ObjectIdCast(query._idEstabelecimento),
                     '_id': ObjectIdCast(query._idCliente)
                 }
             },
             {
                 $project:{
-                    'conquistas': 1
+                    'desafios': 1
                 }
             }
         ]);

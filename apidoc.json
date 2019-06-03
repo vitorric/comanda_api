@@ -1,8 +1,8 @@
 {
-    "name": "API",
+    "name": "comanda-api",
     "version": "1.0.0",
-    "description": "uma agenda simple, cadastro, edit, list. If Testing API extension for visual code  <a href='  https://marketplace.visualstudio.com/items?itemName=just4developments.testing-api'>testing-api</a>",
-    "title": "Projeto Agenda",
+    "description": "A API refere-se a um projeto de Comanda Gameficada, aqui encontra-se tudo o que se precisa para se comunicar com o sistema administrativo e com o aplicativo.",
+    "title": "Comanda Gameficada",
     "url" : "",
     "sampleUrl": false,
     "template": {

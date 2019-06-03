@@ -1,20 +1,43 @@
 const { cadastrarCliente,
         obterClienteParaCadastro,
         obterCliente,
+        obterClienteCompleto,
         obterClienteEmail,
         alterarCliente,
         listarClientes,
         alterarClienteConfigApp,
         alterarConfigClienteAtual,
         alterarSenha,
-        listarClienteConquistas } = require('../../../repository/api/cliente'),
-    {   comprarItemLoja,
-        listarHistoricoCompra } = require('../../../repository/api/historicoCompraLojas'),
+        alterarGoldsEstabelecimento,
+        listarClienteDesafios } = require('../../../repository/api/cliente'),
+    {   cadastrarHistoricoCompra, listarHistoricoCompra  } = require('../../../repository/api/historicoCompraLojas'),
+    {   obterItemLoja, alterarItemLojaCompra  } = require('../../../repository/api/itemLoja'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
     { gerarChaveAmigavel, recuperarSenha } = require('../../../utils'),
-    { FBCriarCliente, FBEntrarNoEstabelecimento, FBRecusarSairDoEstabelecimento } = require('../../../service/firebase/cliente'),
+    { FBCriarCliente,
+        FBEntrarNoEstabelecimento,
+        FBRecusarSairDoEstabelecimento,
+        FBAlterarCliente,
+        FBAlterarConfigApp } = require('../../../service/firebase/cliente'),
     { CadastrarAvatar } = require('../avatar'),
     { criarToken } = require('../../passaport/criarToken');
+
+
+
+function obterDinheiroNoEstabelecimento (goldPorEstabelecimento, estabelecimentoId) {
+    return goldPorEstabelecimento.map(function(value) {
+        if (value.estabelecimento == estabelecimentoId)
+            return value.gold;
+    });
+}
+
+function diminuirDinheiroNoEstabelecimento (goldPorEstabelecimento, estabelecimentoId, precoItem) {
+    return goldPorEstabelecimento.map(function(value) {
+        if (value.estabelecimento == estabelecimentoId)
+            value.gold -= precoItem;
+    });
+}
+
 
 //OK
 exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar }) => {
@@ -37,7 +60,7 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
            !cliente.avatar)
         {
             // eslint-disable-next-line no-undef
-            return { status: false , mensagem: Mensagens.CLIENTE_CADASTRAR_ERRO };
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
 
         let clienteEncontrado = await obterClienteParaCadastro(cliente.email, cliente.apelido);
@@ -61,7 +84,7 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
 
         if (!novoAvatar){
             // eslint-disable-next-line no-undef
-            return { status: false , mensagem: Mensagens.AVATAR_CADASTRAR_ERRO };
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
         cliente.avatar = novoAvatar._id;
@@ -83,7 +106,7 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarCliente:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_CADASTRAR_ERRO };
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
@@ -105,58 +128,68 @@ exports.LoginCliente = async (user) => {
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginCliente:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.LOGIN_NAO_ENCONTRADO };
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
 //OK
-exports.AlterarCliente = async (clienteId, { status, nome, cpf, dataNascimento, pontos, goldGeral } ) => {
+exports.AlterarCliente = async (clienteId, { nome, cpf, dataNascimento } ) => {
 
-    let cliente = {
-        status: status,
-        nome: nome,
-        cpf: cpf,
-        dataNascimento: dataNascimento,
-        pontos: pontos,
-        goldGeral: goldGeral
-    };
+    try{
 
-    return await alterarCliente(clienteId, cliente).then((result) => {
-        return { status: !result ? false : true };
-    }).catch((error) => {
+        let cliente = {
+            nome: nome,
+            cpf: cpf,
+            dataNascimento: dataNascimento
+        };
+
+        let clienteAlterado = await alterarCliente(clienteId, cliente);
+
+        if (!clienteAlterado){
+            // eslint-disable-next-line no-undef
+            return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA  };
+        }
+
+        FBAlterarCliente(clienteId, cliente);
+        return { status: true };
+    }
+    catch(error)
+    {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_ALTERAR_ERRO };
-    });
-
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
 };
 
 //OK
 exports.AlterarClienteConfigApp = async (clienteId, cliente) => {
 
-    if (!clienteId ||
-        !cliente.configApp)
+    try
     {
-        // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_ALTERAR_CONFIG_ERRO };
+        if (!clienteId ||
+            !cliente.configApp)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+
+        let configApp = (typeof cliente.configApp === 'object') ? cliente.configApp : JSON.parse(cliente.configApp);
+
+        let configAlterada = await alterarClienteConfigApp(clienteId, configApp.somFundo, configApp.somGeral);
+
+        if (!configAlterada)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+
+        FBAlterarConfigApp(clienteId, configApp);
+        return { status: true };
     }
-
-    let configApp = (typeof cliente.configApp === 'object') ? cliente.configApp : JSON.parse(cliente.configApp);
-
-    if (!configApp.somFundo ||
-        !configApp.somGeral)
+    catch(error)
     {
-        // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_ALTERAR_CONFIG_ERRO };
-    }
-
-    return await alterarClienteConfigApp(clienteId, configApp.somFundo, configApp.somGeral).then((result) => {
-        return { status: !result ? false : true };
-    }).catch((error) =>{
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarClienteConfigApp:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_ALTERAR_CONFIG_ERRO };
-    });
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+
 };
 
 //OK
@@ -164,12 +197,15 @@ exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
 
     try
     {
-
         let estabelecimento = await obterEstabelecimento(estabelecimentoId);
+
+        if (!estabelecimento)
+            // eslint-disable-next-line no-undef
+            return {status: false, mensagem: Mensagens.ESTABELECIMENTO_NAO_ENCONTRADO };
 
         if (estabelecimento.configEstabelecimentoAtual.estaAberta)
         {
-            const cliente = await obterCliente(clienteId);
+            let cliente = await obterCliente(clienteId);
 
             if (cliente.configClienteAtual.estaEmUmEstabelecimento)
                 // eslint-disable-next-line no-undef
@@ -201,12 +237,12 @@ exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in EntrarNoEstabelecimento:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_ERRO_ENTRAR_ESTABELECIMENTO };
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
 //OK
-exports.SairDoEstabelecimento = async (clienteId,) => {
+exports.SairDoEstabelecimento = async clienteId => {
 
     try
     {
@@ -215,8 +251,8 @@ exports.SairDoEstabelecimento = async (clienteId,) => {
         let estabelecimento = await obterEstabelecimento(cliente.configClienteAtual.estabelecimento);
 
         if (!cliente || !estabelecimento)
-        // eslint-disable-next-line no-undef
-            return { status: false , mensagem: Mensagens.CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP };
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
 
         cliente.configClienteAtual.estaEmUmEstabelecimento = false;
@@ -240,13 +276,14 @@ exports.SairDoEstabelecimento = async (clienteId,) => {
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in SairDoEstabelecimento:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.CLIENTE_ERRO_SAIR_ESTABELECIMENTO };
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
 //OK
 exports.RecuperarSenha = async (email) => {
-    try {
+    try
+    {
         let cliente = await obterClienteEmail(email);
 
         if (cliente)
@@ -266,29 +303,121 @@ exports.RecuperarSenha = async (email) => {
 
         // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.USUARIO_NAO_ENCONTRADO };
-    } catch (error) {
+    }
+    catch (error) {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in RecuperarSenha:', error);
         // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.USUARIO_NAO_ENCONTRADO };
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
 exports.RecusarConviteEstabelecimento = async (clienteId) => {
-
-    let cliente = await obterCliente(clienteId);
-
-    cliente.configClienteAtual.estaEmUmEstabelecimento = false;
-    cliente.configClienteAtual.estabelecimento = null;
-    cliente.configClienteAtual.nomeEstabelecimento = null;
-    cliente.configClienteAtual.conviteEstabPendente = false;
-
-    let saiu = await alterarConfigClienteAtual(clienteId, cliente.configClienteAtual);
-
-    if (saiu)
+    try
     {
-        return await FBRecusarSairDoEstabelecimento(clienteId).then(() => {
-            return { status: true };
-        });
+        let cliente = await obterCliente(clienteId);
+
+        cliente.configClienteAtual.estaEmUmEstabelecimento = false;
+        cliente.configClienteAtual.estabelecimento = null;
+        cliente.configClienteAtual.nomeEstabelecimento = null;
+        cliente.configClienteAtual.conviteEstabPendente = false;
+
+        let saiu = await alterarConfigClienteAtual(clienteId, cliente.configClienteAtual);
+
+        if (saiu)
+        {
+            return await FBRecusarSairDoEstabelecimento(clienteId).then(() => {
+                return { status: true };
+            });
+        }
+
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in RecusarConviteEstabelecimento:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+
+exports.ComprarItemLoja = async (clienteId, infoCompra) => {
+
+    try
+    {
+        if (!clienteId ||
+        !infoCompra.estabelecimento ||
+        !infoCompra.itemLoja ||
+        !infoCompra.precoItem)
+        // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+        let cliente = await obterClienteCompleto(clienteId);
+        //let estabelecimento = await obterEstabelecimento(infoCompra.estabelecimentoId);
+        let itemLoja = await obterItemLoja(infoCompra.itemLoja);
+
+        if (!cliente ||
+            !itemLoja)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
+
+        if (cliente.configClienteAtual.estabelecimento === null ||
+            (cliente.configClienteAtual.estabelecimento.toString() !== infoCompra.estabelecimento.toString()))
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO_APP };
+        if (itemLoja.quantidadeDisponivel <= 0)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.ITEM_LOJA_SEM_ESTOQUE };
+        if (obterDinheiroNoEstabelecimento(cliente.goldPorEstabelecimento, infoCompra.estabelecimento)[0] < infoCompra.precoItem)
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.DINHEIRO_INSUFICIENTE };
+        if (new Date(itemLoja.tempoDisponivel) < new Date())
+            // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.ITEM_LOJA_TEMPO_EXPIRADO };
+
+        itemLoja.quantidadeDisponivel -= 1;
+        itemLoja.quantidadeVendida += 1;
+
+        let compraEfetuada = await alterarItemLojaCompra(itemLoja._id, itemLoja.quantidadeDisponivel, itemLoja.quantidadeVendida);
+
+        if (!compraEfetuada)
+        {
+        // eslint-disable-next-line no-undef
+            return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+        }
+
+        diminuirDinheiroNoEstabelecimento(cliente.goldPorEstabelecimento, infoCompra.estabelecimento, itemLoja.preco);
+
+        await alterarGoldsEstabelecimento(clienteId, cliente.goldPorEstabelecimento);
+
+        infoCompra.chaveUnica = gerarChaveAmigavel();
+
+        await cadastrarHistoricoCompra(clienteId, infoCompra);
+
+        return { status: true, objeto: infoCompra.chaveUnica };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in RecusarConviteEstabelecimento:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ListarHistoricoCompra = async (clienteId) => {
+
+    try
+    {
+        let historico = await listarHistoricoCompra(clienteId);
+
+        return { status: true, objeto: historico };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarHistoricoCompra:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
@@ -302,29 +431,8 @@ exports.ListarClientes = async () => {
         return { status: false , mensagem: Mensagens.ERRO_GENERITICO };
     });
 };
-
-
-exports.ComprarItemLoja = async (obj) => {
-    return await comprarItemLoja(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        return { status: false, msg: err === 0 ? 'REGISTRATION_ERROR_EMAIL' : 'REGISTRATION_ERROR_USER' };
-    });
-};
-
-exports.ListarClienteConquistas = async (obj) => {
-    return await listarClienteConquistas(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        console.log('registerUser errr:', err);
-        return { status: false, msg: err };
-    });
-};
-
-exports.ListarHistoricoCompra = async (obj) => {
-    return await listarHistoricoCompra(obj).then(result => {
+exports.ListarClienteDesafios = async (obj) => {
+    return await listarClienteDesafios(obj).then(result => {
         let resulObj = result;
         return { status: !result ? false : true, resulObj };
     }).catch(err => {
