@@ -2,7 +2,7 @@ const   { cadastrarItemLoja,
         listarItemLoja,
         alterarItemLoja } = require('../../../repository/api/itemLoja'),
     { obterEstabelecimento, adicionarItemNaLojaDoEstabelecimento } = require('../../../repository/api/estabelecimento'),
-    { AdicionarItemEstabelecimento } = require('../../firebase/estabelecimento');
+    { FBAdicionarItemEstabelecimento } = require('../../firebase/estabelecimento');
 
 exports.CadastrarItemLoja = async (estabelecimentoId, item) =>
 {
@@ -40,7 +40,7 @@ exports.CadastrarItemLoja = async (estabelecimentoId, item) =>
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
-        AdicionarItemEstabelecimento(estabelecimentoId, novoItem);
+        FBAdicionarItemEstabelecimento(estabelecimentoId, novoItem);
 
         return { status: true , objeto: novoItem};
     }

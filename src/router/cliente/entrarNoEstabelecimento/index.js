@@ -34,7 +34,6 @@ const { EntrarNoEstabelecimento } = require('../../../service/api/cliente'),
         *           "status": 1,
         *           "valorTotal": 0,
         *           "_id": "5cec76f60a397c3020d62022",
-        *           "dataEntrada": "1970-01-01T00:00:00.027Z",
         *           "estabelecimento": "5cdcc0885d47c43790919e7c",
         *           "grupo": [
         *                   {

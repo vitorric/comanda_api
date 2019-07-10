@@ -95,6 +95,10 @@ const ClienteSchema = new Schema(
                 comanda: {
                     type: Schema.Types.ObjectId,
                     ref: 'comanda'
+                },
+                dataConvite: {
+                    type: Date,
+                    required: true
                 }
             }],
             comanda: {

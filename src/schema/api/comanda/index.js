@@ -4,10 +4,6 @@ const { Schema } = require('mongoose'),
 
 const ComandaSchema = new Schema(
     {
-        dataEntrada:{
-            type:Date,
-            required: true
-        },
         dataSaida:{
             type: Date
         },
@@ -35,6 +31,14 @@ const ComandaSchema = new Schema(
             valorPago:{
                 type: Number,
                 default: 0
+            },
+            jaPagou:{
+                type: Boolean,
+                default: false
+            },
+            avatarAlterado: {
+                type: Date,
+                default: Date.now()
             }
         }],
         produtos:[{

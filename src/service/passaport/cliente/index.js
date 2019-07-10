@@ -22,7 +22,7 @@ module.exports = () => {
             }
 
             // Otherwise, return the user
-            done(null, {clienteId: cliente._id, avatarId: cliente.avatar._id });
+            done(null, {clienteId: cliente._id, apelido: cliente.apelido, avatarId: cliente.avatar._id });
         }catch(error){
             done(error,false);
         }
@@ -32,11 +32,11 @@ module.exports = () => {
     passport.use('cliente', new LocalStrategy({
         usernameField: 'email'
     }, async (email, password, done) => {
-        
+
         try{
             // Find the user given the email
             const cliente = await schemaCliente.findOne({email});
-            
+
             // If not, handle it
             if (!cliente){
                 return done(null, null);

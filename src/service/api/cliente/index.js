@@ -19,6 +19,7 @@ const { cadastrarCliente,
         FBRecusarSairDoEstabelecimento,
         FBAlterarCliente,
         FBAlterarConfigApp } = require('../../../service/firebase/cliente'),
+    { InserirMensagemNoCorreio } = require('../../../service/api/correio'),
     { CadastrarAvatar } = require('../avatar'),
     { criarToken } = require('../../passaport/criarToken');
 
@@ -97,9 +98,17 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
                 // Generate the token
                 let token = criarToken({ _id: result._id });
 
+                InserirMensagemNoCorreio({
+                    cliente: cliente._id,
+                    correio: {
+                        titulo: 'Seja bem vindo!',
+                        mensagem: 'Bem vindo a comanda gameficada!',
+                        mensagemGrande: 'Olá, ' + cliente.nome + '! Agradecemos o seu cadastro em nosso app!'
+                    }
+                });
+
                 return { status: !result ? false : true , objeto: { token, _id: cliente._id } };
             });
-
         });
     }
     catch(error)
@@ -340,7 +349,6 @@ exports.RecusarConviteEstabelecimento = async (clienteId) => {
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
-
 
 exports.ComprarItemLoja = async (clienteId, infoCompra) => {
 

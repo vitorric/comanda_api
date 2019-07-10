@@ -1,25 +1,42 @@
 const connFb = require('../../../conn/firebase');
 
-exports.FBAlterarAvatar = (_idCliente, avatar) => {
+exports.FBAlterarAvatar = (clienteId, avatar) => {
     try
     {
 
         var updates = {};
-        updates['/clientes/' + _idCliente + '/avatar/corpo'] = avatar.corpo;
-        updates['/clientes/' + _idCliente + '/avatar/cabeca'] = avatar.cabeca;
-        updates['/clientes/' + _idCliente + '/avatar/nariz'] = avatar.nariz;
-        updates['/clientes/' + _idCliente + '/avatar/olhos'] = avatar.olhos;
-        updates['/clientes/' + _idCliente + '/avatar/boca'] = avatar.boca;
-        updates['/clientes/' + _idCliente + '/avatar/roupa'] = avatar.roupa;
-        updates['/clientes/' + _idCliente + '/avatar/cabeloTraseiro'] = avatar.cabeloTraseiro;
-        updates['/clientes/' + _idCliente + '/avatar/cabeloFrontal'] = avatar.cabeloFrontal;
-        updates['/clientes/' + _idCliente + '/avatar/barba'] = avatar.barba;
-        updates['/clientes/' + _idCliente + '/avatar/sombrancelhas'] = avatar.sombrancelhas;
-        updates['/clientes/' + _idCliente + '/avatar/orelha'] = avatar.orelha;
-        updates['/clientes/' + _idCliente + '/avatar/corPele'] = avatar.corPele;
-        updates['/clientes/' + _idCliente + '/avatar/corCabelo'] = avatar.corCabelo;
-        updates['/clientes/' + _idCliente + '/avatar/corBarba'] = avatar.corBarba;
+        updates['/clientes/' + clienteId + '/avatar/corpo'] = avatar.corpo;
+        updates['/clientes/' + clienteId + '/avatar/cabeca'] = avatar.cabeca;
+        updates['/clientes/' + clienteId + '/avatar/nariz'] = avatar.nariz;
+        updates['/clientes/' + clienteId + '/avatar/olhos'] = avatar.olhos;
+        updates['/clientes/' + clienteId + '/avatar/boca'] = avatar.boca;
+        updates['/clientes/' + clienteId + '/avatar/roupa'] = avatar.roupa;
+        updates['/clientes/' + clienteId + '/avatar/cabeloTraseiro'] = avatar.cabeloTraseiro;
+        updates['/clientes/' + clienteId + '/avatar/cabeloFrontal'] = avatar.cabeloFrontal;
+        updates['/clientes/' + clienteId + '/avatar/barba'] = avatar.barba;
+        updates['/clientes/' + clienteId + '/avatar/sombrancelhas'] = avatar.sombrancelhas;
+        updates['/clientes/' + clienteId + '/avatar/orelha'] = avatar.orelha;
+        updates['/clientes/' + clienteId + '/avatar/corPele'] = avatar.corPele;
+        updates['/clientes/' + clienteId + '/avatar/corCabelo'] = avatar.corCabelo;
+        updates['/clientes/' + clienteId + '/avatar/corBarba'] = avatar.corBarba;
 
+        connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
+
+exports.FBAlterarAvatarExp = (clienteId, avatarId, exp, expProximoLevel, level) => {
+    try
+    {
+        var updates = {};
+        updates['/clientes/' + clienteId + '/' + avatarId + '/exp'] = exp;
+        updates['/clientes/' + clienteId + '/' + avatarId + '/level'] = level;
+        updates['/clientes/' + clienteId + '/' + avatarId + '/expProximoLevel'] = expProximoLevel;
 
         connFb.database().ref().update(updates);
     }

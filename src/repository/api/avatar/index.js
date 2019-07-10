@@ -15,12 +15,12 @@ exports.cadastrarAvatar = async avatar => {
     }
 };
 
-exports.obterAvatar = (_id) => {
+exports.obterAvatar = (avatarId) => {
     try
     {
         return avatarSchema.findOne(
             {
-                _id: ObjectIdCast(_id)
+                _id: ObjectIdCast(avatarId)
             }).exec();
     }
     catch (error)
@@ -70,7 +70,7 @@ exports.alterarAvatar = async (avatarId, avatar) => {
 };
 
 
-exports.alterarExp = (avatarId, exp, level) => {
+exports.alterarExp = (avatarId, exp, expProximoLevel, level) => {
 
     try
     {
@@ -81,6 +81,7 @@ exports.alterarExp = (avatarId, exp, level) => {
             {
                 $set: {
                     exp: exp,
+                    expProximoLevel: expProximoLevel,
                     level: level
                 }
 

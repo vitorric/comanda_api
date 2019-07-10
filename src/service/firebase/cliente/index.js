@@ -3,7 +3,7 @@ const connFb = require('../../../conn/firebase');
 exports.FBCriarCliente = async (cliente) => {
     try
     {
-        return await connFb.database().ref('clientes').child(cliente._id).set(cliente);
+        return await connFb.database().ref('clientes').child(cliente._id).update(cliente);
     }
     catch(err)
     {
@@ -72,6 +72,41 @@ exports.FBRecusarSairDoEstabelecimento = async (clienteId) => {
     }
 };
 
+exports.FBAlterarConvitesComanda = async (clienteId, convitesComanda) => {
+    try
+    {
+        let convites = [];
+
+        convitesComanda.map((value) => {
+            convites.push({
+                liderComanda: value.liderComanda.toString(),
+                comanda: value.comanda.toString(),
+                dataConvite: value.dataConvite.toISOString()
+            });
+        });
+
+        connFb.database().ref('/clientes/' + clienteId.toString() + '/configClienteAtual/convitesComanda').set(convites);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
+exports.FBLimparConvites = async (clienteId) =>
+{
+    try
+    {
+        connFb.database().ref('/clientes/' + clienteId.toString() + '/configClienteAtual/convitesComanda').remove();
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
 exports.FBAlterarConfigApp = (clienteId, configApp) => {
     try
     {
@@ -87,3 +122,18 @@ exports.FBAlterarConfigApp = (clienteId, configApp) => {
         throw err;
     }
 };
+
+// exports.FBAlterarDesafios = (clienteId, desafioId, desafio) => {
+//     try
+//     {
+//         var updates = {};
+//         updates['/clientes/' + clienteId + '/desafios/' + desafioId + '/desafio'] = desafioId;
+
+//         connFb.database().ref().set(updates);
+//     }
+//     catch(err)
+//     {
+//         console.log(err);
+//         throw err;
+//     }
+// };

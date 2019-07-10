@@ -24,7 +24,8 @@ exports.obterComandaLider = clienteId => {
                         cliente: ObjectIdCast(clienteId),
                         lider: true
                     }
-                }
+                },
+                status: 1
             }
         ).exec();
     } catch (error) {
@@ -36,11 +37,80 @@ exports.obterComanda = comandaId => {
     try {
         return schemaComanda.findOne(
             {
-                _id: comandaId
+                _id: ObjectIdCast(comandaId)
             }
         ).exec();
     }catch(error){
         console.log('\x1b[31m%s\x1b[0m', 'Erro in obterComanda:', error);
+    }
+};
+
+exports.obterGrupoComanda = async (comandaId) => {
+
+    try {
+
+        return await schemaComanda.aggregate([
+            {
+                $match:
+                {
+                    _id: ObjectIdCast(comandaId)
+                }
+            },
+            {
+                $unwind : { 'path': '$grupo' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'cliente',
+                    let: { clienteId: '$grupo.cliente' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$clienteId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'avatar':1,
+                                'apelido': 1,
+                                'sexo': 1
+                            }
+                        }
+
+                    ],
+                    as: 'grupo.cliente'
+                }
+            },
+            {
+                $unwind : { 'path': '$grupo.cliente' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $project :
+                {
+                    'grupo': 1
+                }
+            },
+            {
+                $group:
+                {
+                    '_id': '$_id',
+                    'grupo': {
+                        '$addToSet':'$grupo'
+                    },
+                }
+            }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarItemComanda:', error);
+        return false;
     }
 };
 
@@ -93,6 +163,58 @@ exports.cadastrarItemComanda = async (comandaId, produtos, valorTotal) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarItemComanda:', error);
+        return false;
+    }
+};
+
+exports.transferirLiderancaGrupo = async (comandaId, clienteId, ehLider) => {
+    try {
+
+        let comandaAlterada = await schemaComanda.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(comandaId),
+                'grupo.cliente':ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    'grupo.$.lider': ehLider
+                }
+            }).exec();
+
+        if (!comandaAlterada)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in transferirLiderancaGrupo:', error);
+        return false;
+    }
+};
+
+exports.alterarAvatarClienteComanda = async (comandaId, clienteId) => {
+    try {
+
+        let comandaAlterada = await schemaComanda.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(comandaId),
+                'grupo.cliente':ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    'grupo.$.avatarAlterado': Date.now()
+                }
+            }).exec();
+
+        if (!comandaAlterada)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarAvatarClienteComanda:', error);
         return false;
     }
 };

@@ -1,10 +1,10 @@
 module.exports = () => {
-        const passport = require('passport'),
-            JwtStrategy = require('passport-jwt').Strategy,
-            ExtractJwt = require('passport-jwt').ExtractJwt,
-            LocalStrategy = require('passport-local').Strategy,
-            { JWT_SECRET } = require('../../../../config'),
-            { schemaEstabelecimento } = require('../../../schema/api/estabelecimento');
+    const passport = require('passport'),
+        JwtStrategy = require('passport-jwt').Strategy,
+        ExtractJwt = require('passport-jwt').ExtractJwt,
+        LocalStrategy = require('passport-local').Strategy,
+        { JWT_SECRET } = require('../../../../config'),
+        { schemaEstabelecimento } = require('../../../schema/api/estabelecimento');
 
     //JSON WEB TOKENS STRATEGY ESTABELECIMENTO
     passport.use('estabelecimentoAuth', new JwtStrategy({
@@ -37,7 +37,7 @@ module.exports = () => {
 
         try
         {
-            
+
             const estabelecimento = await schemaEstabelecimento.findOne({email}, {status: 1, email: 1, password: 1, nome: 1});
 
             if (!estabelecimento){

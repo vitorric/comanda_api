@@ -57,6 +57,7 @@ exports.obterCliente = clienteId => {
                                 },
                                 level:1,
                                 exp:1,
+                                expProximoLevel: 1,
                                 corpo: 1,
                                 cabeca: 1,
                                 nariz: 1,
@@ -409,6 +410,50 @@ exports.alterarClienteParaDesafio = async (clienteId, cliente) => {
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarClienteParaDesafio:', error);
         return false;
+    }
+};
+
+
+exports.listarConvitesComandaEnviados = async (comandaId) => {
+    try {
+        return await schemaCliente.aggregate([
+            {
+                $unwind : { 'path': '$configClienteAtual.convitesComanda' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $match:
+                    {
+                        'configClienteAtual.convitesComanda.comanda': ObjectIdCast(comandaId)
+                    }
+            },
+            {
+                $lookup:
+                    {
+                        from: 'avatar',
+                        localField: 'avatar',
+                        foreignField: '_id',
+                        as: 'avatar'
+                    }
+            },
+            {
+                $unwind : { 'path': '$avatar' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $project :
+                {
+                    avatar:1,
+                    apelido: 1,
+                    sexo: 1,
+                    chaveAmigavel: 1
+                }
+            },
+            { $sort : { 'apelido' : 1 } }
+        ]).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarConvitesEnviados:', error);
+        throw error;
     }
 };
 

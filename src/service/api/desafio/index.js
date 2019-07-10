@@ -1,5 +1,6 @@
 const { cadastrarDesafio } = require('../../../repository/api/desafio'),
-    { obterEstabelecimento, adicionarDesafiosAoEsabelecimento } = require('../../../repository/api/estabelecimento');
+    { obterEstabelecimento, adicionarDesafiosAoEsabelecimento } = require('../../../repository/api/estabelecimento'),
+    { FBCadastrarDesafio } = require('../../firebase/estabelecimento');
 
 exports.CadastrarDesafio = async (estabelecimentoId, desafio) => {
     try
@@ -41,6 +42,8 @@ exports.CadastrarDesafio = async (estabelecimentoId, desafio) => {
             // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
+
+        FBCadastrarDesafio(estabelecimentoId, desafio.objetivo.produto, desafioCadastrado);
 
         // eslint-disable-next-line no-undef
         return { status: true , objeto: desafioCadastrado };

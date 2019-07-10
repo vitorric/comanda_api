@@ -5,7 +5,6 @@ module.exports = () => {
     const LocalStrategy = require('passport-local').Strategy;
     const { JWT_SECRET } = require('../../../config');
     const { schemaUser } = require('../../schema/api/user');
-    const { schemaCliente } = require('../../schema/api/cliente');
 
     require('./cliente')();
     require('./estabelecimento')();

@@ -15,5 +15,9 @@ module.exports = () => {
 
     router.post('/cadastrar_item/comanda', passportEstabelecimentoJWT, require('./cadastrarItemComanda')());
 
+    router.post('/listar/convites/enviados',passportClienteJWT, require('./listarConvitesComandaEnviados')());
+
+    router.post('/transferir/lideranca/comanda',passportClienteJWT, require('./transferirLiderancaGrupo')());
+
     return router;
 };

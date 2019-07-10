@@ -21,7 +21,15 @@ exports.ObjectIdCast = mongoose.mongo.ObjectId;
 * @return resposta da requisição (res.status....)
 */
 exports.resJsonP = (res, code, sucesso, retorno, mensagem) => {
-    return res.status(code).jsonp({ sucesso: sucesso, retorno: retorno, mensagem: mensagem });
+    let retornoObj = { sucesso: sucesso };
+
+    if (retorno != null)
+        retornoObj.retorno = retorno;
+
+    if (mensagem != null)
+        retornoObj.mensagem = mensagem;
+
+    return res.status(code).jsonp(retornoObj);
 };
 
 exports.gerarChaveAmigavel = () =>

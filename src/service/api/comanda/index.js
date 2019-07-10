@@ -2,16 +2,22 @@ const { cadastrarComanda,
         alterarGrupoComanda,
         obterComandaLider,
         obterComanda,
-        cadastrarItemComanda  } = require('../../../repository/api/comanda'),
+        cadastrarItemComanda,
+        obterGrupoComanda,
+        transferirLiderancaGrupo  } = require('../../../repository/api/comanda'),
     { obterClienteCompleto,
         obterClienteChaveUnica,
         listarClientesParaDesafios,
         alterarClienteParaDesafio,
         alterarConfigClienteAtual,
         alterarConfigClienteAtualConvitesComanda,
-        alterarConfigClienteAtualComanda } = require('../../../repository/api/cliente'),
+        alterarConfigClienteAtualComanda,
+        listarConvitesComandaEnviados } = require('../../../repository/api/cliente'),
     { obterProduto, alterarProdutoEstoque } = require('../../../repository/api/produto'),
     { listarDesafiosAtivos } = require('../../../repository/api/desafio'),
+    { InserirMensagemNoCorreio, DesativarMensagemConviteGrupo, MarcarAcaoExecutadaMensagem } = require('../../api/correio'),
+    { FBCadastrarComanda, FBInserirMembroNoGrupoComanda, FBAlterarGrupoComanda } = require('../../firebase/comanda'),
+    { FBAlterarConvitesComanda, FBLimparConvites } = require('../../firebase/cliente'),
     { PONTOS_POR_CONQUISTA } = require('../../../../config/game');
 
 function alterarProdutosNaComanda (produtos, produtoId, preco, quantidade)
@@ -39,12 +45,10 @@ function alterarProdutosNaComanda (produtos, produtoId, preco, quantidade)
     return produtos;
 }
 
-
 exports.CadastrarComanda = async (estabelecimentoId, comanda) => {
 
     try
     {
-
         let cliente = await obterClienteCompleto(comanda.clienteId);
 
         if (!cliente)
@@ -52,15 +56,14 @@ exports.CadastrarComanda = async (estabelecimentoId, comanda) => {
         // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
-
-        if (typeof cliente.configClienteAtual.estabelecimento === 'undefined' || (cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId))
+        console.log(cliente.configClienteAtual.estabelecimento);
+        if (typeof cliente.configClienteAtual.estabelecimento === 'undefined' || cliente.configClienteAtual.estabelecimento === null || (cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId))
             // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO };
         if (cliente.configClienteAtual.comanda != null)
             // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_JA_TEM_COMANDA };
 
-        comanda.dataEntrada = new Date().getDate();
         comanda.estabelecimento = estabelecimentoId;
         comanda.grupo = [];
         comanda.grupo.push({ cliente: cliente._id, lider: true });
@@ -83,6 +86,8 @@ exports.CadastrarComanda = async (estabelecimentoId, comanda) => {
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
 
+        FBCadastrarComanda(comandaCriada, cliente.apelido, cliente._id, cliente.avatar, cliente.sexo, cliente.configClienteAtual);
+
         return { status: true , objeto: comandaCriada };
     }
     catch (error)
@@ -93,7 +98,7 @@ exports.CadastrarComanda = async (estabelecimentoId, comanda) => {
     }
 };
 
-exports.EnviarConviteGrupo = async (clienteIdLider, membro) => {
+exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) => {
     try
     {
         //procura a comanda do lider
@@ -107,6 +112,10 @@ exports.EnviarConviteGrupo = async (clienteIdLider, membro) => {
 
         //procura o membro a ser adicionado
         let clienteMembro = await obterClienteChaveUnica(membro.chaveAmigavel);
+
+        if (!clienteMembro)
+            // eslint-disable-next-line no-undef
+            return {status: false, mensagem: Mensagens.MEMBRO_COMANDA_NAO_ENCONTRADO};
 
         //verifica se o cliente membro esta em algum estabelecimento
         if (!clienteMembro.configClienteAtual.estabelecimento)
@@ -135,7 +144,8 @@ exports.EnviarConviteGrupo = async (clienteIdLider, membro) => {
 
         clienteMembro.configClienteAtual.convitesComanda.push({
             liderComanda: clienteIdLider,
-            comanda: comandaLider._id
+            comanda: comandaLider._id,
+            dataConvite: Date.now()
         });
 
         let conviteEnviado = await alterarConfigClienteAtualConvitesComanda(clienteMembro._id, clienteMembro.configClienteAtual.convitesComanda);
@@ -146,11 +156,43 @@ exports.EnviarConviteGrupo = async (clienteIdLider, membro) => {
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
+        //altera a lista de convites do cliente no firebase
+        FBAlterarConvitesComanda(clienteMembro._id, clienteMembro.configClienteAtual.convitesComanda);
+
+        //insere mensagem no correio
+        InserirMensagemNoCorreio({
+            cliente: clienteMembro._id,
+            correio: {
+                titulo: 'Convite para Grupo',
+                mensagem: 'Hey, o ' + clienteApelidoLider + ' esta te convidando para um grupo!',
+                mensagemGrande: 'Aceite o convite, interaja com os outros membros do grupo, dívida sua conta e participe dos desafios exclusivos para grupos!',
+                acao: {
+                    tipo: 'ConviteGrupo',
+                    comanda: comandaLider._id
+                }
+            }
+        });
+
         // eslint-disable-next-line no-undef
         return { status: true, mensagem: Mensagens.CONVITE_COMANDA_ENVIADO };
     }
     catch(error){
         console.log('\x1b[31m%s\x1b[0m', 'Erro in EnviarConviteGrupo:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ListarConvitesComandaEnviados = async comandaId => {
+
+    try
+    {
+        let convitesEnviados = await listarConvitesComandaEnviados(comandaId);
+        return { status: true, objeto: convitesEnviados };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarConvitesComandaEnviados:', error);
         // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
@@ -199,6 +241,9 @@ exports.CancelarConviteGrupo = async (clienteIdLider, membro) => {
             // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
+
+        FBAlterarConvitesComanda(clienteMembro._id, clienteMembro.configClienteAtual.convitesComanda);
+        DesativarMensagemConviteGrupo(clienteMembro._id, comandaLider._id);
 
         // eslint-disable-next-line no-undef
         return { status: true };
@@ -264,7 +309,6 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
                 // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
             }
-
         }
 
         if (!infoResposta.aceitou)
@@ -288,12 +332,53 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
 
         }
 
+        if (infoResposta.aceitou)
+        {
+            //limpa os outros convites
+            FBLimparConvites(clienteId);
+            //insere membro no grupo
+            clienteMembro.configClienteAtual.comanda = comanda._id;
+
+            let grupoComandaFB = await obterGrupoComanda(comanda._id);
+
+            FBInserirMembroNoGrupoComanda(grupoComandaFB, clienteMembro._id, clienteMembro.configClienteAtual);
+        }
+
+        if (!infoResposta.aceitou)
+        {
+            //remove o convite da comanda
+            FBAlterarConvitesComanda(clienteId, clienteMembro.configClienteAtual.convitesComanda);
+        }
+
+        //marcar que a mensagem do correio foi executada com sucesso
+        MarcarAcaoExecutadaMensagem(clienteId, comanda._id);
+
         return { status: true };
 
     }
     catch (error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in AdicionarClienteGrupo:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in RespostaConviteGrupo:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.TransferirLiderancaGrupo = async (comandaId, clienteLiderId, clienteNovoLiderId) => {
+    try
+    {
+        await transferirLiderancaGrupo(comandaId,clienteLiderId, false);
+        await transferirLiderancaGrupo(comandaId,clienteNovoLiderId, true);
+
+        let grupoAlterado = await obterGrupoComanda(comandaId);
+
+        FBAlterarGrupoComanda(grupoAlterado);
+
+        return { status: true };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in TransferirLiderancaGrupo:', error);
         // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
@@ -356,7 +441,7 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
             console.log('Encontrou desafios');
 
             //para cada desafio
-            await desafios.forEach(async desafio => {
+            desafios.forEach(async desafio => {
 
                 //varre todos os clientes da comanda
                 todosClientesDoGrupo.map(async function(cliente)

@@ -14,6 +14,7 @@
 	"SENHA_RECUPERADA": "Uma nova senha de acesso foi enviada ao email!",
 	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO": "O cliente já está ativo em um estabelecimento",
 	"CLIENTE_JA_TEM_CONVITE": "Este cliente já foi convidado por um estabelecimento!",
+	"QRCODE_INVALIDO": "QRCode inválido!",
 	"ESTABELECIMENTO_CLIENTE_ADICIONAR_ERRO": "Erro ao adicionar o cliente no estabelecimento!",
 	"ITEM_LOJA_SEM_ESTOQUE": "Estoque esgotado!",
 	"ITEM_LOJA_TEMPO_EXPIRADO": "Tempo expirado! Este item não está mais disponível.",
@@ -27,7 +28,7 @@
 	"CONVITE_NAO_ENCONTRADO": "Convite não encontrado!",
 	"COMANDA_NAO_ENCOTRADA": "Comanda não foi encontrada!",
 	"LIDER_COMANDA_NAO_ENCONTRADO": "É necessário ser o lider do grupo para convidar um novo membro!",
-	"MEMBRO_COMANDA_NAO_ENCONTRADO": "O membro não foi encontrado!",
+	"MEMBRO_COMANDA_NAO_ENCONTRADO": "Membro não encontrado!",
 	"MEMBRO_ESTABELECIMENTO_DIFERENTE": "O membro adicionado não pertence ao mesmo estabelecimento!",
 
 

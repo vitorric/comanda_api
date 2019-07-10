@@ -11,6 +11,10 @@ const AvatarSchema = new Schema(
             type:Number,
             default: 0
         },
+        expProximoLevel: {
+            type:Number,
+            default: 0
+        },
         corpo: String,
         cabeca: String,
         nariz: String,
