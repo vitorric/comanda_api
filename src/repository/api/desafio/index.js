@@ -14,6 +14,17 @@ exports.cadastrarDesafio = async desafio => {
     }
 };
 
+exports.obterDesafio = async desafioId => {
+    try {
+        return schemaDesafio.findOne({
+            _id: ObjectIdCast(desafioId),
+            status: 1
+        }).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterDesafio:', error);
+    }
+};
+
 exports.listarDesafiosAtivos = async (produto, estabelecimento, estaEmGrupo) => {
     try {
         return await schemaDesafio.aggregate([

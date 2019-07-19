@@ -15,6 +15,18 @@ const HistoricoCompraLojas = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'itemLoja'
         },
+        produto: {
+            type: Schema.Types.ObjectId,
+            ref: 'produto'
+        },
+        quantidade: {
+            type: Number,
+            default: 1
+        },
+        modoObtido:{
+            type: String,
+            required: true
+        },
         chaveUnica:{
             type: String,
             unique: true,

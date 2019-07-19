@@ -439,6 +439,7 @@ exports.ListarClientes = async () => {
         return { status: false , mensagem: Mensagens.ERRO_GENERITICO };
     });
 };
+
 exports.ListarClienteDesafios = async (obj) => {
     return await listarClienteDesafios(obj).then(result => {
         let resulObj = result;

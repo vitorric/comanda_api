@@ -30,6 +30,9 @@
 	"LIDER_COMANDA_NAO_ENCONTRADO": "É necessário ser o lider do grupo para convidar um novo membro!",
 	"MEMBRO_COMANDA_NAO_ENCONTRADO": "Membro não encontrado!",
 	"MEMBRO_ESTABELECIMENTO_DIFERENTE": "O membro adicionado não pertence ao mesmo estabelecimento!",
+	"DESAFIO_NAO_CONCLUIDO": "É necessário concluir o desafio!",
+	"DESAFIO_JA_RESGATADO": "O prêmio deste desafio já foi resgatado!",
+	"DESAFIO_JA_RESGATADO_PRODUTO": "O produto deste desafio já foi resgatado fisicamente!",
 
 
 

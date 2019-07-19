@@ -30,13 +30,14 @@ exports.FBAlterarAvatar = (clienteId, avatar) => {
 };
 
 
-exports.FBAlterarAvatarExp = (clienteId, avatarId, exp, expProximoLevel, level) => {
+exports.FBAlterarAvatarExp = (clienteId, exp, expProximoLevel, level) => {
     try
     {
         var updates = {};
-        updates['/clientes/' + clienteId + '/' + avatarId + '/exp'] = exp;
-        updates['/clientes/' + clienteId + '/' + avatarId + '/level'] = level;
-        updates['/clientes/' + clienteId + '/' + avatarId + '/expProximoLevel'] = expProximoLevel;
+        updates['/clientes/' + clienteId + '/avatar/info/exp'] = exp;
+        updates['/clientes/' + clienteId + '/avatar/info/level'] = level;
+        updates['/clientes/' + clienteId + '/avatar/info/expProximoLevel'] = expProximoLevel;
+
 
         connFb.database().ref().update(updates);
     }

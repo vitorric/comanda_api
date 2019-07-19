@@ -4,6 +4,7 @@ const { cadastrarComanda,
         obterComanda,
         cadastrarItemComanda,
         obterGrupoComanda,
+        obterProdutosComanda,
         transferirLiderancaGrupo  } = require('../../../repository/api/comanda'),
     { obterClienteCompleto,
         obterClienteChaveUnica,
@@ -16,16 +17,17 @@ const { cadastrarComanda,
     { obterProduto, alterarProdutoEstoque } = require('../../../repository/api/produto'),
     { listarDesafiosAtivos } = require('../../../repository/api/desafio'),
     { InserirMensagemNoCorreio, DesativarMensagemConviteGrupo, MarcarAcaoExecutadaMensagem } = require('../../api/correio'),
-    { FBCadastrarComanda, FBInserirMembroNoGrupoComanda, FBAlterarGrupoComanda } = require('../../firebase/comanda'),
+    { FBCadastrarComanda, FBInserirMembroNoGrupoComanda, FBAlterarGrupoComanda, FBAlterarProdutosComanda } = require('../../firebase/comanda'),
     { FBAlterarConvitesComanda, FBLimparConvites } = require('../../firebase/cliente'),
-    { PONTOS_POR_CONQUISTA } = require('../../../../config/game');
+    { FBAlterarDesafios } = require('../../firebase/desafios'),
+    { AlterarExp } = require('../../api/avatar');
 
 function alterarProdutosNaComanda (produtos, produtoId, preco, quantidade)
 {
     let encontrou = false;
 
     produtos.map(function(value) {
-        if (value.produtoId == produtoId)
+        if (value.produto.toString() == produtoId.toString())
         {
             value.preco = preco;
             value.quantidade += quantidade;
@@ -145,7 +147,7 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
         clienteMembro.configClienteAtual.convitesComanda.push({
             liderComanda: clienteIdLider,
             comanda: comandaLider._id,
-            dataConvite: Date.now()
+            dataConvite: new Date()
         });
 
         let conviteEnviado = await alterarConfigClienteAtualConvitesComanda(clienteMembro._id, clienteMembro.configClienteAtual.convitesComanda);
@@ -435,6 +437,15 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
 
         let todosClientesDoGrupo = await listarClientesParaDesafios(idsClientes);
 
+        let produtoFirebase = await obterProdutosComanda(comanda._id);
+
+        //Alterar o firebase da comanda com o produto novo
+        FBAlterarProdutosComanda(produtoFirebase, comanda.valorTotal);
+
+        todosClientesDoGrupo.forEach(element => {
+            AlterarExp(element._id, element.avatar, 10);
+        });
+
         if (desafios.length > 0)
         // eslint-disable-next-line no-empty
         {
@@ -446,7 +457,7 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
                 //varre todos os clientes da comanda
                 todosClientesDoGrupo.map(async function(cliente)
                 {
-                    let indexDesafio = cliente.desafios.findIndex(x => (!x.desafio) ? x.desafio.toString() : '' === desafio._id.toString());
+                    let indexDesafio = cliente.desafios.findIndex(x => x.desafio.toString() == desafio._id.toString());
 
                     //encontrou o desafio
                     if (indexDesafio > -1)
@@ -473,17 +484,12 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
                     if (cliente.desafios[indexDesafio].progresso >= desafio.objetivo.quantidade)
                     {
                         cliente.desafios[indexDesafio].progresso = desafio.objetivo.quantidade;
-
-                        //let indexEstab = cliente.goldPorEstabelecimento.findIndex(el => el.estabelecimento === estabelecimentoId);
-
                         cliente.desafios[indexDesafio].concluido = true;
                         cliente.desafios[indexDesafio].dataConclusao = new Date();
-
-                        //cliente.goldPorEstabelecimento[indexEstab].gold += desafio.premio;
-                        cliente.pontos += PONTOS_POR_CONQUISTA;
                     }
 
                     await alterarClienteParaDesafio(cliente._id, cliente);
+                    FBAlterarDesafios(cliente._id, cliente.desafios);
                 });
             });
 

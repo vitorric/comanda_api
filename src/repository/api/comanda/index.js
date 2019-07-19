@@ -114,6 +114,75 @@ exports.obterGrupoComanda = async (comandaId) => {
     }
 };
 
+exports.obterProdutosComanda = async (comandaId) => {
+
+    try {
+
+        return await schemaComanda.aggregate([
+            {
+                $match:
+                {
+                    _id: ObjectIdCast(comandaId)
+                }
+            },
+            {
+                $unwind : { 'path': '$produtos' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'produto',
+                    let: { produtoId: '$produtos.produto' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$produtoId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'icon':1,
+                                'nome': 1
+                            }
+                        }
+
+                    ],
+                    as: 'produtos.produto'
+                }
+            },
+            {
+                $unwind : { 'path': '$produtos.produto' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $project :
+                {
+                    'produtos': 1
+                }
+            },
+            {
+                $group:
+                {
+                    '_id': '$_id',
+                    'produtos': {
+                        '$addToSet':'$produtos'
+                    },
+                }
+            }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarItemComanda:', error);
+        return false;
+    }
+};
+
+
 exports.alterarGrupoComanda = async (comandaId, grupo) => {
 
     try {
@@ -202,7 +271,8 @@ exports.alterarAvatarClienteComanda = async (comandaId, clienteId) => {
                 'grupo.cliente':ObjectIdCast(clienteId)
             },
             {
-                $set: {
+                $set:
+                {
                     'grupo.$.avatarAlterado': Date.now()
                 }
             }).exec();

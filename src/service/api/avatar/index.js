@@ -21,7 +21,8 @@ exports.CadastrarAvatar = async (avatar) =>
         !avatar.corCabelo)
         return false;
 
-    avatar.expProximoLevel = BASE_EXP;
+    avatar.info = {};
+    avatar.info.expProximoLevel = BASE_EXP;
 
     return await cadastrarAvatar(avatar).then((result) => {
         return result;
@@ -99,19 +100,20 @@ exports.AlterarExp = async (clienteId, avatarId, expParaAdicionar) => {
     {
         let avatar = await obterAvatar(avatarId);
 
-        avatar.exp += expParaAdicionar;
+        avatar.info.exp += expParaAdicionar;
 
-        if (avatar.exp >= avatar.expProximoLevel)
+        if (avatar.info.exp >= avatar.info.expProximoLevel)
         {
-            avatar.level += 1;
-            avatar.exp = avatar.exp - avatar.expProximoLevel;
+            avatar.info.level += 1;
+            avatar.info.exp = avatar.info.exp - avatar.info.expProximoLevel;
         }
 
-        avatar.expProximoLevel = await CalcularExpProLvl(avatar.level);
+        avatar.info.expProximoLevel = await CalcularExpProLvl(avatar.info.level);
 
-        await alterarExp(avatarId, avatar.exp, avatar.expProximoLevel, avatar.level);
+        await alterarExp(avatarId, avatar.info.exp, avatar.info.expProximoLevel, avatar.info.level);
 
-        FBAlterarAvatarExp(clienteId, avatarId, avatar.exp, avatar.expProximoLevel, avatar.level);
+        FBAlterarAvatarExp(clienteId.toString(), avatar.info.exp, avatar.info.expProximoLevel, avatar.info.level);
+        return { status: true };
     }
     catch(error){
 

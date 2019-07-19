@@ -129,6 +129,9 @@ const ClienteSchema = new Schema(
             },
             dataConclusao: {
                 type: Date
+            },
+            dataResgate: {
+                type: Date
             }
         }],
         avatar: {

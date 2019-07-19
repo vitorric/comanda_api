@@ -11,6 +11,39 @@ const { cadastrarEstabelecimento,
     { FBAdicionarClienteAoEstabelecimento } = require('../../firebase/estabelecimento');
 
 
+
+exports.LoginEstabelecimento = async user => {
+    try
+    {
+        if (user == null)
+        {
+            // eslint-disable-next-line no-undef
+            return {status: false, mensagem: Mensagens.LOGIN_NAO_ENCONTRADO};
+        }
+
+        // Generate the token
+        let token = criarToken( user );
+
+        return {
+            status: true,
+            objeto: {
+                token,
+                estabelecimento: {
+                    status: user.status,
+                    email: user.email,
+                    nome: user.nome
+                }
+            }
+        };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginEstabelecimento:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
 exports.CadastrarEstabelecimento = async estabelecimento => {
 
     try
@@ -79,7 +112,6 @@ exports.CadastrarEstabelecimento = async estabelecimento => {
     }
 };
 
-
 exports.ObterParaClientes = async estabelecimentoId => {
     try
     {
@@ -100,7 +132,6 @@ exports.ObterParaClientes = async estabelecimentoId => {
     }
 };
 
-
 exports.ListarParaClientes = async nome => {
 
     try
@@ -115,41 +146,6 @@ exports.ListarParaClientes = async nome => {
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
-
-
-exports.LoginEstabelecimento = async user => {
-    try
-    {
-        if (user == null)
-        {
-        // eslint-disable-next-line no-undef
-            return {status: false, mensagem: Mensagens.LOGIN_NAO_ENCONTRADO};
-        }
-
-        // Generate the token
-        let token = criarToken( user );
-
-        return {
-            status: false,
-            objeto: {
-                token,
-                estabelecimento: {
-                    status: user.status,
-                    email: user.email,
-                    nome: user.nome
-                }
-            }
-        };
-    }
-    catch(error)
-    {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginEstabelecimento:', error);
-        // eslint-disable-next-line no-undef
-        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
-    }
-};
-
-
 exports.AdicionarClienteAoEstabelecimento = async (estabelecimentoId, clienteId) => {
 
     try
@@ -194,7 +190,6 @@ exports.AdicionarClienteAoEstabelecimento = async (estabelecimentoId, clienteId)
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
-
 
 exports.AlterarStatusEstabOnline = async (estabelecimentoId, status) => {
 

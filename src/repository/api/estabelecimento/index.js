@@ -15,8 +15,6 @@ exports.cadastrarEstabelecimento = async estabelecimento => {
     }
 };
 
-
-
 exports.listarParaClientes = nome => {
 
     try {

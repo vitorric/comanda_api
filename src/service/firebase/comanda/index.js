@@ -3,11 +3,11 @@ const connFb = require('../../../conn/firebase');
 exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clienteSexo, configCliente) => {
     try
     {
-        let grupo = [];
+        let membro = [];
         let produtos = [];
 
         comanda.grupo.map((value) => {
-            grupo.push({
+            membro = {
                 lider: value.lider,
                 valorPago: value.valorPago,
                 cliente: {
@@ -18,7 +18,7 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
                 },
                 jaPagou: false,
                 avatarAlterado: value.avatarAlterado.toISOString()
-            });
+            };
         });
 
         comanda.produtos.map((value) => {
@@ -35,7 +35,6 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
             _id: comanda._id.toString(),
             estabelecimento: comanda.estabelecimento.toString(),
             valorTotal: comanda.valorTotal,
-            grupo: grupo,
             produtos: produtos
         };
 
@@ -48,6 +47,7 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
         };
 
         connFb.database().ref('/comandas/' + comanda._id.toString()).set(novaComanda);
+        connFb.database().ref('/comandas/' + comanda._id.toString() + '/grupo/' + membro.cliente._id.toString()).set(membro);
         connFb.database().ref('/clientes/' + clienteId.toString() + '/configClienteAtual').set(configClienteAtual);
     }
     catch(err)
@@ -60,10 +60,10 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
 exports.FBInserirMembroNoGrupoComanda = (comanda, clienteId, configCliente) => {
     try
     {
-        let grupo = [];
+        let membro = {};
 
         comanda.grupo.map((value) => {
-            grupo.push({
+            membro = {
                 lider: value.lider,
                 valorPago: value.valorPago,
                 cliente: {
@@ -74,7 +74,9 @@ exports.FBInserirMembroNoGrupoComanda = (comanda, clienteId, configCliente) => {
                 },
                 jaPagou: value.jaPagou,
                 avatarAlterado: value.avatarAlterado.toISOString()
-            });
+            };
+
+            connFb.database().ref('/comandas/' + comanda._id.toString() + '/grupo/' + membro.cliente._id.toString()).set(membro);
         });
 
         let configClienteAtual = {
@@ -85,7 +87,6 @@ exports.FBInserirMembroNoGrupoComanda = (comanda, clienteId, configCliente) => {
             comanda: configCliente.comanda.toString()
         };
 
-        connFb.database().ref('/comandas/' + comanda._id.toString() + '/grupo').set(grupo);
         connFb.database().ref('/clientes/' + clienteId.toString() + '/configClienteAtual').set(configClienteAtual);
     }
     catch(err)
@@ -98,10 +99,10 @@ exports.FBInserirMembroNoGrupoComanda = (comanda, clienteId, configCliente) => {
 exports.FBAlterarGrupoComanda = (comanda) => {
     try
     {
-        let grupo = [];
+        let membro = {};
 
         comanda.grupo.map((value) => {
-            grupo.push({
+            membro = {
                 lider: value.lider,
                 valorPago: value.valorPago,
                 cliente: {
@@ -112,11 +113,40 @@ exports.FBAlterarGrupoComanda = (comanda) => {
                 },
                 jaPagou: value.jaPagou,
                 avatarAlterado: value.avatarAlterado.toISOString()
-            });
+            };
+
+            connFb.database().ref('/comandas/' + comanda._id.toString() + '/grupo/' + membro.cliente._id.toString()).set(membro);
         });
 
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
 
-        connFb.database().ref('/comandas/' + comanda._id.toString() + '/grupo').set(grupo);
+exports.FBAlterarProdutosComanda = (comanda, valorTotal) => {
+    try
+    {
+        let produto = {};
+
+        comanda.produtos.map((value) => {
+            produto = {
+                preco: value.preco,
+                quantidade: value.quantidade,
+                produto: {
+                    _id: value.produto._id.toString(),
+                    nome: value.produto.nome,
+                    icon: value.produto.icon
+                },
+                precoTotal: value.precoTotal
+            };
+
+            connFb.database().ref('/comandas/' + comanda._id.toString() + '/produtos/' + value.produto._id.toString()).set(produto);
+        });
+
+        connFb.database().ref('/comandas/' + comanda._id.toString() + '/valorTotal').set(valorTotal);
     }
     catch(err)
     {

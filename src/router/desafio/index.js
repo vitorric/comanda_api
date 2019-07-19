@@ -1,5 +1,6 @@
 const passport = require('passport'),
     passportEstabelecimentoJWT = passport.authenticate('estabelecimentoAuth', {session:false}),
+    passportClienteJWT = passport.authenticate('clienteAuth', {session:false}),
     router = require('express').Router();
 
 module.exports = () => {
@@ -56,6 +57,10 @@ module.exports = () => {
  *       }
 **/
     router.post('/cadastrar/desafio', passportEstabelecimentoJWT, require('./cadastrarDesafio')());
+
+    router.post('/obter/desafio/cliente', passportClienteJWT, require('./obterDesafioCliente')());
+
+    router.post('/resgatar/recompensa/desafio', passportClienteJWT, require('./resgatarRecompensaDesafio')());
 
     return router;
 };

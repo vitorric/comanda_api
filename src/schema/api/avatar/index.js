@@ -3,17 +3,19 @@ const { Schema } = require('mongoose'),
 
 const AvatarSchema = new Schema(
     {
-        level: {
-            type: Number,
-            default: 1
-        },
-        exp: {
-            type:Number,
-            default: 0
-        },
-        expProximoLevel: {
-            type:Number,
-            default: 0
+        info:{
+            level: {
+                type: Number,
+                default: 1
+            },
+            exp: {
+                type:Number,
+                default: 0
+            },
+            expProximoLevel: {
+                type:Number,
+                default: 0
+            }
         },
         corpo: String,
         cabeca: String,

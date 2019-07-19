@@ -3,8 +3,6 @@ const connFb = require('../../../conn/firebase');
 exports.FBInserirMensagemNoCorreio = async (correioCliente) => {
     try
     {
-        let correio = [];
-
         correioCliente.correio.map((value) => {
 
             if (value.status)
@@ -40,16 +38,9 @@ exports.FBInserirMensagemNoCorreio = async (correioCliente) => {
                     mensagem.acao = acao;
                 }
 
-                correio.push(mensagem);
+                connFb.database().ref('/correios/' + correioCliente.cliente.toString() + '/correio/' + mensagem._id).update(mensagem);
             }
         });
-
-        let novaMensagem = {
-            cliente: correioCliente.cliente.toString(),
-            correio: correio
-        };
-
-        connFb.database().ref('/correios/' + novaMensagem.cliente.toString()).update(novaMensagem);
     }
     catch(err)
     {

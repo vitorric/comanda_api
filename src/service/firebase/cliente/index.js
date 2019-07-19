@@ -122,18 +122,3 @@ exports.FBAlterarConfigApp = (clienteId, configApp) => {
         throw err;
     }
 };
-
-// exports.FBAlterarDesafios = (clienteId, desafioId, desafio) => {
-//     try
-//     {
-//         var updates = {};
-//         updates['/clientes/' + clienteId + '/desafios/' + desafioId + '/desafio'] = desafioId;
-
-//         connFb.database().ref().set(updates);
-//     }
-//     catch(err)
-//     {
-//         console.log(err);
-//         throw err;
-//     }
-// };

@@ -8,5 +8,7 @@ module.exports = () => {
 
     router.post('/obter/cliente/avatar',passportJWT, require('./obterAvatar')());
 
+    router.post('/alterar/cliente/avatar/exp',passportJWT, require('./alterarExp')());
+
     return router;
 };

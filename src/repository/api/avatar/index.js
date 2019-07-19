@@ -80,9 +80,9 @@ exports.alterarExp = (avatarId, exp, expProximoLevel, level) => {
             },
             {
                 $set: {
-                    exp: exp,
-                    expProximoLevel: expProximoLevel,
-                    level: level
+                    'info.exp': exp,
+                    'info.expProximoLevel': expProximoLevel,
+                    'info.level': level
                 }
 
             }).exec();

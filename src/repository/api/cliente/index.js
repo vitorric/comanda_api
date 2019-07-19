@@ -55,9 +55,7 @@ exports.obterCliente = clienteId => {
                                 _id: {
                                     $toString: '$_id'
                                 },
-                                level:1,
-                                exp:1,
-                                expProximoLevel: 1,
+                                info:1,
                                 corpo: 1,
                                 cabeca: 1,
                                 nariz: 1,
@@ -107,9 +105,21 @@ exports.obterCliente = clienteId => {
 
 exports.obterClienteCompleto = clienteId => {
     try {
-        return schemaCliente.findOne({_id: clienteId}).exec();
+        return schemaCliente.findOne({_id: ObjectIdCast(clienteId)}).exec();
     } catch (error) {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteCompleto:', error);
+    }
+};
+
+exports.obterClienteDesafio = (clienteId, desafioId) => {
+    try {
+        return schemaCliente.findOne(
+            {
+                _id: ObjectIdCast(clienteId),
+                'desafios.desafio': ObjectIdCast(desafioId)
+            }).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteDesafio:', error);
     }
 };
 
@@ -148,7 +158,8 @@ exports.listarClientesParaDesafios = async clientes =>
                     desafios: 1,
                     goldGeral:1,
                     pontos: 1,
-                    goldPorEstabelecimento: 1
+                    goldPorEstabelecimento: 1,
+                    avatar: 1
                 }
             }]).exec();
     } catch (error) {
@@ -335,16 +346,17 @@ exports.alterarConfigClienteAtualConvitesComanda = async (clienteId, convitesCom
 
 };
 
-exports.alterarGoldsEstabelecimento = async (clienteId, goldPorEstabelecimento) => {
+exports.alterarGoldsEstabelecimento = async (clienteId, estabelecimentoId, goldNoEstabelecimento) => {
 
     try{
         let clienteAlterado = await schemaCliente.findOneAndUpdate(
             {
-                _id: ObjectIdCast(clienteId)
+                _id: ObjectIdCast(clienteId),
+                'goldPorEstabelecimento.estabelecimento':ObjectIdCast(estabelecimentoId)
             },
             {
                 $set: {
-                    goldPorEstabelecimento: goldPorEstabelecimento
+                    'goldPorEstabelecimento.$.gold': goldNoEstabelecimento
                 }
             }).exec();
 
@@ -356,32 +368,6 @@ exports.alterarGoldsEstabelecimento = async (clienteId, goldPorEstabelecimento) 
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarGoldsEstabelecimento:', error);
-        return false;
-    }
-};
-
-exports.removerTodosOsClientesDeUmEstabelecimento = async clientes => {
-    try{
-
-        await schemaCliente.updateMany(
-            {
-                _id: { $in: clientes }
-            },
-            {
-                $set: {
-                    'configClienteAtual.estaEmUmEstabelecimento': false,
-                    'configClienteAtual.conviteEstabPendente': false,
-                    'configClienteAtual.estabelecimento': null,
-                    'configClienteAtual.nomeEstabelecimento': null,
-                    'configClienteAtual.comanda': null
-                }
-            });
-
-        return true;
-    }
-    catch (error)
-    {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in removerTodosOsClientesDeUmEstabelecimento:', error);
         return false;
     }
 };
@@ -412,7 +398,6 @@ exports.alterarClienteParaDesafio = async (clienteId, cliente) => {
         return false;
     }
 };
-
 
 exports.listarConvitesComandaEnviados = async (comandaId) => {
     try {
@@ -457,26 +442,28 @@ exports.listarConvitesComandaEnviados = async (comandaId) => {
     }
 };
 
-//---------------------------------------------------------------------- REFAZER PRA BAIXO
+exports.removerTodosOsClientesDeUmEstabelecimento = async clientes => {
+    try{
 
-exports.listarClienteDesafios = async (query) => {
-    try {
-        return await schemaCliente.aggregate([
+        await schemaCliente.updateMany(
             {
-                $match:
-                {
-                    'desafios.estabelecimento': ObjectIdCast(query._idEstabelecimento),
-                    '_id': ObjectIdCast(query._idCliente)
-                }
+                _id: { $in: clientes }
             },
             {
-                $project:{
-                    'desafios': 1
+                $set: {
+                    'configClienteAtual.estaEmUmEstabelecimento': false,
+                    'configClienteAtual.conviteEstabPendente': false,
+                    'configClienteAtual.estabelecimento': null,
+                    'configClienteAtual.nomeEstabelecimento': null,
+                    'configClienteAtual.comanda': null
                 }
-            }
-        ]);
+            });
 
-    } catch (error) {
-        throw error;
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in removerTodosOsClientesDeUmEstabelecimento:', error);
+        return false;
     }
 };
