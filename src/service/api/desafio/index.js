@@ -1,4 +1,4 @@
-const { cadastrarDesafio, obterDesafio } = require('../../../repository/api/desafio'),
+const { cadastrarDesafio, obterDesafio, listarDesafiosEstab, obterDesafioEstab, alterarDesafioEstab } = require('../../../repository/api/desafio'),
     { obterClienteDesafio, alterarGoldsEstabelecimento, alterarClienteParaDesafio } = require('../../../repository/api/cliente'),
     { obterEstabelecimento, adicionarDesafiosAoEsabelecimento } = require('../../../repository/api/estabelecimento'),
     { InserirMensagemNoCorreio } = require('../../../service/api/correio'),
@@ -10,12 +10,15 @@ exports.CadastrarDesafio = async (estabelecimentoId, desafio) => {
     try
     {
         desafio.objetivo = (typeof desafio.objetivo === 'object') ? desafio.objetivo : JSON.parse(desafio.objetivo);
+        desafio.premio = (typeof desafio.premio === 'object') ? desafio.premio : JSON.parse(desafio.premio);
 
         if (!estabelecimentoId ||
             !desafio.nome ||
             !desafio.tempoDuracao ||
             !desafio.objetivo.tipo ||
-            !desafio.objetivo.quantidade)
+            !desafio.objetivo.quantidade ||
+            !desafio.premio.tipo ||
+            !desafio.premio.quantidade)
             // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
@@ -47,7 +50,7 @@ exports.CadastrarDesafio = async (estabelecimentoId, desafio) => {
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
-        FBCadastrarDesafio(estabelecimentoId, desafio.objetivo.produto, desafioCadastrado);
+        FBCadastrarDesafio(estabelecimentoId, desafio.premio.produto, desafio.objetivo.produto, desafioCadastrado);
 
         // eslint-disable-next-line no-undef
         return { status: true , objeto: desafioCadastrado };
@@ -155,4 +158,54 @@ exports.ResgatarRecompensaDesafio = async (desafioId, clienteId) => {
     await alterarClienteParaDesafio(clienteId, cliente);
 
     return { status: true };
+};
+
+exports.ListarDesafiosEstab = async estabelecimentoId => {
+    try
+    {
+        let desafios = await listarDesafiosEstab(estabelecimentoId);
+
+        return { status: true, objeto: desafios };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarDesafiosEstab:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterDesafioEstab = async (estabelecimentoId, desafioId) => {
+    try
+    {
+        let desafios = await obterDesafioEstab(estabelecimentoId, desafioId);
+
+        return { status: true, objeto: desafios };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterDesafiosEstab:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.AlterarDesafioEstab = async desafio => {
+    try
+    {
+        let desafioAlterado = await alterarDesafioEstab(desafio._id, desafio);
+
+        if (!desafioAlterado){
+            // eslint-disable-next-line no-undef
+            return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA  };
+        }
+
+        return { status: true };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterDesafiosEstab:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
 };

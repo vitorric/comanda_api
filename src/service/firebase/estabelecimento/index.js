@@ -45,19 +45,17 @@ exports.FBAdicionarItemEstabelecimento = (estabelecimentoId, { _id, icon, preco,
 
 
 exports.FBCadastrarDesafio = (estabelecimentoId,
-    produtoId,
+    produtoPremioId,
+    produtoObjetivoId,
     {
         _id,
         nome,
         descricao,
         icon,
-        premio,
         tempoDuracao,
         emGrupo,
-        objetivo:{
-            quantidade,
-            tipo
-        }
+        premio,
+        objetivo
     }) => {
     try
     {
@@ -66,17 +64,24 @@ exports.FBCadastrarDesafio = (estabelecimentoId,
             nome: nome,
             descricao: descricao,
             icon: icon,
-            premio: premio,
+            premio: {
+                quantidade: premio.quantidade,
+                tipo: premio.tipo
+            },
             emGrupo: emGrupo,
             objetivo: {
-                quantidade: quantidade,
-                tipo: tipo
+                quantidade: objetivo.quantidade,
+                tipo: objetivo.tipo
             },
             tempoDuracao: tempoDuracao.toISOString()
         };
 
-        if (produtoId){
-            desafio.objetivo.produto = produtoId.toString();
+        if (produtoObjetivoId){
+            desafio.objetivo.produto = produtoObjetivoId.toString();
+        }
+
+        if (produtoPremioId){
+            desafio.premio.produto = produtoPremioId.toString();
         }
 
         connFb.database().ref('estabelecimentos').child(estabelecimentoId.toString()).child('desafios').child(desafio._id.toString()).set(desafio);

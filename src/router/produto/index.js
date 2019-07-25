@@ -109,5 +109,9 @@ module.exports = () => {
 **/
     router.post('/listar/produto', passportEstabelecimentoJWT, require('./listarProduto')());
 
+    router.post('/obter/produto', passportEstabelecimentoJWT, require('./obterProduto')());
+
+    router.post('/alterar/produto', passportEstabelecimentoJWT, require('./alterarProduto')());
+
     return router;
 };

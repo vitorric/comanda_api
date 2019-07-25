@@ -7,6 +7,8 @@ module.exports = () => {
 
     router.post('/cadastrar/comanda', passportEstabelecimentoJWT, require('./cadastrarComanda')());
 
+    router.post('/listar/comandas', passportEstabelecimentoJWT, require('./listarComandaEstab')());
+
     router.post('/convidar/membro_grupo/comanda', passportClienteJWT, require('./enviarConviteGrupo')());
 
     router.post('/cancelar_convite/membro_grupo/comanda', passportClienteJWT, require('./cancelarConviteGrupo')());

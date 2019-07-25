@@ -182,7 +182,6 @@ exports.obterProdutosComanda = async (comandaId) => {
     }
 };
 
-
 exports.alterarGrupoComanda = async (comandaId, grupo) => {
 
     try {
@@ -286,5 +285,48 @@ exports.alterarAvatarClienteComanda = async (comandaId, clienteId) => {
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarAvatarClienteComanda:', error);
         return false;
+    }
+};
+
+exports.listarComandasEstab = async estabelecimentoId => {
+    try {
+        return await schemaComanda.aggregate([
+            {
+                $match: {
+                    estabelecimento: ObjectIdCast(estabelecimentoId)
+                }
+            },
+            { $unwind : { 'path': '$grupo' ,
+                'preserveNullAndEmptyArrays': true} },
+            {
+                $lookup:
+                    {
+                        from: 'cliente',
+                        localField: 'grupo.cliente',
+                        foreignField: '_id',
+                        as: 'responsavel'
+                    }
+            },
+            { $unwind : { 'path': '$responsavel' ,
+                'preserveNullAndEmptyArrays': true} },
+            {
+                $match: {
+                    'grupo.lider': true
+                }
+            },
+            { $sort : { status: 1, createdAt: 1 } },
+            {
+                $project:
+                {
+                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$createdAt' } },
+                    valorTotal: 1,
+                    status: 1,
+                    'responsavel.nome': 1,
+                    dataSaida: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$dataSaida' } }
+                }
+            }
+        ]).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarComandasEstab:', error);
     }
 };

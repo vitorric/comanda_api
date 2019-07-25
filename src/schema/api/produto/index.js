@@ -3,6 +3,11 @@ const { Schema } = require('mongoose'),
 
 const ProdutoSchema = new Schema(
     {
+        codigo: {
+            type: Number,
+            required: true,
+            unique: true
+        },
         nome: {
             type: String,
             required: true

@@ -5,7 +5,8 @@ const { cadastrarComanda,
         cadastrarItemComanda,
         obterGrupoComanda,
         obterProdutosComanda,
-        transferirLiderancaGrupo  } = require('../../../repository/api/comanda'),
+        transferirLiderancaGrupo,
+        listarComandasEstab  } = require('../../../repository/api/comanda'),
     { obterClienteCompleto,
         obterClienteChaveUnica,
         listarClientesParaDesafios,
@@ -500,5 +501,20 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarItemComanda:', error);
+    }
+};
+
+exports.ListarComandasEstab = async estabelecimentoId => {
+    try
+    {
+        let comandas = await listarComandasEstab(estabelecimentoId);
+
+        return { status: true, objeto: comandas };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarComandasEstab:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

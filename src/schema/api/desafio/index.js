@@ -18,9 +18,20 @@ const DesafioSchema = new Schema(
             type: Boolean,
             default: false
         },
-        premio:{
-            type:Number,
-            default: 0
+        premio:
+        {
+            tipo: {
+                type: String,
+                required: true
+            },
+            quantidade: {
+                type:Number,
+                required: true
+            },
+            produto:{
+                type: Schema.Types.ObjectId,
+                ref: 'produto'
+            }
         },
         tempoDuracao:{
             type:Date,

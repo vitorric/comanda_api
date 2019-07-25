@@ -58,9 +58,16 @@ module.exports = () => {
 **/
     router.post('/cadastrar/desafio', passportEstabelecimentoJWT, require('./cadastrarDesafio')());
 
+    router.post('/listar/desafios', passportEstabelecimentoJWT, require('./listarDesafiosEstab')());
+
+    router.post('/obter/desafio', passportEstabelecimentoJWT, require('./obterDesafioEstab')());
+
+    router.post('/alterar/desafio', passportEstabelecimentoJWT, require('./alterarDesafioEstab')());
+
     router.post('/obter/desafio/cliente', passportClienteJWT, require('./obterDesafioCliente')());
 
     router.post('/resgatar/recompensa/desafio', passportClienteJWT, require('./resgatarRecompensaDesafio')());
+
 
     return router;
 };

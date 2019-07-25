@@ -11,7 +11,7 @@ const { cadastrarCliente,
         alterarGoldsEstabelecimento,
         listarClienteDesafios } = require('../../../repository/api/cliente'),
     {   cadastrarHistoricoCompra, listarHistoricoCompra  } = require('../../../repository/api/historicoCompraLojas'),
-    {   obterItemLoja, alterarItemLojaCompra  } = require('../../../repository/api/itemLoja'),
+    {   obterItemLojaCliente, alterarItemLojaCompra  } = require('../../../repository/api/itemLoja'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
     { gerarChaveAmigavel, recuperarSenha } = require('../../../utils'),
     { FBCriarCliente,
@@ -363,7 +363,7 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
 
         let cliente = await obterClienteCompleto(clienteId);
         //let estabelecimento = await obterEstabelecimento(infoCompra.estabelecimentoId);
-        let itemLoja = await obterItemLoja(infoCompra.itemLoja);
+        let itemLoja = await obterItemLojaCliente(infoCompra.itemLoja);
 
         if (!cliente ||
             !itemLoja)

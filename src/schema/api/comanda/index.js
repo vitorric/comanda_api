@@ -7,7 +7,8 @@ const ComandaSchema = new Schema(
         dataSaida:{
             type: Date
         },
-        status:{
+        status:
+        {
             type:Number,
             default: 0
         },
