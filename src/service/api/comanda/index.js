@@ -6,7 +6,8 @@ const { cadastrarComanda,
         obterGrupoComanda,
         obterProdutosComanda,
         transferirLiderancaGrupo,
-        listarComandasEstab  } = require('../../../repository/api/comanda'),
+        listarComandasEstab,
+        obterComandaEstab  } = require('../../../repository/api/comanda'),
     { obterClienteCompleto,
         obterClienteChaveUnica,
         listarClientesParaDesafios,
@@ -30,9 +31,9 @@ function alterarProdutosNaComanda (produtos, produtoId, preco, quantidade)
     produtos.map(function(value) {
         if (value.produto.toString() == produtoId.toString())
         {
-            value.preco = preco;
-            value.quantidade += quantidade;
-            value.precoTotal += quantidade * preco;
+            value.preco = Number(preco);
+            value.quantidade += Number(quantidade);
+            value.precoTotal += Number(quantidade) * Number(preco);
             encontrou = true;
         }
     });
@@ -514,6 +515,21 @@ exports.ListarComandasEstab = async estabelecimentoId => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarComandasEstab:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterComandasEstab = async comandaId => {
+    try
+    {
+        let comanda = await obterComandaEstab(comandaId);
+
+        return { status: true, objeto: comanda };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterComandasEstab:', error);
         // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }

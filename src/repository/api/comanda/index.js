@@ -109,7 +109,7 @@ exports.obterGrupoComanda = async (comandaId) => {
     }
     catch (error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarItemComanda:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterGrupoComanda:', error);
         return false;
     }
 };
@@ -304,10 +304,10 @@ exports.listarComandasEstab = async estabelecimentoId => {
                         from: 'cliente',
                         localField: 'grupo.cliente',
                         foreignField: '_id',
-                        as: 'responsavel'
+                        as: 'lider'
                     }
             },
-            { $unwind : { 'path': '$responsavel' ,
+            { $unwind : { 'path': '$lider' ,
                 'preserveNullAndEmptyArrays': true} },
             {
                 $match: {
@@ -321,12 +321,130 @@ exports.listarComandasEstab = async estabelecimentoId => {
                     createdAt: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$createdAt' } },
                     valorTotal: 1,
                     status: 1,
-                    'responsavel.nome': 1,
+                    'lider.nome': 1,
                     dataSaida: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$dataSaida' } }
                 }
             }
         ]).exec();
     } catch (error) {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in listarComandasEstab:', error);
+    }
+};
+
+exports.obterComandaEstab = async comandaId => {
+
+    try {
+
+        return await schemaComanda.aggregate([
+            {
+                $match:
+                {
+                    _id: ObjectIdCast(comandaId)
+                }
+            },
+            {
+                $unwind : { 'path': '$grupo' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'cliente',
+                    let: { clienteId: '$grupo.cliente' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$clienteId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'apelido': 1,
+                                'nome': 1,
+                                'chaveAmigavel': 1
+                            }
+                        }
+                    ],
+                    as: 'grupo.cliente'
+                }
+            },
+            {
+                $unwind : { 'path': '$grupo.cliente' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $sort:
+                {
+                    'grupo.lider': 1
+                }
+            },
+            {
+                $unwind : { 'path': '$produtos' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'produto',
+                    let: { produtoId: '$produtos.produto' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$produtoId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'nome': 1
+                            }
+                        }
+                    ],
+                    as: 'produtos.produto'
+                }
+            },
+            {
+                $unwind : { 'path': '$produtos.produto' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $group:
+                {
+                    '_id': {
+                        _id: '$_id',
+                        status: '$status',
+                        valorTotal: '$valorTotal',
+                        createdAt: '$createdAt'
+                    },
+                    'grupo': {
+                        '$addToSet':'$grupo'
+                    },
+                    'produtos': {
+                        '$addToSet':'$produtos'
+                    }
+                }
+            },
+            {
+                $project:
+                {
+                    _id: '$_id._id',
+                    status: '$_id.status',
+                    grupo: 1,
+                    produtos: 1,
+                    valorTotal: '$_id.valorTotal',
+                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$_id.createdAt' } }
+                }
+            }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterComandaEstab:', error);
+        return false;
     }
 };
