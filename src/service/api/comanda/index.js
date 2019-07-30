@@ -49,28 +49,34 @@ function alterarProdutosNaComanda (produtos, produtoId, preco, quantidade)
     return produtos;
 }
 
-exports.CadastrarComanda = async (estabelecimentoId, comanda) => {
+exports.CadastrarComanda = async (estabelecimentoId, clienteId) => {
 
     try
     {
-        let cliente = await obterClienteCompleto(comanda.clienteId);
+        let cliente = await obterClienteCompleto(clienteId);
 
         if (!cliente)
         {
         // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
-        console.log(cliente.configClienteAtual.estabelecimento);
-        if (typeof cliente.configClienteAtual.estabelecimento === 'undefined' || cliente.configClienteAtual.estabelecimento === null || (cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId))
+
+        // if (typeof cliente.configClienteAtual.estabelecimento === 'undefined' || cliente.configClienteAtual.estabelecimento === null || (cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId))
+        //     // eslint-disable-next-line no-undef
+        //     return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO };
+        if (typeof cliente.configClienteAtual.estabelecimento !== 'undefined' && cliente.configClienteAtual.estabelecimento !== null && cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId)
             // eslint-disable-next-line no-undef
-            return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO };
+            return { status: false , mensagem: Mensagens.CLIENTE_ESTA_EM_OUTRO_ESTABELECIMENTO };
+
         if (cliente.configClienteAtual.comanda != null)
             // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_JA_TEM_COMANDA };
 
+        let comanda = {};
         comanda.estabelecimento = estabelecimentoId;
         comanda.grupo = [];
         comanda.grupo.push({ cliente: cliente._id, lider: true });
+        comanda.status = 1;
 
         let comandaCriada = await cadastrarComanda(comanda);
 

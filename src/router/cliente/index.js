@@ -1,5 +1,6 @@
 const passport = require('passport'),
     passportClienteJWT = passport.authenticate('clienteAuth', {session:false}),
+    passportEstabelecimentoJWT = passport.authenticate('estabelecimentoAuth', {session:false}),
     router = require('express').Router();
 
 module.exports = () => {
@@ -27,6 +28,8 @@ module.exports = () => {
     router.post('/listar/cliente/historico/compra',passportClienteJWT, require('./listarHistoricoCompra')());
 
     router.post('/listar/cliente/desafios',passportClienteJWT, require('./listarClienteDesafios')());
+
+    router.post('/obter/cliente/chave_unica',passportEstabelecimentoJWT, require('./obterClienteChaveUnica')());
 
     return router;
 };

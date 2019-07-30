@@ -131,6 +131,20 @@ exports.obterClienteChaveUnica = chaveAmigavel => {
     }
 };
 
+exports.obterClienteChaveUnicaPortal = chaveAmigavel => {
+    try {
+        return schemaCliente.findOne({chaveAmigavel: chaveAmigavel},
+            {
+                nome: 1,
+                apelido: 1,
+                cpf: 1,
+                chaveAmigavel: 1
+            }).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteChaveUnica:', error);
+    }
+};
+
 exports.obterClienteEmail = email => {
     try
     {

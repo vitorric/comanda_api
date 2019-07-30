@@ -3,6 +3,7 @@ const { cadastrarCliente,
         obterCliente,
         obterClienteCompleto,
         obterClienteEmail,
+        obterClienteChaveUnicaPortal,
         alterarCliente,
         listarClientes,
         alterarClienteConfigApp,
@@ -136,6 +137,27 @@ exports.LoginCliente = async (user) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginCliente:', error);
+        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterClienteChaveUnica = async chaveAmigavel => {
+
+    try{
+
+        let cliente = await obterClienteChaveUnicaPortal(chaveAmigavel);
+
+        if (!cliente){
+            // eslint-disable-next-line no-undef
+            return { status: false, mensagem: Mensagens.CLIENTE_NAO_ENCONTRADO  };
+        }
+
+        return { status: true, objeto: cliente };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
         // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }

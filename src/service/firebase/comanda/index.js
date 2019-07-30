@@ -4,8 +4,7 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
     try
     {
         let membro = [];
-        let produtos = [];
-
+        console.log(comanda, clienteApelido, clienteId, avatarId, clienteSexo, configCliente);
         comanda.grupo.map((value) => {
             membro = {
                 lider: value.lider,
@@ -21,27 +20,17 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
             };
         });
 
-        comanda.produtos.map((value) => {
-            produtos.push({
-                preco: value.preco,
-                quantidade: value.quantidade,
-                produto: value.produto.toString(),
-                precoTotal: value.precoTotal
-            });
-        });
-
         let novaComanda =
         {
             _id: comanda._id.toString(),
             estabelecimento: comanda.estabelecimento.toString(),
-            valorTotal: comanda.valorTotal,
-            produtos: produtos
+            valorTotal: comanda.valorTotal
         };
 
         let configClienteAtual = {
             estaEmUmEstabelecimento: configCliente.estaEmUmEstabelecimento,
             conviteEstabPendente: configCliente.conviteEstabPendente,
-            estabelecimento: configCliente.estabelecimento.toString(),
+            estabelecimento: (configCliente.estabelecimento !== null) ? configCliente.estabelecimento.toString() : '',
             nomeEstabelecimento: configCliente.nomeEstabelecimento,
             comanda: configCliente.comanda.toString()
         };

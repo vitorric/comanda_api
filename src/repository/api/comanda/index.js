@@ -393,7 +393,7 @@ exports.obterComandaEstab = async comandaId => {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: [ '$_id', '$$produtoId'],
+                                    $eq: [ '$_id', '$$produtoId']
                                 }
                             }
                         },
@@ -439,8 +439,13 @@ exports.obterComandaEstab = async comandaId => {
                     valorTotal: '$_id.valorTotal',
                     createdAt: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$_id.createdAt' } }
                 }
-            }
-        ]).exec().then(items => items[0]);
+            },
+        ]).exec().then(items => {
+            if (Object.keys(items[0].produtos[0]).length === 0)
+                items[0].produtos = [];
+
+            return items[0];
+        });
     }
     catch (error)
     {
