@@ -25,6 +25,21 @@ exports.obterDesafio = async desafioId => {
     }
 };
 
+exports.obterDesafioStatusFirebase = async desafioId => {
+    try {
+        let resultado = await schemaDesafio.findOne({
+            _id: ObjectIdCast(desafioId)
+        },
+        {
+            statusFirebase: 1
+        }).exec();
+
+        return resultado.statusFirebase;
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterDesafioStatusFirebase:', error);
+    }
+};
+
 exports.listarDesafiosAtivos = async (produto, estabelecimento, estaEmGrupo) => {
     try {
         return await schemaDesafio.aggregate([
@@ -87,11 +102,12 @@ exports.listarDesafiosEstab = async estabelecimentoId => {
                         }
             },
             { $unwind : { 'path': '$premio.produto' ,
-                'preserveNullAndEmptyArrays': true} },{
+                'preserveNullAndEmptyArrays': true} },
+            {
                 $project:
                 {
                     nome: 1,
-                    tempoDuracao: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$tempoDuracao' } },
+                    tempoDuracao: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$tempoDuracao', timezone: 'America/Sao_Paulo' } },
                     emGrupo: 1,
                     status: 1,
                     'objetivo.tipo': 1,
@@ -101,7 +117,8 @@ exports.listarDesafiosEstab = async estabelecimentoId => {
                     'premio.tipo': 1,
                     'premio.produto.nome': 1
                 }
-            }]).exec();
+            },
+            { $sort : { 'createdAt': 1 } } ]).exec();
     } catch (error) {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in listarDesafiosEstab:', error);
     }
@@ -140,8 +157,10 @@ exports.obterDesafioEstab = async (estabelecimentoId, desafioId) => {
                 'preserveNullAndEmptyArrays': true} },{
                 $project:
                 {
+                    icon: 1,
                     nome: 1,
                     tempoDuracao: 1,
+                    tempoEntrarNoAr: 1,
                     emGrupo: 1,
                     descricao: 1,
                     status: 1,
@@ -173,8 +192,7 @@ exports.alterarDesafioEstab = async (desafioId, desafio) => {
                     nome: desafio.nome,
                     descricao: desafio.descricao,
                     status: desafio.status,
-                    tempoDuracao: desafio.tempoDuracao,
-                    icon: desafio.icon
+                    tempoDuracao: desafio.tempoDuracao
                 }
 
             }).exec();
@@ -188,5 +206,80 @@ exports.alterarDesafioEstab = async (desafioId, desafio) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarAvatar:', error);
+    }
+};
+
+exports.alterarDesafioEstabStatus = async (desafioId, status) => {
+
+    try {
+
+        let desafioAlterado = await schemaDesafio.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(desafioId)
+            },
+            {
+                $set: {
+                    status: status
+                }
+
+            }).exec();
+
+        if (!desafioAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarDesafioEstabStatus:', error);
+    }
+};
+
+exports.alterarDesafioIcon = async (desafioId, nomeIcon) => {
+
+    try {
+
+        let desafioAlterado = await schemaDesafio.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(desafioId)
+            },
+            {
+                $set: {
+                    icon: nomeIcon
+                }
+
+            }).exec();
+
+        if (!desafioAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarDesafioIcon:', error);
+    }
+};
+
+exports.alterarDesafioStatusFirebase = (desafioId, statusFirebase) => {
+    try{
+        schemaDesafio.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(desafioId)
+            },
+            {
+                $set: {
+                    statusFirebase: statusFirebase
+                }
+            }).exec();
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarDesafioStatusFirebase:', error);
+        return false;
     }
 };

@@ -29,10 +29,10 @@ exports.FBAlterarCliente = async (clienteId, cliente) => {
     }
 };
 
-exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEstabelecimento) => {
+exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEstabelecimento, comandaId) => {
     try
     {
-
+        console.log(clienteId, _idEstabelecimento, nomeEstabelecimento, comandaId);
         let configAtualCliente = {
             estaEmUmEstabelecimento: true,
             conviteEstabPendente: false,
@@ -40,10 +40,58 @@ exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEs
             nomeEstabelecimento: nomeEstabelecimento
         };
 
+        if (typeof comandaId !== 'undefined' && comandaId !== null)
+            configAtualCliente.comanda = comandaId.toString();
+
+        console.log(configAtualCliente);
         var updates = {};
         updates['/clientes/' + clienteId + '/configClienteAtual'] = configAtualCliente;
 
         return await connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
+exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEstabelecimento, comandaId) => {
+    try
+    {
+        console.log(clienteId, _idEstabelecimento, nomeEstabelecimento, comandaId);
+        let configAtualCliente = {
+            estaEmUmEstabelecimento: true,
+            conviteEstabPendente: false,
+            estabelecimento: _idEstabelecimento,
+            nomeEstabelecimento: nomeEstabelecimento
+        };
+
+        if (typeof comandaId !== 'undefined' && comandaId !== null)
+            configAtualCliente.comanda = comandaId.toString();
+
+        console.log(configAtualCliente);
+        var updates = {};
+        updates['/clientes/' + clienteId + '/configClienteAtual'] = configAtualCliente;
+
+        return await connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
+exports.FBSairDoEstabelecimento = async clienteId => {
+    try
+    {
+        let configAtualCliente = {
+            estaEmUmEstabelecimento: false,
+            conviteEstabPendente: false
+        };
+
+        connFb.database().ref('/clientes/' + clienteId.toString() + '/configClienteAtual').set(configAtualCliente);
     }
     catch(err)
     {

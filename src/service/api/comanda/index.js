@@ -7,7 +7,9 @@ const { cadastrarComanda,
         obterProdutosComanda,
         transferirLiderancaGrupo,
         listarComandasEstab,
-        obterComandaEstab  } = require('../../../repository/api/comanda'),
+        obterComandaEstab,
+        alterarClientePagouComanda,
+        fecharComanda } = require('../../../repository/api/comanda'),
     { obterClienteCompleto,
         obterClienteChaveUnica,
         listarClientesParaDesafios,
@@ -15,12 +17,22 @@ const { cadastrarComanda,
         alterarConfigClienteAtual,
         alterarConfigClienteAtualConvitesComanda,
         alterarConfigClienteAtualComanda,
-        listarConvitesComandaEnviados } = require('../../../repository/api/cliente'),
-    { obterProduto, alterarProdutoEstoque } = require('../../../repository/api/produto'),
+        listarConvitesComandaEnviados,
+        removerClienteEstabelecimento } = require('../../../repository/api/cliente'),
+    { obterProduto, alterarProdutoVendido } = require('../../../repository/api/produto'),
+    { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
     { listarDesafiosAtivos } = require('../../../repository/api/desafio'),
-    { InserirMensagemNoCorreio, DesativarMensagemConviteGrupo, MarcarAcaoExecutadaMensagem } = require('../../api/correio'),
-    { FBCadastrarComanda, FBInserirMembroNoGrupoComanda, FBAlterarGrupoComanda, FBAlterarProdutosComanda } = require('../../firebase/comanda'),
-    { FBAlterarConvitesComanda, FBLimparConvites } = require('../../firebase/cliente'),
+    {
+        InserirMensagemNoCorreio,
+        DesativarMensagemConviteGrupo,
+        MarcarAcaoExecutadaMensagem } = require('../../api/correio'),
+    {
+        FBCadastrarComanda,
+        FBInserirMembroNoGrupoComanda,
+        FBAlterarGrupoComanda,
+        FBAlterarProdutosComanda,
+        FBRemoverComanda } = require('../../firebase/comanda'),
+    { FBAlterarConvitesComanda, FBLimparConvites, FBSairDoEstabelecimento } = require('../../firebase/cliente'),
     { FBAlterarDesafios } = require('../../firebase/desafios'),
     { AlterarExp } = require('../../api/avatar');
 
@@ -56,20 +68,19 @@ exports.CadastrarComanda = async (estabelecimentoId, clienteId) => {
         let cliente = await obterClienteCompleto(clienteId);
 
         if (!cliente)
-        {
-        // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
-        }
+
+        let estabelecimento = await obterEstabelecimento(estabelecimentoId);
+
+        if (!estabelecimento.configEstabelecimentoAtual.estaAberta)
+            return { status: false, mensagem: Mensagens.ESTABELECIMENTO_FECHADO };
 
         // if (typeof cliente.configClienteAtual.estabelecimento === 'undefined' || cliente.configClienteAtual.estabelecimento === null || (cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId))
-        //     // eslint-disable-next-line no-undef
         //     return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO };
         if (typeof cliente.configClienteAtual.estabelecimento !== 'undefined' && cliente.configClienteAtual.estabelecimento !== null && cliente.configClienteAtual.estabelecimento.toString() != estabelecimentoId)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_ESTA_EM_OUTRO_ESTABELECIMENTO };
 
         if (cliente.configClienteAtual.comanda != null)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_JA_TEM_COMANDA };
 
         let comanda = {};
@@ -82,19 +93,25 @@ exports.CadastrarComanda = async (estabelecimentoId, clienteId) => {
 
         if (!comandaCriada)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
 
         cliente.configClienteAtual.comanda = comandaCriada._id;
+        //insere o cliente no estabelecimento
+        cliente.configClienteAtual.estabelecimento = estabelecimentoId;
+        cliente.configClienteAtual.nomeEstabelecimento = estabelecimento.nome;
+        cliente.configClienteAtual.estaEmUmEstabelecimento = true;
 
         let configAlterada = await alterarConfigClienteAtual(cliente._id, cliente.configClienteAtual);
 
         if (!configAlterada)
         {
-        // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
+
+        estabelecimento.configEstabelecimentoAtual.clientesNoLocal.push(clienteId);
+
+        alterarClientesNoLocal(estabelecimentoId, estabelecimento.configEstabelecimentoAtual.clientesNoLocal);
 
         FBCadastrarComanda(comandaCriada, cliente.apelido, cliente._id, cliente.avatar, cliente.sexo, cliente.configClienteAtual);
 
@@ -103,7 +120,6 @@ exports.CadastrarComanda = async (estabelecimentoId, clienteId) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarComanda:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -116,7 +132,6 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
 
         if (!comandaLider)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.LIDER_COMANDA_NAO_ENCONTRADO };
         }
 
@@ -124,22 +139,18 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
         let clienteMembro = await obterClienteChaveUnica(membro.chaveAmigavel);
 
         if (!clienteMembro)
-            // eslint-disable-next-line no-undef
             return {status: false, mensagem: Mensagens.MEMBRO_COMANDA_NAO_ENCONTRADO};
 
         //verifica se o cliente membro esta em algum estabelecimento
         if (!clienteMembro.configClienteAtual.estabelecimento)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO };
 
         //verifica se encontrou o cliente membro
         if (!clienteMembro)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.MEMBRO_COMANDA_NAO_ENCONTRADO };
 
         //verifica se o membro ja tem alguma comanda
         if (typeof clienteMembro.configClienteAtual.comanda !== 'undefined' && clienteMembro.configClienteAtual.comanda !== null)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_JA_TEM_COMANDA };
 
         let indexConvite = clienteMembro.configClienteAtual.convitesComanda.findIndex(x =>
@@ -148,7 +159,6 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
 
         if (indexConvite > -1)
         {
-            // eslint-disable-next-line no-undef
             return { status: false, mensagem: Mensagens.CONVITE_CLIENTE_JA_CONVIDADO };
         }
 
@@ -162,7 +172,6 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
 
         if (!conviteEnviado)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
@@ -183,12 +192,10 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
             }
         });
 
-        // eslint-disable-next-line no-undef
         return { status: true, mensagem: Mensagens.CONVITE_COMANDA_ENVIADO };
     }
     catch(error){
         console.log('\x1b[31m%s\x1b[0m', 'Erro in EnviarConviteGrupo:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -203,7 +210,6 @@ exports.ListarConvitesComandaEnviados = async comandaId => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarConvitesComandaEnviados:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -216,7 +222,6 @@ exports.CancelarConviteGrupo = async (clienteIdLider, membro) => {
 
         if (!comandaLider)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.LIDER_COMANDA_NAO_ENCONTRADO };
         }
 
@@ -225,7 +230,6 @@ exports.CancelarConviteGrupo = async (clienteIdLider, membro) => {
 
         //verifica se encontrou o cliente membro
         if (!clienteMembro)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.MEMBRO_COMANDA_NAO_ENCONTRADO };
 
         let indexConvite = clienteMembro.configClienteAtual.convitesComanda.findIndex(x =>
@@ -240,7 +244,6 @@ exports.CancelarConviteGrupo = async (clienteIdLider, membro) => {
 
         if (indexConvite === -1)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CONVITE_NAO_ENCONTRADO };
         }
 
@@ -248,19 +251,16 @@ exports.CancelarConviteGrupo = async (clienteIdLider, membro) => {
 
         if (!conviteEnviado)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
         FBAlterarConvitesComanda(clienteMembro._id, clienteMembro.configClienteAtual.convitesComanda);
         DesativarMensagemConviteGrupo(clienteMembro._id, comandaLider._id);
 
-        // eslint-disable-next-line no-undef
         return { status: true };
     }
     catch(error){
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CancelarConviteGrupo:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -274,7 +274,6 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
 
         if (!comanda)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.COMANDA_NAO_ENCOTRADA };
         }
 
@@ -283,24 +282,20 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
 
         //verifica se encontrou o cliente membro
         if (!clienteMembro)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.MEMBRO_COMANDA_NAO_ENCONTRADO };
 
         if (infoResposta.aceitou)
         {
             //verifica se o cliente membro esta em algum estabelecimento
             if (!clienteMembro.configClienteAtual.estabelecimento)
-            // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO_APP };
 
             //verifica se o cliente membro esta no mesmo estabelecimento da
             if (clienteMembro.configClienteAtual.estabelecimento.toString() !== comanda.estabelecimento.toString())
-            // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.CLIENTE_ESTABELECIMENTO_DIFERENTE_APP };
 
             //verifica se o membro ja tem alguma comanda
-            if (clienteMembro.configClienteAtual.comanda !== null)
-            // eslint-disable-next-line no-undef
+            if (typeof clienteMembro.configClienteAtual.comanda !== 'undefined' && clienteMembro.configClienteAtual.comanda !== null)
                 return { status: false , mensagem: Mensagens.CLIENTE_JA_TEM_COMANDA };
 
             //atribui a comanda pro membro tambem e zera os convites
@@ -316,7 +311,6 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
 
             if (!grupoAlterado)
             {
-                // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
             }
         }
@@ -336,7 +330,6 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
 
             if (!conviteEnviado)
             {
-                // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
             }
 
@@ -369,7 +362,6 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in RespostaConviteGrupo:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -389,7 +381,6 @@ exports.TransferirLiderancaGrupo = async (comandaId, clienteLiderId, clienteNovo
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in TransferirLiderancaGrupo:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -401,7 +392,6 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
         if (!estabelecimentoId ||
             !produtoComanda.comandaId ||
             !produtoComanda.produto)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         let comanda = await obterComanda(produtoComanda.comandaId);
@@ -409,13 +399,11 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
 
         if (!produto || !comanda)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
 
         if (produto.estoque < produtoComanda.quantidade)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.ITEM_LOJA_SEM_ESTOQUE };
         }
 
@@ -425,15 +413,16 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
 
         comanda.valorTotal += precoTotalDaCompra;
 
-        produto.estoque -= produtoComanda.quantidade;
+        produto.estoque -= parseInt(produtoComanda.quantidade);
+
+        produto.quantidadeVendida += parseInt(produtoComanda.quantidade);
 
         let comandaAlterada = await cadastrarItemComanda(comanda._id, comanda.produtos, comanda.valorTotal);
 
         if (!comandaAlterada)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
 
-        alterarProdutoEstoque(produto._id, produto.estoque);
+        alterarProdutoVendido(produto._id, produto.estoque, produto.quantidadeVendida);
 
         let desafios = await listarDesafiosAtivos(produto._id, estabelecimentoId, (comanda.grupo.length > 1) ? true : false);
 
@@ -455,26 +444,25 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
         });
 
         if (desafios.length > 0)
-        // eslint-disable-next-line no-empty
         {
-            console.log('Encontrou desafios');
-
             //para cada desafio
             desafios.forEach(async desafio => {
 
                 //varre todos os clientes da comanda
-                todosClientesDoGrupo.map(async function(cliente)
+                todosClientesDoGrupo.forEach(async function(cliente)
                 {
                     let indexDesafio = cliente.desafios.findIndex(x => x.desafio.toString() == desafio._id.toString());
 
+                    //verifica se o desafio ja foi concluido == Fazer isso amanha
+
                     //encontrou o desafio
-                    if (indexDesafio > -1)
+                    if (indexDesafio > -1 && cliente.desafios[indexDesafio].concluido === false)
                     {
                         if (desafio.objetivo.tipo === 'Produto')
-                            cliente.desafios[indexDesafio].progresso += produtoComanda.quantidade;
+                            cliente.desafios[indexDesafio].progresso += parseInt(produtoComanda.quantidade);
 
                         if (desafio.objetivo.tipo === 'Dinheiro')
-                            cliente.desafios[indexDesafio].progresso += precoTotalDaCompra;
+                            cliente.desafios[indexDesafio].progresso += parseInt(precoTotalDaCompra);
                     }
 
                     if (indexDesafio === -1)
@@ -491,19 +479,21 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
 
                     if (cliente.desafios[indexDesafio].progresso >= desafio.objetivo.quantidade)
                     {
-                        cliente.desafios[indexDesafio].progresso = desafio.objetivo.quantidade;
-                        cliente.desafios[indexDesafio].concluido = true;
-                        cliente.desafios[indexDesafio].dataConclusao = new Date();
+                        if (typeof cliente.desafios[indexDesafio].concluido === 'undefined' || cliente.desafios[indexDesafio].concluido === false)
+                        {
+                            cliente.desafios[indexDesafio].progresso = parseInt(desafio.objetivo.quantidade);
+                            cliente.desafios[indexDesafio].concluido = true;
+                            cliente.desafios[indexDesafio].dataConclusao = new Date();
+                        }
                     }
 
-                    await alterarClienteParaDesafio(cliente._id, cliente);
+                    alterarClienteParaDesafio(cliente._id, cliente);
                     FBAlterarDesafios(cliente._id, cliente.desafios);
                 });
             });
-
         }
 
-        return { status: true };
+        return { status: true, objeto: { valorTotal: comanda.valorTotal, produtosComanda: produtoFirebase } };
     }
     catch (error)
     {
@@ -521,7 +511,6 @@ exports.ListarComandasEstab = async estabelecimentoId => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarComandasEstab:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -536,7 +525,101 @@ exports.ObterComandasEstab = async comandaId => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterComandasEstab:', error);
-        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ClientePagarComanda = async (estabelecimentoId, {clienteId, comandaId, valorPago}) => {
+    try
+    {
+        let comanda = await obterComanda(comandaId);
+
+        if (!comanda)
+            return { status: false , mensagem: Mensagens.COMANDA_NAO_ENCOTRADA };
+
+        let cliente = await obterClienteCompleto(clienteId);
+
+        if (!cliente)
+            return { status: false , mensagem: Mensagens.CLIENTE_NAO_ENCONTRADO };
+
+        let estabelecimento = await obterEstabelecimento(estabelecimentoId);
+
+        if (!estabelecimento)
+            return { status: false, mensagem: Mensagens.ESTABELECIMENTO_NAO_ENCONTRADO };
+
+        //obtem o cliente que vai pagar a comanda
+        let clienteComanda = comanda.grupo.filter(integrante => {
+            return integrante.cliente.toString() === clienteId && !integrante.jaPagou;
+        })[0];
+
+        //se nao encontrar o cliente, ou ele nao esta na comanda ou ja pagou
+        if (!clienteComanda)
+            return { status: false , mensagem: Mensagens.CLIENTE_NAO_ENCONTRADO_OU_PAGOU };
+
+        //obtem o valor total pago pelos clientes na comanda
+        let valorPagoTotal = comanda.grupo.reduce((a, b) => a + (b['valorPago'] || 0), 0);
+
+        //obtem quantas pessoas na comanda ainda nao pagaram
+        let pessoasNaoPagaramNoGrupo = comanda.grupo.filter(integrante => {
+            return !integrante.jaPagou;
+        });
+
+        let valorRestanteAPagar = (comanda.valorTotal - valorPagoTotal);
+
+        //verifica se o valor que o cliente ira pagar eh menor que o restante e se tem somente 1 no grupo
+        if (valorPago < valorRestanteAPagar && pessoasNaoPagaramNoGrupo.length === 1)
+            return { status: false , mensagem: Mensagens.PAGAMENTO_VALOR_INVALIDO };
+
+        if (valorPago > valorRestanteAPagar)
+            return { status: false , mensagem: Mensagens.PAGAMENTO_VALOR_MAIOR };
+
+        //verifica se o cliente que esta pagando eh o lider do grupo, caso seja, a lideranca eh transferida para o proximo membro do grupo que ainda nao pagou
+        if (clienteComanda.lider && pessoasNaoPagaramNoGrupo.length > 1)
+        {
+            let novoLider = pessoasNaoPagaramNoGrupo.filter(integrante => {
+                return integrante.cliente.toString() !== clienteId;
+            })[0];
+
+            transferirLiderancaGrupo(comandaId, clienteId, false);
+            transferirLiderancaGrupo(comandaId, novoLider.cliente, true);
+        }
+
+        //altera a comanda informando que o cliente pagou
+        alterarClientePagouComanda(comandaId, clienteId, valorPago);
+
+        let grupoAlterado = await obterGrupoComanda(comandaId);
+
+        let fechar = (pessoasNaoPagaramNoGrupo.length === 1) ? true : false;
+
+        //se tiver apenas o cliente pagante no grupo, fecha a comanda
+        if (fechar)
+        {
+            fecharComanda(comandaId, new Date());
+            FBRemoverComanda(comandaId);
+        }
+
+        if (!fechar)
+        {
+            FBAlterarGrupoComanda(grupoAlterado);
+        }
+
+        //retira a comanda do cliente e remove ele do estabelecimento
+        removerClienteEstabelecimento(clienteId);
+        //remove do firebase
+        FBSairDoEstabelecimento(clienteId);
+
+        //remove o cliente do estabelecimento
+        let clientesAtuaisNoEstab = estabelecimento.configEstabelecimentoAtual.clientesNoLocal.filter(cliente => {
+            return cliente.toString() !== clienteId.toString();
+        });
+
+        alterarClientesNoLocal(estabelecimentoId, clientesAtuaisNoEstab);
+
+        return { status: true };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ClientePagarComanda:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

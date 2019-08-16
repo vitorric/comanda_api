@@ -48,7 +48,6 @@ exports.AlterarAvatar = async (clienteId, avatarId, avatar) => {
             !avatar.corPele ||
             !avatar.corCabelo)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
 
@@ -57,7 +56,6 @@ exports.AlterarAvatar = async (clienteId, avatarId, avatar) => {
         let avatarAlterado = await alterarAvatar(avatarId, avatar);
 
         if (!avatarAlterado)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
 
         if (cliente.configClienteAtual.comanda != null)
@@ -74,7 +72,6 @@ exports.AlterarAvatar = async (clienteId, avatarId, avatar) => {
     catch(error){
 
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarAvatar:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -90,7 +87,6 @@ exports.ObterAvatar = async (avatarId) => {
     catch(error){
 
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterAvatar:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -118,7 +114,6 @@ exports.AlterarExp = async (clienteId, avatarId, expParaAdicionar) => {
     catch(error){
 
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarExp:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

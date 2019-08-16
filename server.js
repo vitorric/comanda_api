@@ -2,8 +2,10 @@ const express = require('express'),
     morgan = require('morgan'),
     bodyParser = require('body-parser'),
     i18n = require('i18n'),
+    fileUpload = require('express-fileupload'),
     app = express();
 
+app.use(fileUpload());
 app.all('*', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST');
@@ -14,6 +16,8 @@ app.all('*', (req, res, next) => {
 
     next();
 });
+
+app.use(express.static(__dirname + '/public'));
 
 require('./src/conn/mongo');
 
@@ -26,13 +30,12 @@ global.Mensagens = require('./locales/br.json');
 
 
 /**
- * @description inicia os servicos de mongo watch
+ * @description inicia o job que verifica a entrada de desafios, itens na loja e estabelecimentos aberto/fechado
  */
-//require('./src/service/watch').iniciarWatch();
+require('./src/service/cron').Job();
 
 i18n.configure({
     locales: ['br', 'en'],
-
     directory: __dirname + '/locales',
     register: global,
 });

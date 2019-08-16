@@ -49,7 +49,31 @@ exports.listarHistoricoCompra = async clienteId => {
             },
             { $unwind : { 'path': '$itemLoja' ,
                 'preserveNullAndEmptyArrays': true} },
-            { $project : { _id: 1, 'estabelecimento.nome' : 1 , createdAt : 1, 'itemLoja.nome': 1, precoItem: 1, 'infoEntrega.jaEntregue': 1, 'infoEntrega.dataEntrega': 1, 'chaveUnica': 1 } },
+            {
+                $lookup:
+                        {
+                            from: 'produto',
+                            localField: 'produto',
+                            foreignField: '_id',
+                            as: 'produto'
+                        }
+            },
+            { $unwind : { 'path': '$produto' ,
+                'preserveNullAndEmptyArrays': true} },
+            { $project :
+                { _id: 1,
+                    'estabelecimento.nome' : 1 ,
+                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$createdAt', timezone: 'America/Sao_Paulo' } },
+                    'itemLoja.nome': 1,
+                    'itemLoja.icon': 1,
+                    'produto.nome': 1,
+                    'produto.icon': 1,
+                    precoItem: 1,
+                    modoObtido: 1,
+                    quantidade: 1,
+                    'infoEntrega.jaEntregue': 1,
+                    'infoEntrega.dataEntrega': { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$infoEntrega.dataEntrega', timezone: 'America/Sao_Paulo' } },
+                    'chaveUnica': 1 } },
             { $sort : { createdAt: -1 } }
         ]).exec();
 

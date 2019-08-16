@@ -30,8 +30,8 @@ exports.FBCadastrarComanda = (comanda, clienteApelido, clienteId, avatarId, clie
         let configClienteAtual = {
             estaEmUmEstabelecimento: configCliente.estaEmUmEstabelecimento,
             conviteEstabPendente: configCliente.conviteEstabPendente,
-            estabelecimento: (configCliente.estabelecimento !== null) ? configCliente.estabelecimento.toString() : '',
-            nomeEstabelecimento: configCliente.nomeEstabelecimento,
+            estabelecimento: (typeof configCliente.estabelecimento !== 'undefined' && configCliente.estabelecimento !== null) ? configCliente.estabelecimento.toString() : '',
+            nomeEstabelecimento: (typeof configCliente.nomeEstabelecimento !== 'undefined' && configCliente.nomeEstabelecimento !== null) ? configCliente.nomeEstabelecimento : '',
             comanda: configCliente.comanda.toString()
         };
 
@@ -141,5 +141,15 @@ exports.FBAlterarProdutosComanda = (comanda, valorTotal) => {
     {
         console.log(err);
         throw err;
+    }
+};
+
+exports.FBRemoverComanda = comandaId => {
+    try
+    {
+        connFb.database().ref('/comandas').child(comandaId.toString()).remove();
+    }
+    catch(error){
+        console.log(error);
     }
 };

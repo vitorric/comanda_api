@@ -50,6 +50,5 @@ const { AlterarCliente } = require('../../../service/api/cliente'),
 
 module.exports = () => (req, res) => {
     AlterarCliente(req.user.clienteId, req.body).then((result) => resJsonP(res, 200, result.status))
-    // eslint-disable-next-line no-undef
         .catch(() => resJsonP(res, 200, false));
 };

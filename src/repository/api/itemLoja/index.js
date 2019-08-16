@@ -36,7 +36,6 @@ exports.alterarItemLoja = async item => {
                 $set: {
                     nome: item.nome,
                     descricao: item.descricao,
-                    icon: item.icon,
                     preco: item.preco,
                     status: item.status,
                     hotSale: item.hotSale,
@@ -53,6 +52,96 @@ exports.alterarItemLoja = async item => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in obterItemLoja:', error);
+        return false;
+    }
+};
+
+exports.alterarItemLojaStatus = async (itemId, status) => {
+    try{
+
+        let itemAlterado = await schemaItemLoja.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(itemId)
+            },
+            {
+                $set:
+                {
+                    status: status
+                }
+            }).exec();
+
+        if (!itemAlterado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarItemLojaStatus:', error);
+        return false;
+    }
+};
+
+exports.alterarItemLojaIcon = async (itemLojaId, nomeIcon) => {
+
+    try {
+
+        let produtoAlterado = await schemaItemLoja.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(itemLojaId)
+            },
+            {
+                $set: {
+                    icon: nomeIcon
+                }
+
+            }).exec();
+
+        if (!produtoAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarItemLojaIcon:', error);
+    }
+};
+
+exports.obterItemLojaStatusFirebase = async itemId => {
+    try {
+        let resultado = await schemaItemLoja.findOne({
+            _id: ObjectIdCast(itemId)
+        },
+        {
+            statusFirebase: 1
+        }).exec();
+
+        return resultado.statusFirebase;
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterItemLojaStatusFirebase:', error);
+    }
+};
+
+exports.alterarItemLojaStatusFirebase = (itemId, statusFirebase) => {
+    try{
+
+        schemaItemLoja.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(itemId)
+            },
+            {
+                $set: {
+                    statusFirebase: statusFirebase
+                }
+            }).exec();
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarItemLojaStatusFirebase:', error);
         return false;
     }
 };
@@ -108,7 +197,7 @@ exports.listarItemLoja = async (estabelecimentoId, nomeItem) => {
             {
                 $project:
                 {
-                    tempoDisponivel: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$tempoDisponivel' } },
+                    tempoDisponivel: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$tempoDisponivel', timezone: 'America/Sao_Paulo' } },
                     icon: 1,
                     preco: 1,
                     status: 1,
@@ -155,6 +244,7 @@ exports.obterItemLoja = async (estabelecimentoId, itemId) => {
                 $project:
                 {
                     tempoDisponivel: 1,
+                    tempoEntrarNoAr: 1,
                     icon: 1,
                     preco: 1,
                     status: 1,

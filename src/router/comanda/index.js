@@ -23,5 +23,7 @@ module.exports = () => {
 
     router.post('/transferir/lideranca/comanda',passportClienteJWT, require('./transferirLiderancaGrupo')());
 
+    router.post('/cliente/pagar/comanda',passportEstabelecimentoJWT, require('./clientePagarComanda')());
+
     return router;
 };

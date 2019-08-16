@@ -12,6 +12,10 @@ const ComandaSchema = new Schema(
             type:Number,
             default: 0
         },
+        aberta: {
+            type: Boolean,
+            default: true
+        },
         estabelecimento:{
             type: Schema.Types.ObjectId,
             ref: 'estabelecimento'

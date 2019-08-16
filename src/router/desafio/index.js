@@ -64,6 +64,8 @@ module.exports = () => {
 
     router.post('/alterar/desafio', passportEstabelecimentoJWT, require('./alterarDesafioEstab')());
 
+    router.post('/alterar/desafio/status', passportEstabelecimentoJWT, require('./alterarDesafioEstabStatus')());
+
     router.post('/obter/desafio/cliente', passportClienteJWT, require('./obterDesafioCliente')());
 
     router.post('/resgatar/recompensa/desafio', passportClienteJWT, require('./resgatarRecompensaDesafio')());

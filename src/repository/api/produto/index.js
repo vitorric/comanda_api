@@ -18,8 +18,20 @@ exports.obterProduto = produtoId => {
     try
     {
         return schemaProduto.findOne({
-            _id: produtoId
+            _id: ObjectIdCast(produtoId)
         }, {__v: 0, createdAt: 0, updatedAt: 0, estabelecimento: 0 }).exec();
+    }
+    catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterProduto:', error);
+    }
+};
+
+exports.obterProdutoCliente = produtoId => {
+    try
+    {
+        return schemaProduto.findOne({
+            _id: ObjectIdCast(produtoId)
+        }, { nome: 1, icon: 1 }).exec();
     }
     catch (error) {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in obterProduto:', error);
@@ -59,7 +71,7 @@ exports.alterarProduto = async (produtoId, produto) => {
     }
 };
 
-exports.alterarProdutoEstoque = async (produtoId, estoque) =>
+exports.alterarProdutoVendido = async (produtoId, estoque, quantidadeVendida) =>
 {
     try {
 
@@ -69,7 +81,8 @@ exports.alterarProdutoEstoque = async (produtoId, estoque) =>
             },
             {
                 $set: {
-                    estoque: estoque
+                    estoque: estoque,
+                    quantidadeVendida: quantidadeVendida
                 }
             }).exec();
 
@@ -82,6 +95,33 @@ exports.alterarProdutoEstoque = async (produtoId, estoque) =>
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in cadastrarItemComanda:', error);
         return false;
+    }
+};
+
+exports.alterarProdutoIcon = async (produtoId, nomeIcon) => {
+
+    try {
+
+        let produtoAlterado = await schemaProduto.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(produtoId)
+            },
+            {
+                $set: {
+                    icon: nomeIcon
+                }
+
+            }).exec();
+
+        if (!produtoAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarProdutoIcon:', error);
     }
 };
 

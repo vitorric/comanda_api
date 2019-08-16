@@ -148,7 +148,7 @@ module.exports = () => {
      *            "retorno": " E-mail already registered "
      *       }
     **/
-    router.post('/obterviatoken/estabelecimento', passportJWTEstabelecimento, require('./obterEstabelecimentoViaToken')());
+    router.post('/obter/estabelecimento', passportJWTEstabelecimento, require('./obterEstabelecimento')());
 
 
     /**

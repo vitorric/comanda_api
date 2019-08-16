@@ -29,6 +29,8 @@ module.exports = () => {
 
     router.post('/listar/cliente/desafios',passportClienteJWT, require('./listarClienteDesafios')());
 
+    router.post('/listar/cliente/desafios/concluido',passportClienteJWT, require('./listarClienteDesafiosConcluido')());
+
     router.post('/obter/cliente/chave_unica',passportEstabelecimentoJWT, require('./obterClienteChaveUnica')());
 
     return router;

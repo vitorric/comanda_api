@@ -1,6 +1,13 @@
 const { Schema } = require('mongoose'),
     conn = require('../../../conn/mongo/index');
 
+/*
+statusFirebase:
+0 = ainda nao foi pro firebase
+1 = ja foi para o firebase
+2 = ja saiu do firebase
+*/
+
 const ItemLojaSchema = new Schema(
     {
         nome: {
@@ -11,8 +18,7 @@ const ItemLojaSchema = new Schema(
             type: String
         },
         icon:{
-            type:String,
-            default: 'defaultIcon.png'
+            type:String
         },
         preco:{
             type:Number,
@@ -20,6 +26,10 @@ const ItemLojaSchema = new Schema(
         },
         status:{
             type:Number,
+            default: 0
+        },
+        statusFirebase: {
+            type: Number,
             default: 0
         },
         quantidadeVendida:{
@@ -33,6 +43,10 @@ const ItemLojaSchema = new Schema(
         quantidadeDisponivel:{
             type: Number,
             default: 1
+        },
+        tempoEntrarNoAr:{
+            type:Date,
+            required: true
         },
         tempoDisponivel:{
             type:Date,

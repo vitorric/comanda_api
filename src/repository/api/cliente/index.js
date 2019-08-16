@@ -91,7 +91,7 @@ exports.obterCliente = clienteId => {
                     nome: 1,
                     status: 1,
                     goldGeral: 1,
-                    dataNascimento: { $dateToString: { format: '%Y-%m-%d', date: '$dataNascimento' } },
+                    dataNascimento: { $dateToString: { format: '%Y-%m-%d', date: '$dataNascimento', timezone: 'America/Sao_Paulo' } },
                     avatar: 1,
                     configApp: 1,
                     configClienteAtual: 1
@@ -180,6 +180,165 @@ exports.listarClientesParaDesafios = async clientes =>
         console.log('\x1b[31m%s\x1b[0m', 'Erro in listarClientesParaDesafios:', error);
     }
 
+};
+
+exports.listarClienteDesafiosConcluidos = async clienteId => {
+    try {
+        return schemaCliente.aggregate([
+            {
+                $match: {
+                    _id: ObjectIdCast(clienteId)
+                }
+            },
+            {
+                $unwind : { 'path': '$desafios' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $match:
+                {
+                    'desafios.concluido': true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'desafio',
+                    let: { desafioId: '$desafios.desafio' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$desafioId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'nome':1,
+                                'icon': 1,
+                                'descricao': 1,
+                                'premio': 1,
+                                'objetivo': 1,
+                                'pontos': 1
+                            }
+                        }
+
+                    ],
+                    as: 'desafios.desafio'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafios.desafio' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'produto',
+                    let: { produtoObjId: '$desafios.desafio.objetivo.produto' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$produtoObjId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'nome': 1,
+                                'icon': 1
+                            }
+                        }
+
+                    ],
+                    as: 'desafios.desafio.objetivo.produto'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafios.desafio.objetivo.produto' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'produto',
+                    let: { produtoPremioId: '$desafios.desafio.premio.produto' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$produtoPremioId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                'nome': 1,
+                                'icon': 1
+                            }
+                        }
+
+                    ],
+                    as: 'desafios.desafio.premio.produto'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafios.desafio.premio.produto' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'estabelecimento',
+                    let: { estabelecimentoId: '$desafios.estabelecimento' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [ '$_id', '$$estabelecimentoId'],
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                'nome': 1
+                            }
+                        }
+
+                    ],
+                    as: 'desafios.estabelecimento'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafios.estabelecimento' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $project :
+                {
+                    'desafios.dataConclusao': { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$desafios.dataConclusao', timezone: 'America/Sao_Paulo' } },
+                    'desafios.desafio': 1,
+                    'desafios.estabelecimento': 1
+                }
+            },
+            {
+                $group:
+                {
+                    '_id': '$_id',
+                    'desafios': {
+                        '$addToSet':'$desafios'
+                    }
+                }
+            }
+        ]).exec().then(items => items[0]);
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarDesafiosClienteConcluidos:', error);
+    }
 };
 
 exports.alterarClienteConfigApp = async (clienteId, somFundo, somGeral) => {
@@ -287,11 +446,7 @@ exports.alterarConfigClienteAtual = async (clienteId, configClienteAtual) => {
             },
             {
                 $set: {
-                    'configClienteAtual.estaEmUmEstabelecimento': configClienteAtual.estaEmUmEstabelecimento,
-                    'configClienteAtual.conviteEstabPendente': configClienteAtual.conviteEstabPendente,
-                    'configClienteAtual.estabelecimento': configClienteAtual.estabelecimento,
-                    'configClienteAtual.nomeEstabelecimento': configClienteAtual.nomeEstabelecimento,
-                    'configClienteAtual.comanda': configClienteAtual.comanda
+                    configClienteAtual: configClienteAtual
                 }
             }).exec();
 
@@ -366,12 +521,21 @@ exports.alterarGoldsEstabelecimento = async (clienteId, estabelecimentoId, goldN
         let clienteAlterado = await schemaCliente.findOneAndUpdate(
             {
                 _id: ObjectIdCast(clienteId),
-                'goldPorEstabelecimento.estabelecimento':ObjectIdCast(estabelecimentoId)
+                goldPorEstabelecimento:
+                {
+                    $elemMatch: {
+                        estabelecimento: ObjectIdCast(estabelecimentoId),
+                        lider: true
+                    }
+                }
             },
             {
                 $set: {
                     'goldPorEstabelecimento.$.gold': goldNoEstabelecimento
                 }
+            },
+            {
+                upsert: true
             }).exec();
 
         if (!clienteAlterado)
@@ -456,7 +620,7 @@ exports.listarConvitesComandaEnviados = async (comandaId) => {
     }
 };
 
-exports.removerTodosOsClientesDeUmEstabelecimento = async clientes => {
+exports.removerClienteEstabelecimento = async clientes => {
     try{
 
         await schemaCliente.updateMany(

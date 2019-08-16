@@ -10,7 +10,8 @@ const { cadastrarCliente,
         alterarConfigClienteAtual,
         alterarSenha,
         alterarGoldsEstabelecimento,
-        listarClienteDesafios } = require('../../../repository/api/cliente'),
+        listarClienteDesafios,
+        listarClienteDesafiosConcluidos } = require('../../../repository/api/cliente'),
     {   cadastrarHistoricoCompra, listarHistoricoCompra  } = require('../../../repository/api/historicoCompraLojas'),
     {   obterItemLojaCliente, alterarItemLojaCompra  } = require('../../../repository/api/itemLoja'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
@@ -61,7 +62,6 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
            !cliente.sexo ||
            !cliente.avatar)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
 
@@ -71,13 +71,11 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
         {
             if (clienteEncontrado.email === cliente.email)
             {
-                // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.CLIENTE_CADASTRAR_EMAIL };
             }
 
             if (clienteEncontrado.apelido === cliente.apelido)
             {
-                // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.CLIENTE_CADASTRAR_APELIDO };
             }
         }
@@ -85,7 +83,6 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
         let novoAvatar = await CadastrarAvatar((typeof cliente.avatar === 'object') ? cliente.avatar : JSON.parse(cliente.avatar));
 
         if (!novoAvatar){
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
@@ -115,7 +112,6 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarCliente:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -125,7 +121,6 @@ exports.LoginCliente = async (user) => {
     {
         if (user == null)
         {
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.LOGIN_NAO_ENCONTRADO };
         }
 
@@ -137,7 +132,6 @@ exports.LoginCliente = async (user) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginCliente:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -146,10 +140,9 @@ exports.ObterClienteChaveUnica = async chaveAmigavel => {
 
     try{
 
-        let cliente = await obterClienteChaveUnicaPortal(chaveAmigavel);
+        let cliente = await obterClienteChaveUnicaPortal(chaveAmigavel.toUpperCase());
 
         if (!cliente){
-            // eslint-disable-next-line no-undef
             return { status: false, mensagem: Mensagens.CLIENTE_NAO_ENCONTRADO  };
         }
 
@@ -158,7 +151,6 @@ exports.ObterClienteChaveUnica = async chaveAmigavel => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -177,7 +169,6 @@ exports.AlterarCliente = async (clienteId, { nome, cpf, dataNascimento } ) => {
         let clienteAlterado = await alterarCliente(clienteId, cliente);
 
         if (!clienteAlterado){
-            // eslint-disable-next-line no-undef
             return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA  };
         }
 
@@ -187,7 +178,6 @@ exports.AlterarCliente = async (clienteId, { nome, cpf, dataNascimento } ) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -199,7 +189,6 @@ exports.AlterarClienteConfigApp = async (clienteId, cliente) => {
     {
         if (!clienteId ||
             !cliente.configApp)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
 
@@ -208,7 +197,6 @@ exports.AlterarClienteConfigApp = async (clienteId, cliente) => {
         let configAlterada = await alterarClienteConfigApp(clienteId, configApp.somFundo, configApp.somGeral);
 
         if (!configAlterada)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
 
         FBAlterarConfigApp(clienteId, configApp);
@@ -217,7 +205,6 @@ exports.AlterarClienteConfigApp = async (clienteId, cliente) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarClienteConfigApp:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 
@@ -231,7 +218,6 @@ exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
         let estabelecimento = await obterEstabelecimento(estabelecimentoId);
 
         if (!estabelecimento)
-            // eslint-disable-next-line no-undef
             return {status: false, mensagem: Mensagens.ESTABELECIMENTO_NAO_ENCONTRADO };
 
         if (estabelecimento.configEstabelecimentoAtual.estaAberta)
@@ -239,13 +225,13 @@ exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
             let cliente = await obterCliente(clienteId);
 
             if (cliente.configClienteAtual.estaEmUmEstabelecimento)
-                // eslint-disable-next-line no-undef
                 return { status: false , mensagem: Mensagens.CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP };
 
             cliente.configClienteAtual.estaEmUmEstabelecimento = true;
             cliente.configClienteAtual.estabelecimento = estabelecimento._id;
             cliente.configClienteAtual.nomeEstabelecimento = estabelecimento.nome;
             cliente.configClienteAtual.conviteEstabPendente = false;
+            cliente.configClienteAtual.convitesComanda = [];
 
             let entrou = await alterarConfigClienteAtual(clienteId, cliente.configClienteAtual);
 
@@ -255,19 +241,17 @@ exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
 
                 await alterarClientesNoLocal(estabelecimentoId, estabelecimento.configEstabelecimentoAtual.clientesNoLocal);
 
-                return await FBEntrarNoEstabelecimento(clienteId, estabelecimentoId, estabelecimento.nome).then(() => {
+                return await FBEntrarNoEstabelecimento(clienteId, estabelecimentoId, estabelecimento.nome, cliente.configClienteAtual.comanda).then(() => {
                     return { status: true };
                 });
             }
         }
 
-        // eslint-disable-next-line no-undef
         return {status: false, mensagem: Mensagens.ESTABELECIMENTO_FECHADO };
     }
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in EntrarNoEstabelecimento:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -282,7 +266,6 @@ exports.SairDoEstabelecimento = async clienteId => {
         let estabelecimento = await obterEstabelecimento(cliente.configClienteAtual.estabelecimento);
 
         if (!cliente || !estabelecimento)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
 
@@ -306,7 +289,6 @@ exports.SairDoEstabelecimento = async clienteId => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in SairDoEstabelecimento:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -328,16 +310,13 @@ exports.RecuperarSenha = async (email) => {
                 require('../../../service/email')(cliente.email, cliente.nome, senhas.novaSenha);
             }
 
-            // eslint-disable-next-line no-undef
             return { status: true , mensagem: Mensagens.SENHA_RECUPERADA };
         }
 
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.USUARIO_NAO_ENCONTRADO };
     }
     catch (error) {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in RecuperarSenha:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -361,13 +340,11 @@ exports.RecusarConviteEstabelecimento = async (clienteId) => {
             });
         }
 
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in RecusarConviteEstabelecimento:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -380,7 +357,6 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
         !infoCompra.estabelecimento ||
         !infoCompra.itemLoja ||
         !infoCompra.precoItem)
-        // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         let cliente = await obterClienteCompleto(clienteId);
@@ -389,21 +365,16 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
 
         if (!cliente ||
             !itemLoja)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         if (cliente.configClienteAtual.estabelecimento === null ||
             (cliente.configClienteAtual.estabelecimento.toString() !== infoCompra.estabelecimento.toString()))
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO_APP };
         if (itemLoja.quantidadeDisponivel <= 0)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.ITEM_LOJA_SEM_ESTOQUE };
         if (obterDinheiroNoEstabelecimento(cliente.goldPorEstabelecimento, infoCompra.estabelecimento)[0] < infoCompra.precoItem)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DINHEIRO_INSUFICIENTE };
         if (new Date(itemLoja.tempoDisponivel) < new Date())
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.ITEM_LOJA_TEMPO_EXPIRADO };
 
         itemLoja.quantidadeDisponivel -= 1;
@@ -413,7 +384,6 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
 
         if (!compraEfetuada)
         {
-        // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
@@ -430,7 +400,6 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in RecusarConviteEstabelecimento:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -446,7 +415,6 @@ exports.ListarHistoricoCompra = async (clienteId) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarHistoricoCompra:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -457,7 +425,6 @@ exports.ListarClientes = async () => {
         return { status: !result ? false : true, objeto: result };
     }).catch((error) => {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarClientes:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.ERRO_GENERITICO };
     });
 };
@@ -470,4 +437,20 @@ exports.ListarClienteDesafios = async (obj) => {
         console.log('registerUser errr:', err);
         return { status: false, msg: err };
     });
+};
+
+
+exports.ListarClienteDesafiosConcluidos = async clienteId => {
+
+    try
+    {
+        let desafiosConcluidos = await listarClienteDesafiosConcluidos(clienteId);
+
+        return { status: true, objeto: desafiosConcluidos };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarClienteDesafiosConcluidos:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
 };

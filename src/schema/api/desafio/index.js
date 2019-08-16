@@ -11,8 +11,7 @@ const DesafioSchema = new Schema(
             type: String
         },
         icon:{
-            type:String,
-            default: 'defaultIcon.png'
+            type:String
         },
         emGrupo:{
             type: Boolean,
@@ -33,9 +32,17 @@ const DesafioSchema = new Schema(
                 ref: 'produto'
             }
         },
+        tempoEntrarNoAr:{
+            type:Date,
+            required: true
+        },
         tempoDuracao:{
             type:Date,
             required: true
+        },
+        statusFirebase: {
+            type: Number,
+            default: 0
         },
         status:{
             type:Number,

@@ -35,6 +35,7 @@ module.exports = {
       "afterEach": false,
       "jasmine": false,
       "it": false,
-      "expect": false
+      "expect": false,
+      "Mensagens": false
     }
   }

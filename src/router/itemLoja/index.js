@@ -111,6 +111,8 @@ module.exports = () => {
 **/
     router.post('/alterar/itemLoja', passportEstabelecimentoJWT, require('./alterarItemLoja')());
 
+    router.post('/alterar/itemLoja/status', passportEstabelecimentoJWT, require('./alterarItemLojaStatus')());
+
     /**
  * @api {post} /rgister/user find user post
  * @apiName findpost

@@ -8,4 +8,6 @@ module.exports = (app) => {
     app.use('/api', require('./comanda')());
     app.use('/api', require('./avatar')());
     app.use('/api', require('./correio')());
+    app.use('/api', require('./uploadFiles')());
+    app.use('/api', require('./downloadFiles')());
 };

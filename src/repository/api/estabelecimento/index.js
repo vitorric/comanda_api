@@ -298,17 +298,27 @@ exports.obterParaClientes = async estabelecimentoId => {
 
 exports.obterEstabelecimento = estabelecimentoId => {
     try {
-        return schemaEstabelecimento.findOne({ _id: estabelecimentoId }).exec();
+        return schemaEstabelecimento.findOne(
+            {
+                _id: estabelecimentoId
+            },
+            {
+                email: 0,
+                password: 0,
+                createdAt: 0,
+                updatedAt: 0,
+                __v: 0
+            }).exec();
     } catch (error) {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in updateSchool:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterEstabelecimento:', error);
     }
 };
 
-exports.alterarClientesNoLocal = async (estabelcimentoId, clientesNoLocal) => {
+exports.alterarClientesNoLocal = async (estabelecimentoId, clientesNoLocal) => {
     try{
-        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
             {
-                _id: ObjectIdCast(estabelcimentoId)
+                _id: ObjectIdCast(estabelecimentoId)
             },
             {
                 $set: {
@@ -316,7 +326,7 @@ exports.alterarClientesNoLocal = async (estabelcimentoId, clientesNoLocal) => {
                 }
             }).exec();
 
-        if (!estabelcimentoAlterado)
+        if (!estabelecimentoAlterado)
             return false;
 
         return true;
@@ -328,20 +338,19 @@ exports.alterarClientesNoLocal = async (estabelcimentoId, clientesNoLocal) => {
     }
 };
 
-exports.alterarStatusEstabOnline = async (estabelecimentoId, status, clientesNoLocal) => {
+exports.alterarStatusEstabOnline = async (estabelecimentoId, status) => {
     try{
-        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
             {
                 _id: ObjectIdCast(estabelecimentoId)
             },
             {
                 $set: {
-                    'configEstabelecimentoAtual.estaAberta': status,
-                    'configEstabelecimentoAtual.clientesNoLocal': clientesNoLocal
+                    'configEstabelecimentoAtual.estaAberta': status
                 }
             }).exec();
 
-        if (!estabelcimentoAlterado)
+        if (!estabelecimentoAlterado)
             return false;
 
         return true;
@@ -356,7 +365,7 @@ exports.alterarStatusEstabOnline = async (estabelecimentoId, status, clientesNoL
 exports.adicionarProdutoAoEstabelecimento = async (estabelecimentoId, produtos) => {
 
     try{
-        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
             {
                 _id: ObjectIdCast(estabelecimentoId)
             },
@@ -366,7 +375,7 @@ exports.adicionarProdutoAoEstabelecimento = async (estabelecimentoId, produtos) 
                 }
             }).exec();
 
-        if (!estabelcimentoAlterado)
+        if (!estabelecimentoAlterado)
             return false;
 
         return true;
@@ -381,7 +390,7 @@ exports.adicionarProdutoAoEstabelecimento = async (estabelecimentoId, produtos) 
 exports.adicionarItemNaLojaDoEstabelecimento = async (estabelecimentoId, itens) => {
 
     try{
-        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
             {
                 _id: ObjectIdCast(estabelecimentoId)
             },
@@ -391,7 +400,7 @@ exports.adicionarItemNaLojaDoEstabelecimento = async (estabelecimentoId, itens) 
                 }
             }).exec();
 
-        if (!estabelcimentoAlterado)
+        if (!estabelecimentoAlterado)
             return false;
 
         return true;
@@ -406,7 +415,7 @@ exports.adicionarItemNaLojaDoEstabelecimento = async (estabelecimentoId, itens) 
 exports.adicionarDesafiosAoEsabelecimento = async (estabelecimentoId, desafios) => {
 
     try{
-        let estabelcimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
             {
                 _id: ObjectIdCast(estabelecimentoId)
             },
@@ -416,7 +425,7 @@ exports.adicionarDesafiosAoEsabelecimento = async (estabelecimentoId, desafios) 
                 }
             }).exec();
 
-        if (!estabelcimentoAlterado)
+        if (!estabelecimentoAlterado)
             return false;
 
         return true;
@@ -427,6 +436,221 @@ exports.adicionarDesafiosAoEsabelecimento = async (estabelecimentoId, desafios) 
         return false;
     }
 };
+
+/*
+Obtem a informacao se eh pra setar o estabelecimento como aberto ou fechado no firebase
+Obtem os itens da loja que devem ser excluidos e adicionados no firebase
+Obtem os desafios que devem ser excluidos e adicionados no firebase
+*/
+exports.obterInfoProJobOrganizarFB = async () => {
+
+    try{
+        let estabelecimentos = await schemaEstabelecimento.aggregate([
+            {
+                $unwind : { 'path': '$itensLoja' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'itemLoja',
+                    let: { itemLojaId: '$itensLoja._id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and:
+                                        [
+                                            {
+                                                $eq: [ '$_id', '$$itemLojaId']
+                                            },
+                                            {
+                                                $lt: [ '$statusFirebase', 2]
+                                            },
+                                            {
+                                                $eq: [ '$status', 1]
+                                            }
+                                        ]
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                icon: 1,
+                                preco: 1,
+                                quantidadeVendida: 1,
+                                hotSale: 1,
+                                quantidadeDisponivel: 1,
+                                nome: 1,
+                                descricao: 1,
+                                tempoDisponivel: 1,
+                                adicionar:
+                                {
+                                    $cond: [
+                                        {
+                                            $and:
+                                            [
+                                                {
+                                                    $lte:
+                                                    [
+                                                        '$tempoEntrarNoAr', new Date()
+                                                    ]
+                                                },
+                                                {
+                                                    $eq: [ '$statusFirebase', 0]
+                                                }
+                                            ]
+                                        }, 1, 0 ]
+                                },
+                                remover:
+                                {
+                                    $cond: [
+                                        {
+                                            $and:
+                                            [
+                                                {
+                                                    $lte:
+                                                    [
+                                                        '$tempoDisponivel', new Date()
+                                                    ]
+                                                },
+                                                {
+                                                    $eq: [ '$statusFirebase', 1]
+                                                }
+                                            ]
+                                        }, 1, 0 ]
+                                }
+                            }
+                        }
+
+                    ],
+                    as: 'itensLoja'
+                }
+            },
+            {
+                $unwind : { 'path': '$itensLoja' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $unwind : { 'path': '$desafios' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'desafio',
+                    let: { desafioId: '$desafios' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and:
+                                        [
+                                            {
+                                                $eq: [ '$_id', '$$desafioId']
+                                            },
+                                            {
+                                                $lt: [ '$statusFirebase', 2]
+                                            },
+                                            {
+                                                $eq: [ '$status', 1]
+                                            }
+                                        ]
+                                }
+                            }
+                        },
+                        {
+                            $project :
+                            {
+                                '_id': 1,
+                                nome: 1,
+                                descricao: 1,
+                                icon: 1,
+                                tempoDuracao: 1,
+                                emGrupo: 1,
+                                premio: 1,
+                                objetivo: 1,
+                                adicionar:
+                                {
+                                    $cond: [
+                                        {
+                                            $and:
+                                            [
+                                                {
+                                                    $lte:
+                                                    [
+                                                        '$tempoEntrarNoAr', new Date()
+                                                    ]
+                                                },
+                                                {
+                                                    $eq: [ '$statusFirebase', 0]
+                                                }
+                                            ]
+                                        }, 1, 0 ]
+                                },
+                                remover:
+                                {
+                                    $cond: [
+                                        {
+                                            $and:
+                                            [
+                                                {
+                                                    $lte:
+                                                    [
+                                                        '$tempoDuracao', new Date()
+                                                    ]
+                                                },
+                                                {
+                                                    $eq: [ '$statusFirebase', 1]
+                                                }
+                                            ]
+                                        }, 1, 0 ]
+                                }
+                            }
+                        }
+
+                    ],
+                    as: 'desafios'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafios' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $project :
+                {
+                    _id: 1,
+                    itensLoja: 1,
+                    desafios: 1,
+                    horarioAtendimentoInicio: 1,
+                    horarioAtendimentoFim: 1
+                }
+            },
+            {
+                $group:
+                {
+                    '_id': '$_id',
+                    'itensLoja': {
+                        '$addToSet':'$itensLoja'
+                    },
+                    'desafios': {
+                        '$addToSet':'$desafios'
+                    }
+                }
+            }
+        ]).exec();
+
+        return {estabelecimentos};
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterInfoProJobOrganizarFB:', error);
+        return false;
+    }
+};
+
+
 
 //---------------------------------------------------------------------- REFAZER PRA BAIXO
 
@@ -563,7 +787,7 @@ exports.listarParaFirebase = async (obj) => {
             }
         ]);
     } catch (error) {
-        console.log('erro na listagem do estabelcimento ' + error);
+        console.log('erro na listagem do estabelecimento ' + error);
         throw error;
     }
 };

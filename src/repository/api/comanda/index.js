@@ -25,7 +25,7 @@ exports.obterComandaLider = clienteId => {
                         lider: true
                     }
                 },
-                status: 1
+                aberta: true
             }
         ).exec();
     } catch (error) {
@@ -314,15 +314,16 @@ exports.listarComandasEstab = async estabelecimentoId => {
                     'grupo.lider': true
                 }
             },
-            { $sort : { status: 1, createdAt: 1 } },
+            { $sort : { aberta: -1, createdAt: -1 } },
             {
                 $project:
                 {
-                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$createdAt' } },
+                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$createdAt', timezone: 'America/Sao_Paulo' } },
                     valorTotal: 1,
                     status: 1,
+                    aberta: 1,
                     'lider.nome': 1,
-                    dataSaida: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$dataSaida' } }
+                    dataSaida: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$dataSaida', timezone: 'America/Sao_Paulo' } }
                 }
             }
         ]).exec();
@@ -419,7 +420,9 @@ exports.obterComandaEstab = async comandaId => {
                         _id: '$_id',
                         status: '$status',
                         valorTotal: '$valorTotal',
-                        createdAt: '$createdAt'
+                        createdAt: '$createdAt',
+                        dataSaida: '$dataSaida',
+                        aberta: '$aberta'
                     },
                     'grupo': {
                         '$addToSet':'$grupo'
@@ -434,10 +437,12 @@ exports.obterComandaEstab = async comandaId => {
                 {
                     _id: '$_id._id',
                     status: '$_id.status',
+                    aberta: '$_id.aberta',
+                    dataSaida: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$_id.dataSaida', timezone: 'America/Sao_Paulo' } },
                     grupo: 1,
                     produtos: 1,
                     valorTotal: '$_id.valorTotal',
-                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%m', date: '$_id.createdAt' } }
+                    createdAt: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$_id.createdAt', timezone: 'America/Sao_Paulo' } }
                 }
             },
         ]).exec().then(items => {
@@ -450,6 +455,59 @@ exports.obterComandaEstab = async comandaId => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in obterComandaEstab:', error);
+        return false;
+    }
+};
+
+exports.alterarClientePagouComanda = async (comandaId, clienteId, valorPago) => {
+
+    try{
+        let comandaAlterada = await schemaComanda.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(comandaId),
+                'grupo.cliente':ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    'grupo.$.jaPagou': true,
+                    'grupo.$.valorPago': valorPago
+                }
+            }).exec();
+
+        if (!comandaAlterada)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarClientePagouComanda:', error);
+        return false;
+    }
+};
+
+exports.fecharComanda = async (comandaId, dataSaida) => {
+
+    try{
+        let fecharComanda = await schemaComanda.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(comandaId)
+            },
+            {
+                $set: {
+                    aberta: false,
+                    dataSaida: dataSaida
+                }
+            }).exec();
+
+        if (!fecharComanda)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in fecharComanda:', error);
         return false;
     }
 };

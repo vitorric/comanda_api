@@ -5,8 +5,7 @@ const ProdutoSchema = new Schema(
     {
         codigo: {
             type: Number,
-            required: true,
-            unique: true
+            required: true
         },
         nome: {
             type: String,
@@ -16,14 +15,17 @@ const ProdutoSchema = new Schema(
             type: String
         },
         icon:{
-            type:String,
-            default: 'defaultIcon.png'
+            type:String
         },
         custo: {
             type: Number,
             default: 0
         },
         estoque: {
+            type: Number,
+            default: 0
+        },
+        quantidadeVendida: {
             type: Number,
             default: 0
         },

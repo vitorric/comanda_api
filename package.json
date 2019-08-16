@@ -9,7 +9,9 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
+    "cron": "^1.7.1",
     "express": "^4.16.2",
+    "express-fileupload": "^1.1.5",
     "express-jwt": "^5.3.1",
     "express-language": "0.0.2",
     "express-request-language": "^1.1.15",
@@ -29,9 +31,10 @@
   "devDependencies": {
     "coveralls": "^3.0.0",
     "docdash": "^0.4.0",
+    "eslint": "^6.1.0",
     "grand": "^1.1.0",
     "minami": "^1.2.3",
-    "serve": ">=7.0.0"
+    "serve": "^11.1.0"
   },
   "scripts": {
     "test": "NODE_ENV=test istanbul cover -x ./  --report text --report lcov jasmine test/**/**/*_[sS]pec.js",

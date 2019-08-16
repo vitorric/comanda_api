@@ -36,6 +36,11 @@
 	"DESAFIO_JA_RESGATADO": "O prêmio deste desafio já foi resgatado!",
 	"DESAFIO_JA_RESGATADO_PRODUTO": "O produto deste desafio já foi resgatado fisicamente!",
 	"JA_EXISTE_PRODUTO_COM_CODIGO": "Este código já foi usado em outro produto!",
+	"DATA_DE_ENTRADA_MENOR_QUE_SAIDA": "A data para entrar no ar deve ser menor que a data de saida!",
+	"PROBLEMA_ENVIO_IMAGEM": "Ops, ocorreu um problema ao tentar enviar a imagem, tente novamente!",
+	"CLIENTE_NAO_ENCONTRADO_OU_PAGOU": "O cliente não está na comanda ou ele já pagou!",
+	"PAGAMENTO_VALOR_INVALIDO": "O valor a ser pago é menor que o necessário!",
+	"PAGAMENTO_VALOR_MAIOR": "O valor a ser pago é maior que o valor restante da comanda!",
 
 
 

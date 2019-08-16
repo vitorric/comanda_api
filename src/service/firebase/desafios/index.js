@@ -32,3 +32,15 @@ exports.FBAlterarDesafios = (clienteId, desafios) => {
         throw err;
     }
 };
+
+exports.FBAlterarDesafioResgatouPremio = (clienteId, desafioId) => {
+    try
+    {
+        connFb.database().ref('/desafios/' + clienteId.toString() + '/' + desafioId.toString() + '/resgatouPremio').set(true);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};

@@ -1,4 +1,4 @@
-const { cadastrarProduto, listarProdutos, obterProduto, obterProdutoPorCodigo, alterarProduto } = require('../../../repository/api/produto'),
+const { cadastrarProduto, listarProdutos, obterProduto, obterProdutoCliente, obterProdutoPorCodigo, alterarProduto } = require('../../../repository/api/produto'),
     { obterEstabelecimento, adicionarProdutoAoEstabelecimento } = require('../../../repository/api/estabelecimento');
 
 exports.CadastrarProduto = async (estabelecimentoId, produto) => {
@@ -6,19 +6,16 @@ exports.CadastrarProduto = async (estabelecimentoId, produto) => {
     try
     {
         if (!produto.nome || !produto.codigo)
-        // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         let existeProdutoComCodigo = await obterProdutoPorCodigo(produto.codigo);
 
         if (existeProdutoComCodigo)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.JA_EXISTE_PRODUTO_COM_CODIGO };
 
         let estabelecimento = await obterEstabelecimento(estabelecimentoId);
 
         if (!estabelecimento)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         produto.estabelecimento = estabelecimentoId;
@@ -36,17 +33,14 @@ exports.CadastrarProduto = async (estabelecimentoId, produto) => {
                 return { status: true, objeto: produtoCadastrado };
             }
 
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarProduto:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 
@@ -62,7 +56,20 @@ exports.ObterProduto = async produtoId => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterProduto:', error);
-        // eslint-disable-next-line no-undef
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterProdutoCliente = async produtoId => {
+    try
+    {
+        let produto = await obterProdutoCliente(produtoId);
+
+        return { status: true, objeto: produto };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterProdutoCliente:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -73,7 +80,6 @@ exports.AlterarProduto = async produto => {
         let produtoAlterado = await alterarProduto(produto._id, produto);
 
         if (!produtoAlterado)
-            // eslint-disable-next-line no-undef
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
 
         return { status: true };
@@ -81,7 +87,6 @@ exports.AlterarProduto = async produto => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarProduto:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -99,7 +104,6 @@ exports.ListarProdutos = async (estabelecimentoId, nome) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarProdutos:', error);
-        // eslint-disable-next-line no-undef
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
