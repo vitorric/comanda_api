@@ -19,7 +19,7 @@ const ClienteSchema = new Schema(
             default: 1
         },
         chaveAmigavel: {
-            type: String,
+            type: Number,
             required: true,
             unique: true
         },
@@ -133,6 +133,10 @@ const ClienteSchema = new Schema(
             dataResgate: {
                 type: Date
             }
+        }],
+        tokenFirebase: [{
+            token: String,
+            deviceId: String
         }],
         avatar: {
             type: Schema.Types.ObjectId,

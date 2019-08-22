@@ -11,7 +11,11 @@ const { cadastrarCliente,
         alterarSenha,
         alterarGoldsEstabelecimento,
         listarClienteDesafios,
-        listarClienteDesafiosConcluidos } = require('../../../repository/api/cliente'),
+        listarClienteDesafiosConcluidos,
+        listarGoldEstabelecimento,
+        obterUltimaChaveAmigavel,
+        registrarTokenFirebase,
+        deletarTokenFirebase } = require('../../../repository/api/cliente'),
     {   cadastrarHistoricoCompra, listarHistoricoCompra  } = require('../../../repository/api/historicoCompraLojas'),
     {   obterItemLojaCliente, alterarItemLojaCompra  } = require('../../../repository/api/itemLoja'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
@@ -20,7 +24,9 @@ const { cadastrarCliente,
         FBEntrarNoEstabelecimento,
         FBRecusarSairDoEstabelecimento,
         FBAlterarCliente,
-        FBAlterarConfigApp } = require('../../../service/firebase/cliente'),
+        FBAlterarConfigApp,
+        FBAlterarGoldEstabelecimento } = require('../../../service/firebase/cliente'),
+    { FBAlterarEstoqueItem } = require('../../firebase/estabelecimento'),
     { InserirMensagemNoCorreio } = require('../../../service/api/correio'),
     { CadastrarAvatar } = require('../avatar'),
     { criarToken } = require('../../passaport/criarToken');
@@ -34,16 +40,8 @@ function obterDinheiroNoEstabelecimento (goldPorEstabelecimento, estabelecimento
     });
 }
 
-function diminuirDinheiroNoEstabelecimento (goldPorEstabelecimento, estabelecimentoId, precoItem) {
-    return goldPorEstabelecimento.map(function(value) {
-        if (value.estabelecimento == estabelecimentoId)
-            value.gold -= precoItem;
-    });
-}
-
-
 //OK
-exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar }) => {
+exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar, deviceId, tokenFirebase, dataNascimento, cpf }) => {
     try
     {
         let cliente = {
@@ -52,7 +50,9 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
             nome: nome,
             apelido: apelido,
             sexo: sexo,
-            avatar: avatar
+            avatar: avatar,
+            dataNascimento: dataNascimento,
+            cpf: cpf
         };
 
         if (!cliente.email ||
@@ -60,7 +60,9 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
            !cliente.nome ||
            !cliente.apelido ||
            !cliente.sexo ||
-           !cliente.avatar)
+           !cliente.avatar ||
+           !cliente.dataNascimento ||
+           !cliente.cpf)
         {
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
         }
@@ -87,12 +89,22 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
         }
 
         cliente.avatar = novoAvatar._id;
-        cliente.chaveAmigavel = gerarChaveAmigavel();
+
+        let ultimaChaveAmigavel = await obterUltimaChaveAmigavel();
+
+        cliente.chaveAmigavel = parseInt(ultimaChaveAmigavel.chaveAmigavel) + 1;
 
         cliente = await cadastrarCliente(cliente);
 
         return await obterCliente(cliente._id).then(async (result) => {
             return FBCriarCliente(result).then(() => {
+
+                if (tokenFirebase)
+                {
+                    deletarTokenFirebase(cliente._id, deviceId);
+                    registrarTokenFirebase(cliente._id, deviceId, token);
+                }
+
                 // Generate the token
                 let token = criarToken({ _id: result._id });
 
@@ -116,12 +128,20 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
     }
 };
 
-exports.LoginCliente = async (user) => {
+exports.LoginCliente = async (user, { deviceId, tokenFirebase }) => {
     try
     {
+        console.log(deviceId, tokenFirebase);
+
         if (user == null)
         {
             return { status: false , mensagem: Mensagens.LOGIN_NAO_ENCONTRADO };
+        }
+
+        if (tokenFirebase)
+        {
+            await deletarTokenFirebase(user, deviceId);
+            registrarTokenFirebase(user, deviceId, tokenFirebase);
         }
 
         // Generate the token
@@ -353,10 +373,10 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
 
     try
     {
+        console.log(infoCompra);
         if (!clienteId ||
         !infoCompra.estabelecimento ||
-        !infoCompra.itemLoja ||
-        !infoCompra.precoItem)
+        !infoCompra.itemLoja)
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         let cliente = await obterClienteCompleto(clienteId);
@@ -367,12 +387,14 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
             !itemLoja)
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
-        if (cliente.configClienteAtual.estabelecimento === null ||
-            (cliente.configClienteAtual.estabelecimento.toString() !== infoCompra.estabelecimento.toString()))
+        let estabelecimentoId = cliente.configClienteAtual.estabelecimento;
+
+        if (estabelecimentoId === null ||
+            (estabelecimentoId.toString() !== infoCompra.estabelecimento.toString()))
             return { status: false , mensagem: Mensagens.CLIENTE_NAO_ESTA_NO_ESTABELECIMENTO_APP };
         if (itemLoja.quantidadeDisponivel <= 0)
             return { status: false , mensagem: Mensagens.ITEM_LOJA_SEM_ESTOQUE };
-        if (obterDinheiroNoEstabelecimento(cliente.goldPorEstabelecimento, infoCompra.estabelecimento)[0] < infoCompra.precoItem)
+        if (obterDinheiroNoEstabelecimento(cliente.goldPorEstabelecimento, infoCompra.estabelecimento)[0] < itemLoja.preco)
             return { status: false , mensagem: Mensagens.DINHEIRO_INSUFICIENTE };
         if (new Date(itemLoja.tempoDisponivel) < new Date())
             return { status: false , mensagem: Mensagens.ITEM_LOJA_TEMPO_EXPIRADO };
@@ -387,13 +409,38 @@ exports.ComprarItemLoja = async (clienteId, infoCompra) => {
             return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
         }
 
-        diminuirDinheiroNoEstabelecimento(cliente.goldPorEstabelecimento, infoCompra.estabelecimento, itemLoja.preco);
+        FBAlterarEstoqueItem(estabelecimentoId, itemLoja);
 
-        await alterarGoldsEstabelecimento(clienteId, cliente.goldPorEstabelecimento);
+        await alterarGoldsEstabelecimento(clienteId, estabelecimentoId, (parseInt(itemLoja.preco) * -1));
 
-        infoCompra.chaveUnica = gerarChaveAmigavel();
+        let listaGolds = await listarGoldEstabelecimento(clienteId);
+        FBAlterarGoldEstabelecimento(clienteId, listaGolds);
 
-        await cadastrarHistoricoCompra(clienteId, infoCompra);
+        let chaveUnica = gerarChaveAmigavel();
+
+        let infoCompraHist = {
+            cliente: cliente._id,
+            estabelecimento: estabelecimentoId,
+            itemLoja: infoCompra.itemLoja,
+            quantidade: 1,
+            modoObtido: 'Compra',
+            chaveUnica: chaveUnica,
+            precoItem: itemLoja.preco
+        };
+
+        cadastrarHistoricoCompra(clienteId, infoCompraHist);
+
+        let estabelecimento = await obterEstabelecimento(estabelecimentoId);
+
+        //insere mensagem no correio
+        InserirMensagemNoCorreio({
+            cliente: cliente._id,
+            correio: {
+                titulo: 'Resgate sua compra!',
+                mensagem: 'Apresente o cupom de resgate <color=yellow>' + chaveUnica + '</color> para o estabelecimento ' + estabelecimento.nome,
+                mensagemGrande: 'Apresente o cupom de resgate <color=yellow>' + chaveUnica + '</color> para o estabelecimento ' + estabelecimento.nome + '. O cupom é valido somente 1x.'
+            }
+        });
 
         return { status: true, objeto: infoCompra.chaveUnica };
     }

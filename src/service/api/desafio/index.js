@@ -9,14 +9,18 @@ const {
         alterarDesafioStatusFirebase } = require('../../../repository/api/desafio'),
     {
         obterClienteDesafio,
+        obterGoldEstabelecimento,
         alterarGoldsEstabelecimento,
-        alterarClienteParaDesafio
+        inserirGoldEstabelecimento,
+        alterarClienteParaDesafio,
+        listarGoldEstabelecimento
     } = require('../../../repository/api/cliente'),
     {
         obterEstabelecimento,
         adicionarDesafiosAoEsabelecimento
     } = require('../../../repository/api/estabelecimento'),
     { InserirMensagemNoCorreio } = require('../../../service/api/correio'),
+    { FBAlterarGoldEstabelecimento } = require('../../firebase/cliente'),
     { cadastrarHistoricoCompra } = require('../../../repository/api/historicoCompraLojas'),
     { gerarChaveAmigavel } = require('../../../utils'),
     { FBAlterarDesafio, FBRemoverDesafio } = require('../../firebase/estabelecimento'),
@@ -112,7 +116,7 @@ exports.ResgatarRecompensaDesafio = async (desafioId, clienteId) => {
             return {status: false, mensagem: Mensagens.DADOS_INVALIDOS };
 
         let indexDesafio = cliente.desafios.findIndex(x => x.desafio.toString() === desafio._id.toString());
-        console.log(cliente.desafios[indexDesafio]);
+
         if (!cliente.desafios[indexDesafio].concluido)
             return {status: false, mensagem: Mensagens.DESAFIO_NAO_CONCLUIDO };
 
@@ -123,10 +127,18 @@ exports.ResgatarRecompensaDesafio = async (desafioId, clienteId) => {
         cliente.desafios[indexDesafio].dataResgate = new Date();
         cliente.pontos += 10;
 
-
-        if (desafio.premio.tipo === 'Dinheiro')
+        if (desafio.premio.tipo === 'CPGold')
         {
-            await alterarGoldsEstabelecimento(clienteId, desafio.estabelecimento, desafio.premio);
+            let goldEstabelecimento = await obterGoldEstabelecimento(clienteId, desafio.estabelecimento);
+
+            if (goldEstabelecimento)
+                await alterarGoldsEstabelecimento(clienteId, desafio.estabelecimento, desafio.premio.quantidade);
+
+            if (!goldEstabelecimento)
+                await inserirGoldEstabelecimento(clienteId, desafio.estabelecimento, desafio.premio.quantidade);
+
+            let listaGolds = await listarGoldEstabelecimento(clienteId);
+            FBAlterarGoldEstabelecimento(clienteId, listaGolds);
         }
 
         if (desafio.premio.tipo === 'Produto')
@@ -148,7 +160,7 @@ exports.ResgatarRecompensaDesafio = async (desafioId, clienteId) => {
                 precoItem: 0
             };
 
-            await cadastrarHistoricoCompra(clienteId, infoPremio);
+            cadastrarHistoricoCompra(clienteId, infoPremio);
 
             let estabelecimento = await obterEstabelecimento(desafio.estabelecimento);
 

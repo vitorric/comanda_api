@@ -53,6 +53,14 @@ const EstabelecimentoSchema = new Schema(
         emailContato:{
             type: String
         },
+        coordenadas: {
+            lat:{
+                type: String
+            },
+            long: {
+                type: String
+            }
+        },
         endereco:{
             rua:{
                 type: String,

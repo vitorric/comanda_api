@@ -156,6 +156,74 @@ exports.obterClienteEmail = email => {
     }
 };
 
+exports.obterUltimaChaveAmigavel = () => {
+    try
+    {
+        return schemaCliente.find({}, {chaveAmigavel: 1, _id: 0})
+            .sort({chaveAmigavel: -1})
+            .limit(1)
+            .exec()
+            .then(item => item[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteEmail:', error);
+    }
+};
+
+exports.registrarTokenFirebase = async (clienteId, deviceId, tokenFirebase) => {
+    try
+    {
+        let tokenRegistrado = await schemaCliente.updateOne({
+            '_id': ObjectIdCast(clienteId),
+            'fireBaseToken.deviceId': { $ne: deviceId }
+        },
+        {
+            $push: {
+                tokenFirebase: {
+                    $each: [{ token: tokenFirebase, deviceId: deviceId }],
+                    $sort: { score: -1 }
+                }
+            }
+        }).exec();
+
+        if (!tokenRegistrado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in registrarTokenFirebase:', error);
+    }
+};
+
+exports.deletarTokenFirebase = async (clienteId, deviceId) => {
+    try
+    {
+        let tokenDeletado = await schemaCliente.updateOne({
+            '_id': { $ne: ObjectIdCast(clienteId) },
+            'fireBaseToken.deviceId': { $eq: deviceId }
+        },
+        {
+            $pull: {
+                tokenFirebase: {
+                    deviceId: deviceId,
+                }
+            }
+        }).exec();
+
+        if (!tokenDeletado)
+            return false;
+
+        return true;
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in deletarTokenFirebase:', error);
+    }
+};
+
 exports.listarClientesParaDesafios = async clientes =>
 {
     try {
@@ -515,6 +583,21 @@ exports.alterarConfigClienteAtualConvitesComanda = async (clienteId, convitesCom
 
 };
 
+exports.obterGoldEstabelecimento = async (clienteId, estabelecimentoId) => {
+    try {
+        return schemaCliente.findOne({
+            _id: ObjectIdCast(clienteId),
+            goldPorEstabelecimento:
+            {
+                $elemMatch: {
+                    estabelecimento: ObjectIdCast(estabelecimentoId)
+                }
+            }}).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterGoldEstabelecimento:', error);
+    }
+};
+
 exports.alterarGoldsEstabelecimento = async (clienteId, estabelecimentoId, goldNoEstabelecimento) => {
 
     try{
@@ -524,18 +607,12 @@ exports.alterarGoldsEstabelecimento = async (clienteId, estabelecimentoId, goldN
                 goldPorEstabelecimento:
                 {
                     $elemMatch: {
-                        estabelecimento: ObjectIdCast(estabelecimentoId),
-                        lider: true
+                        estabelecimento: ObjectIdCast(estabelecimentoId)
                     }
                 }
             },
             {
-                $set: {
-                    'goldPorEstabelecimento.$.gold': goldNoEstabelecimento
-                }
-            },
-            {
-                upsert: true
+                $inc: { 'goldPorEstabelecimento.$.gold': goldNoEstabelecimento }
             }).exec();
 
         if (!clienteAlterado)
@@ -547,6 +624,40 @@ exports.alterarGoldsEstabelecimento = async (clienteId, estabelecimentoId, goldN
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarGoldsEstabelecimento:', error);
         return false;
+    }
+};
+
+exports.inserirGoldEstabelecimento = async (clienteId, estabelecimentoId, gold) => {
+    try {
+        return await schemaCliente.updateOne(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                $push: {
+                    goldPorEstabelecimento: {
+                        estabelecimento: ObjectIdCast(estabelecimentoId),
+                        gold: gold
+                    }
+                }
+            }).exec();
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterGoldEstabelecimento:', error);
+    }
+};
+
+exports.listarGoldEstabelecimento = async clienteId => {
+    try {
+        return await schemaCliente.find(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                _id: 0,
+                goldPorEstabelecimento: 1
+            }).exec().then(items => items[0]);
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterGoldEstabelecimento:', error);
     }
 };
 

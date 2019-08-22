@@ -76,11 +76,25 @@ exports.FBAlterarItemEstabelecimento = (estabelecimentoId, {_id, descricao, hotS
     }
 };
 
+exports.FBAlterarEstoqueItem = (estabelecimentoId, {_id, quantidadeDisponivel, quantidadeVendida} ) => {
+    try
+    {
+        let item = {
+            _id,
+            quantidadeDisponivel,
+            quantidadeVendida
+        };
+
+        connFb.database().ref('estabelecimentos/' + estabelecimentoId.toString() +'/itensLoja/' + item._id.toString()).update(item);
+    }
+    catch(error){
+        console.log(error);
+    }
+};
+
 exports.FBCadastrarDesafio = (estabelecimentoId, produtoPremioId, produtoObjetivoId, {_id,nome,descricao,icon,tempoDuracao,emGrupo,premio,objetivo}) => {
     try
     {
-        console.log(estabelecimentoId, produtoPremioId, produtoObjetivoId)
-        console.log(_id,nome,descricao,icon,tempoDuracao,emGrupo,premio,objetivo)
         let desafio = {
             _id: _id.toString(),
             nome: nome,
@@ -124,7 +138,6 @@ exports.FBRemoverDesafio = (estabelecimentoId, desafioId) => {
         console.log(error);
     }
 };
-
 
 exports.FBAlterarIconDesafio = (estabelecimentoId, desafioId, nomeIcon) => {
     try

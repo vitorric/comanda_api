@@ -52,7 +52,7 @@ const { LoginCliente } = require('../../../service/api/cliente'),
 
 module.exports = () => (req, res) => {
 
-    LoginCliente(req.user).then((result) => resJsonP(res, 200, result.status, result.objeto, result.mensagem))
+    LoginCliente(req.user, req.body).then((result) => resJsonP(res, 200, result.status, result.objeto, result.mensagem))
         .catch((error) => {
             console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginCliente:', error);
             resJsonP(res, 200, false, null, Mensagens.SOLICITACAO_INVALIDA);

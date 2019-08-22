@@ -170,3 +170,24 @@ exports.FBAlterarConfigApp = (clienteId, configApp) => {
         throw err;
     }
 };
+
+exports.FBAlterarGoldEstabelecimento = (clienteId, listaGolds) => {
+    try
+    {
+        listaGolds.goldPorEstabelecimento.map((value) => {
+
+            let novoGold = {
+                estabelecimento: value.estabelecimento.toString(),
+                gold: value.gold
+            };
+
+            connFb.database().ref('/clientes/' + clienteId.toString() + '/goldPorEstabelecimento/' + value.estabelecimento.toString()).set(novoGold);
+        });
+
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};

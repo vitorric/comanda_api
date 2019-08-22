@@ -20,8 +20,10 @@ const { cadastrarComanda,
         listarConvitesComandaEnviados,
         removerClienteEstabelecimento } = require('../../../repository/api/cliente'),
     { obterProduto, alterarProdutoVendido } = require('../../../repository/api/produto'),
+    { cadastrarHistoricoComanda } = require('../../../repository/api/historicoComanda'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
     { listarDesafiosAtivos } = require('../../../repository/api/desafio'),
+    { listarHistoricoComanda } = require('../../../repository/api/historicoComanda'),
     {
         InserirMensagemNoCorreio,
         DesativarMensagemConviteGrupo,
@@ -443,18 +445,17 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
             AlterarExp(element._id, element.avatar, 10);
         });
 
-        if (desafios.length > 0)
+        if (typeof desafios !== 'undefined' && desafios.length > 0)
         {
             //para cada desafio
-            desafios.forEach(async desafio => {
+            desafios.map(desafio => {
 
                 //varre todos os clientes da comanda
-                todosClientesDoGrupo.forEach(async function(cliente)
+                todosClientesDoGrupo.map(cliente =>
                 {
                     let indexDesafio = cliente.desafios.findIndex(x => x.desafio.toString() == desafio._id.toString());
 
                     //verifica se o desafio ja foi concluido == Fazer isso amanha
-
                     //encontrou o desafio
                     if (indexDesafio > -1 && cliente.desafios[indexDesafio].concluido === false)
                     {
@@ -486,12 +487,25 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
                             cliente.desafios[indexDesafio].dataConclusao = new Date();
                         }
                     }
-
-                    alterarClienteParaDesafio(cliente._id, cliente);
-                    FBAlterarDesafios(cliente._id, cliente.desafios);
                 });
             });
         }
+
+        const promise = todosClientesDoGrupo.map(async cliente => {
+            await alterarClienteParaDesafio(cliente._id, cliente);
+            FBAlterarDesafios(cliente._id, cliente.desafios);
+        });
+
+        await Promise.all(promise);
+
+        cadastrarHistoricoComanda({
+            comanda: comanda._id,
+            estabelecimento: comanda.estabelecimento,
+            nomeProduto: produto.nome,
+            iconProduto: produto.icon,
+            quantidade: produtoComanda.quantidade,
+            valorTotal: precoTotalDaCompra
+        });
 
         return { status: true, objeto: { valorTotal: comanda.valorTotal, produtosComanda: produtoFirebase } };
     }
@@ -620,6 +634,20 @@ exports.ClientePagarComanda = async (estabelecimentoId, {clienteId, comandaId, v
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ClientePagarComanda:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ListarHistoricoComanda = async comandaId => {
+    try
+    {
+        let historicoComanda = await listarHistoricoComanda(comandaId);
+
+        return { status: true, objeto: historicoComanda };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarHistoricoComanda:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

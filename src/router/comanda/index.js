@@ -21,6 +21,8 @@ module.exports = () => {
 
     router.post('/listar/convites/enviados',passportClienteJWT, require('./listarConvitesComandaEnviados')());
 
+    router.post('/listar/historico/comanda',passportClienteJWT, require('./listarHistoricoComanda')());
+
     router.post('/transferir/lideranca/comanda',passportClienteJWT, require('./transferirLiderancaGrupo')());
 
     router.post('/cliente/pagar/comanda',passportEstabelecimentoJWT, require('./clientePagarComanda')());
