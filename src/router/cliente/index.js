@@ -5,6 +5,12 @@ const passport = require('passport'),
 
 module.exports = () => {
 
+    router.post('/validar/cadastrar/cliente/cpf', require('./validarCadastroCPF')());
+
+    router.post('/validar/cadastrar/cliente/apelido', require('./validarCadastroApelido')());
+
+    router.post('/validar/cadastrar/cliente/email', require('./validarCadastroEmail')());
+
     router.post('/cadastrar/cliente', require('./cadastrarCliente')());
 
     router.post('/alterar_config_app/cliente',passportClienteJWT, require('./alterarConfigApp')());
@@ -19,11 +25,13 @@ module.exports = () => {
 
     router.post('/login/cliente', passport.authenticate('cliente', {session: false}), require('./login')());
 
+    router.post('/login/facebook', require('./loginFacebook')());
+
     router.post('/recuperar_senha/cliente', require('./recuperarSenha')());
 
     router.post('/comprar_item/cliente', passportClienteJWT, require('./comprarItemLoja')());
 
-    router.get('/listar/cliente',passportClienteJWT, require('./get/listarClientes')());
+    router.get('/listar/cliente',passportClienteJWT, require('./listarClientes')());
 
     router.post('/listar/cliente/historico/compra',passportClienteJWT, require('./listarHistoricoCompra')());
 

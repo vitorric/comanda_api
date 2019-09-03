@@ -10,8 +10,7 @@ const ClienteSchema = new Schema(
             required: true
         },
         password: {
-            type: String,
-            required: true
+            type: String
         },
         status: {
             type: Boolean,
@@ -36,6 +35,12 @@ const ClienteSchema = new Schema(
         },
         dataNascimento:{
             type: Date
+        },
+        tipoLogin: {
+            type: String
+        },
+        socialId: {
+            type: String
         },
         sexo:{
             type: String,

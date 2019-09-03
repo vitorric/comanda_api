@@ -4,7 +4,7 @@ module.exports = () => {
     const ExtractJwt = require('passport-jwt').ExtractJwt;
     const LocalStrategy = require('passport-local').Strategy;
     const { JWT_SECRET } = require('../../../config');
-    const { schemaUser } = require('../../schema/api/user');
+    const { schemaUser } = require('../../schema/api/usuario');
 
     require('./cliente')();
     require('./estabelecimento')();

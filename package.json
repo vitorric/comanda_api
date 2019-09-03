@@ -1,7 +1,7 @@
 {
   "name": "comanda-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Esta é a API do projeto Comanda Gameficada, esta API é utilizada no aplicativo Mobile e no Portal.",
   "main": "index.js",
   "dependencies": {
     "accepts": "^1.3.4",
@@ -37,7 +37,6 @@
     "serve": "^11.1.0"
   },
   "scripts": {
-    "test": "NODE_ENV=test istanbul cover -x ./  --report text --report lcov jasmine test/**/**/*_[sS]pec.js",
     "start": "nodemon index.js",
     "gen-doc": "apidoc -i src/ -o apidoc/"
   },

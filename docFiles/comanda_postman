@@ -1,0 +1,2231 @@
+{
+	"info": {
+		"_postman_id": "b695d0b8-4e97-4326-bf7e-744c3cf59e73",
+		"name": "Comanda",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Estabelecimento",
+			"item": [
+				{
+					"name": "Cadastrar Estabelecimento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"email\": \"estab2@email.com\",\r\n\t\"password\": \"81dc9bdb52d04dc20036dbd8313ed055\",\r\n\t\"status\": true,\r\n\t\"tipo\": \"Restaurante\",\r\n\t\"nome\": \"Torremos\",\r\n\t\"descricao\": \"Churrascaria de primeira qualidade\",\r\n\t\"cnpj\": \"31.767.071/0001-48\",\r\n\t\"telefone\": \"(15) 3265-9865\",\r\n\t\"celular\": \"(15) 99876-5648\",\r\n\t\"emailContato\": \"contato@estab2.com\",\r\n\t\"horarioAtendimentoInicio\": \"10:00\",\r\n\t\"horarioAtendimentoFim\": \"16:00\",\r\n\t\"endereco\": {\r\n\t\t\"rua\": \"Rua boa pergunta\",\r\n\t\t\"numero\": \"326\",\r\n\t\t\"bairro\": \"Vila Santana\",\r\n\t\t\"cidade\": \"Sorocaba\",\r\n\t\t\"cep\": \"18010-003\",\r\n\t\t\"estado\": \"SP\"\r\n\t}\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar/estabelecimento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar",
+								"estabelecimento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Estabelecimento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"estab1@email.com\",\n\t\"password\": \"81dc9bdb52d04dc20036dbd8313ed055\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/login/estabelecimento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"login",
+								"estabelecimento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Estabelecimento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWQ0MGRiNGQ4Y2FmZWU0ODc0YmNmYTZlIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkLzc3S1JDM3guN3d4ZzIzRmpERVNhdS56MjJNdVN1akM2MzNJMm9uZjFPdGhkTWdnN0dUdjIiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTY1MTQwMzAzLCJpYXQiOjE1NjUxMzY3MDN9.4X1FBwNMfWYJ2SVeMem-MWFuUeQZZIZ8qJnJ247Aa_o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/estabelecimento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"estabelecimento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Estabelecimento Para Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGViYzFhNTgyODAwMjM5NDE4YmI4ZCJ9LCJleHAiOjE1NTgxMTMzNzYsImlhdCI6MTU1ODEwOTc3Nn0.7p4sTcpA8KCq-NiMVCFExJXyO0C0nw2TdPAcuNSTX10",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"estabelecimentoId\": \"5cdcc0885d47c43790919e7c\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/estabelecimento/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"estabelecimento",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Estabelecimento Para Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTkzNTI2NjIsImlhdCI6MTU1OTM0OTA2Mn0.ipgs_YICrM2KrVPeI4Q-jt7zg7vmw-XqO04QJhdXpJg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/javascript",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZXIiOiJDb21hbmRhIiwiY2xpZW50ZSI6eyJjb25maWdBcHAiOnsic29tRnVuZG8iOjEsInNvbUdlcmFsIjoxfSwiY29uZmlnQ2xpZW50ZUF0dWFsIjp7ImVzdGFFbVVtRXN0YWJlbGVjaW1lbnRvIjpmYWxzZX0sInN0YXR1cyI6dHJ1ZSwicG9udG9zIjowLCJnb2xkR2VyYWwiOjAsIl9pZCI6IjVjYjY2MmYxZWZkNGI1M2FlODQ5NDVhMyIsImVtYWlsIjoiZW1haWwxQGVtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJhJDEwJGlJWXkya1NIWEExRU00MkxCTGJ2aWVGVXd2M1YuZXNxeXd6Q3JsVUU5YUlyTmo0S29IQ1RLIiwiYXBlbGlkbyI6IlRlc3R0IiwiZGF0YU5hc2NpbWVudG8iOiIxOTk0LTEyLTIyVDAwOjAwOjAwLjAwMFoiLCJub21lIjoiMTIzNDEyMyIsImNwZiI6IjE3OS44ODkuNzk4LTQ1Iiwic2V4byI6Ik1hc2N1bGlubyIsImdvbGRQb3JFc3RhYmVsZWNpbWVudG8iOltdLCJjb25xdWlzdGFzIjpbXSwiYXZhdGFyIjoiNWNiNjYyZjFlZmQ0YjUzYWU4NDk0NWE0IiwiY3JlYXRlZEF0IjoiMjAxOS0wNC0xNlQyMzoxOToxMy4yMjdaIiwidXBkYXRlZEF0IjoiMjAxOS0wNC0xNlQyMzoxOToxMy4yMjdaIiwiX192IjowfSwiZXhwIjoxNTU1NDY5OTM4LCJpYXQiOjE1NTU0NjYzMzh9.2ipCpITM3MS6P4mOK4QGOt8iZbtOD18PVCxuCNq73pY",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:3000/api/listar/estabelecimento/cliente",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"estabelecimento",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Adicionar Cliente ao Estabelecimento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwibm9tZSI6IlJhdmljaW5pIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUifSwiZXhwIjoxNTYwODIzNjE5LCJpYXQiOjE1NjA4MjAwMTl9.A3yoTrH4NBRih8IbfPnakPX6jSVUddieMRqbwkJDR0c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"clienteId\": \"5cf7d30577834cac98472c6e\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/adicionar/estabelecimento/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"adicionar",
+								"estabelecimento",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Status Estabelecimento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTU4MTI0NTQ2LCJpYXQiOjE1NTgxMjA5NDZ9.XLhNFVDAny6wYTTVmpYvWru3I_59kvWAfbYCtuNluzw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"status\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/estabelecimento/online",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"estabelecimento",
+								"online"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cliente",
+			"item": [
+				{
+					"name": "Cadastrar Cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"teste42@email.com\",\r\n  \"password\": \"81dc9bdb52d04dc20036dbd8313ed055\",\r\n  \"nome\": \"teste42\",\r\n  \"apelido\": \"teste42\",\r\n  \"sexo\": \"Masculino\",\r\n  \"cpf\": \"552.245.666-99\",\r\n  \"dataNascimento\": \"22/12/1994\",\r\n  \"avatar\": {\r\n\t\"corpo\" : \"corpo_01\",\r\n\t\"cabeca\" : \"cabeca_01\",\r\n\t\"nariz\" : \"nariz_01\",\r\n\t\"olhos\" : \"olhos_06\",\r\n\t\"boca\" : \"boca_04\",\r\n\t\"roupa\" : \"roupa_04\",\r\n\t\"cabeloTraseiro\" : \"cabeloTraseiro_01\",\r\n\t\"cabeloFrontal\" : \"cabeloFrontal_02\",\r\n\t\"barba\" : \"barba_01\",\r\n\t\"sombrancelhas\" : \"sombrancelhas_06\",\r\n\t\"orelha\" : \"orelha_01\",\r\n\t\"corPele\" : \"cor_pele\",\r\n\t\"corCabelo\" : \"amarelo\",\r\n\t\"corBarba\" : \"marron\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validar Cadastro CPF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"cpf\": \"364.239.819-64\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/validar/cadastrar/cliente/cpf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"validar",
+								"cadastrar",
+								"cliente",
+								"cpf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validar Cadastro Apelido",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"apelido\": \"Krodon2\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/validar/cadastrar/cliente/apelido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"validar",
+								"cadastrar",
+								"cliente",
+								"apelido"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validar Cadastro Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"teste40@email.com\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/validar/cadastrar/cliente/email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"validar",
+								"cadastrar",
+								"cliente",
+								"email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"email1@email.com\",\n\t\"password\": \"81dc9bdb52d04dc20036dbd8313ed055\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/login/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"login",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Cliente Facebook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"email1@email.com\",\n\t\"password\": \"81dc9bdb52d04dc20036dbd8313ed055\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/login/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"login",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Historico Compra Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNGI3MzFlMDMzNzc1MDI4NDI1Yjc4MCJ9LCJleHAiOjE1NjU4Mzc4MDksImlhdCI6MTU2NTgzNDIwOX0.hJbSgzTDvWTP8k3yWGMhEFeRLduHoYjQKfYwS8zrM7A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/cliente/historico/compra",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"cliente",
+								"historico",
+								"compra"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cliente Entrar Estabelecimento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGQ4Yzk1Zjg0ODY4MDljY2I4NjU2OCJ9LCJleHAiOjE1NTkwMDQxMzMsImlhdCI6MTU1OTAwMDUzM30.EbcIGIyL2efC_s_KEW2VU5WgFRyKiXkI8igRDovcBUQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"estabelecimentoId\": \"5cdcc0885d47c43790919e7c\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/entrar_estabelecimento/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"entrar_estabelecimento",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Cliente Config App",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTg2NjI1NzgsImlhdCI6MTU1ODY1ODk3OH0.7XFEqaV4gTKVp78u-h-pfTSn8awaHS5alRkx2ECx3YY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZXIiOiJDb21hbmRhIiwidXNlciI6eyJfaWQiOiI1Y2NiN2Q2OWVjYzI2MzEzZDQwYjM3NDIifSwiZXhwIjoxNTU3NzcwMzgxLCJpYXQiOjE1NTc3NjY3ODF9._n2R6LF6_Jo9N32cK43fsXgFzHsNbHMqZbqHS8DhdLE",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"configApp\": {\n\t\t\"somFundo\": 0.2,\n\t\t\"somGeral\": 0.8\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar_config_app/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar_config_app",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTg2NjI1NzgsImlhdCI6MTU1ODY1ODk3OH0.7XFEqaV4gTKVp78u-h-pfTSn8awaHS5alRkx2ECx3YY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nome\": \"Email123\",\n\t\"cpf\": \"555.666.333-88\",\n\t\"dataNascimento\": \"1994-12-22\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cliente Sair Estabelecimento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZjdkMzA1Nzc4MzRjYWM5ODQ3MmM2ZSJ9LCJleHAiOjE1NjA0NzE3NjUsImlhdCI6MTU2MDQ2ODE2NX0.2CYlVXXAYlBYZwEQ3nThbvVJd17iUOUfO6WXlHvmvt4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/sair_estabelecimento/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"sair_estabelecimento",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recuperar Senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"vitorricardo@outlook.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/recuperar_senha/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recuperar_senha",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Desafios Concluidos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNGI3MzFlMDMzNzc1MDI4NDI1Yjc4MCJ9LCJleHAiOjE1NjU4Mzc4MDksImlhdCI6MTU2NTgzNDIwOX0.hJbSgzTDvWTP8k3yWGMhEFeRLduHoYjQKfYwS8zrM7A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/cliente/desafios/concluido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"cliente",
+								"desafios",
+								"concluido"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recusar Convite Estabelecimento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTgxMjQ2ODcsImlhdCI6MTU1ODEyMTA4N30.-pHcLQ70DBXuBOiX6Kr0QtYiotdEBMI5gULJFdw2Xao",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/recusar_convite_estabelecimento/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"recusar_convite_estabelecimento",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Comprar Item Loja",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZjdkMzA1Nzc4MzRjYWM5ODQ3MmM2ZSJ9LCJleHAiOjE1NTk3NTA5NjYsImlhdCI6MTU1OTc0NzM2Nn0.AKpQ3UYxh_YDlDN9p078VnChHKU4rR_cmPE8wFRND5A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"estabelecimento\": \"5cdcc0885d47c43790919e7c\",\n\t\"itemLoja\": \"5cdf4f98220c286140212e6e\",\n\t\"precoItem\": 150\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/comprar_item/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"comprar_item",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Avatar",
+			"item": [
+				{
+					"name": "Alterar Avatar",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTg3MDY3NzksImlhdCI6MTU1ODcwMzE3OX0.pB7pIoVUcsyxlxGWfCLsgN2fQjqcUm9b8I8ljswQg7Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZXIiOiJDb21hbmRhIiwiY2xpZW50ZSI6eyJfaWQiOiI1Y2NiN2Q2OWVjYzI2MzEzZDQwYjM3NDIifSwiZXhwIjoxNTU3NTk2NDMxLCJpYXQiOjE1NTc1OTI4MzF9.PxLv4zy8zDaBSPmSzdgj3tMzHMjWhhGCqJAxGBpBah8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"corpo\" : \"corpo_03\",\n\t\"cabeca\" : \"cabeca_01\",\n\t\"nariz\" : \"nariz_01\",\n\t\"olhos\" : \"olhos_06\",\n\t\"boca\" : \"boca_04\",\n\t\"roupa\" : \"roupa_04\",\n\t\"cabeloTraseiro\" : \"cabeloTraseiro_01\",\n\t\"cabeloFrontal\" : \"cabeloFrontal_02\",\n\t\"barba\" : \"barba_01\",\n\t\"sombrancelhas\" : \"sombrancelhas_06\",\n\t\"orelha\" : \"orelha_01\",\n\t\"corPele\" : \"cor_pele\",\n\t\"corCabelo\" : \"amarelo\",\n\t\"corBarba\" : \"marron\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/cliente/avatar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"cliente",
+								"avatar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Exp",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkMWI1MWRkNTQyZjZjOGFjOGRlNWE3MiJ9LCJleHAiOjE1NjI3NzI1NDksImlhdCI6MTU2Mjc2ODk0OX0.2pncHbKyjKb1pw57-FFmtbBY6g5-fKXUB7Ceu3SPc7Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"clienteId\": \"5d1b51dd542f6c8ac8de5a72\",\n\t\"avatarId\": \"5d1b51dd542f6c8ac8de5a71\",\n\t\"exp\": 1000\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/cliente/avatar/exp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"cliente",
+								"avatar",
+								"exp"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Produtos",
+			"item": [
+				{
+					"name": "Cadastrar Produto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTU5MzU4NTA1LCJpYXQiOjE1NTkzNTQ5MDV9.2i4uF-rr0PkMRbjg7blEfAJ94zYBJV89NPKkvH3wzdU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nome\": \"Carne de carneiro\",\n\t\"descricao\": \"Carne de carneiro dura pakas\",\n\t\"icon\": \"DefaultIcon.png\",\n\t\"custo\": \"100\",\n\t\"estoque\": \"50\",\n\t\"preco\": \"200\",\n\t\"status\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar/produto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar",
+								"produto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Produto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTU5MzU4NTA1LCJpYXQiOjE1NTkzNTQ5MDV9.2i4uF-rr0PkMRbjg7blEfAJ94zYBJV89NPKkvH3wzdU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"_id\": \"5d350430876c63301cab55dc\",\n\t\"nome\": \"Carne de carneiro\",\n\t\"descricao\": \"Carne de carneiro dura pakas\",\n\t\"icon\": \"DefaultIcon.png\",\n\t\"custo\": \"100\",\n\t\"estoque\": \"50\",\n\t\"preco\": \"200\",\n\t\"status\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/produto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"produto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Produto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTYzNzYwNDQxLCJpYXQiOjE1NjM3NTY4NDF9.Z3BQ8yGTCI9N4TUsIESdg8TcjTWcqQW6lZbnSzrzLjE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"produtoId\": \"5d350430876c63301cab55dc\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/produto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"produto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Produto Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNGI3MzFlMDMzNzc1MDI4NDI1Yjc4MCJ9LCJleHAiOjE1NjU3MjEzODQsImlhdCI6MTU2NTcxNzc4NH0.d-AJGfJvpcHsKOPIBK1bC-hupFuuV0bD7y47uu_TLr0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"produtoId\": \"5d4dad4dc6a74815bcbb6b5b\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/produto/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"produto",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Produto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTYzNDk0OTA3LCJpYXQiOjE1NjM0OTEzMDd9.7w5wXSZey77PDd-E-JezpVKDzPzD60QKeiw1KEKi_Nc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/produto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"produto"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ItemLoja",
+			"item": [
+				{
+					"name": "Cadastrar Item Loja",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWQ0MGRiNGQ4Y2FmZWU0ODc0YmNmYTZlIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkLzc3S1JDM3guN3d4ZzIzRmpERVNhdS56MjJNdVN1akM2MzNJMm9uZjFPdGhkTWdnN0dUdjIiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTY0NzUyMDYyLCJpYXQiOjE1NjQ3NDg0NjJ9.0KG6H9rQr_23xFv2M8ireLPITqT3yuz9VRo0I-Q76v8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nome\": \"Pao de Alho 05\",\n\t\"descricao\": \"Pao de alho cheio de alho\",\n\t\"icon\": \"defaultIcon.png\",\n\t\"preco\": 80,\n\t\"status\": 1,\n\t\"quantidadeVendida\": 0,\n\t\"hotSale\": false,\n\t\"quantidadeDisponivel\": 100,\n\t\"tempoDisponivel\": \"2019-06-17 18:00\",\n\t\"tempoEntrarNoAr\": \"2019-05-17 18:00\",\n\t\"produto\": \"5cf1d317b8f1fd9b90809e80\"\n}\n"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar/itemLoja",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar",
+								"itemLoja"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Item Loja",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTU4MTQxNDg0LCJpYXQiOjE1NTgxMzc4ODR9.veEPBD9AkuwgZhh7DYUc-rAH5VM_hXPCiwLqaAylPvA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/itemLoja",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"itemLoja"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Item Loja",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTU4MTQxNDg0LCJpYXQiOjE1NTgxMzc4ODR9.veEPBD9AkuwgZhh7DYUc-rAH5VM_hXPCiwLqaAylPvA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/itemLoja",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"itemLoja"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Item Loja",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTU4MTQxNDg0LCJpYXQiOjE1NTgxMzc4ODR9.veEPBD9AkuwgZhh7DYUc-rAH5VM_hXPCiwLqaAylPvA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"_id\": \"5cdf4f98220c286140212e6e\",\n\t\"nome\": \"Cerveja 01\",\n\t\"descricao\": \"Essa é uma breja deliciousa\",\n\t\"icon\": \"defaultIcon.png\",\n\t\"preco\": 150,\n\t\"status\": 1,\n\t\"hotSale\": true,\n\t\"quantidadeDisponivel\": 50,\n\t\"tempoDisponivel\": \"2019-05-17 18:00\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/itemLoja",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"itemLoja"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Item Loja Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWQ0YjJmODViOTc5NmUzZTA0ZGZiZDQ5IiwiZW1haWwiOiJlc3RhYjJAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkUXgwZml4bWRtQjRjSVowcmJzandrdWFsTk8uNEJsYmVqYXhSaEV4VEh6L2pFUTU5Q0hzc1ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTY1Mjc3NDAxLCJpYXQiOjE1NjUyNzM4MDF9.EeY-DazJpSkmSJ7pgeCqnw7OMoDPTc_9fCP2LHgkAPU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"itemId\": \"5d4b315d3038bf15ec205cf3\",\n\t\"status\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/itemLoja/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"itemLoja",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Desafios",
+			"item": [
+				{
+					"name": "Cadastrar Desafio",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTY0MDIwNDc2LCJpYXQiOjE1NjQwMTY4NzZ9.sTGEs6YY_uGzSn5L05KvsCuDciiTd3loMpCKGk6vqpY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"nome\": \"Testando Novo Premio\", \r\n\t\"descricao\": \"Consuma 1 coxinha\",\r\n\t\"icon\": \"defaultIcon.png\",\r\n\t\"premio\":\r\n\t{\r\n\t    \"tipo\": \"Produto\",\r\n\t    \"quantidade\": 1,\r\n\t    \"produto\": \"5cdefeeafbf0ae5ee06168cd\"\r\n\t},\r\n\t\"tempoDuracao\": \"2019-06-18 22:00\",\r\n\t\"status\": 1,\r\n\t\"emGrupo\": true,\r\n\t\"objetivo\":\r\n\t{\r\n\t    \"tipo\": \"Produto\",\r\n\t    \"quantidade\": 10,\r\n\t    \"produto\": \"5cdefeeafbf0ae5ee06168cd\"\r\n\t}\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar/desafio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar",
+								"desafio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Desafio",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTY0MDIwNDc2LCJpYXQiOjE1NjQwMTY4NzZ9.sTGEs6YY_uGzSn5L05KvsCuDciiTd3loMpCKGk6vqpY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"nome\": \"Testando Novo Premio\", \r\n\t\"descricao\": \"Consuma 1 coxinha\",\r\n\t\"icon\": \"defaultIcon.png\",\r\n\t\"premio\":\r\n\t{\r\n\t    \"tipo\": \"Produto\",\r\n\t    \"quantidade\": 1,\r\n\t    \"produto\": \"5cdefeeafbf0ae5ee06168cd\"\r\n\t},\r\n\t\"tempoDuracao\": \"2019-06-18 22:00\",\r\n\t\"status\": 1,\r\n\t\"emGrupo\": true,\r\n\t\"objetivo\":\r\n\t{\r\n\t    \"tipo\": \"Produto\",\r\n\t    \"quantidade\": 10,\r\n\t    \"produto\": \"5cdefeeafbf0ae5ee06168cd\"\r\n\t}\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/desafio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"desafio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Desafio Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWQ0YjJmODViOTc5NmUzZTA0ZGZiZDQ5IiwiZW1haWwiOiJlc3RhYjJAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkUXgwZml4bWRtQjRjSVowcmJzandrdWFsTk8uNEJsYmVqYXhSaEV4VEh6L2pFUTU5Q0hzc1ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTY1Mjc3NDAxLCJpYXQiOjE1NjUyNzM4MDF9.EeY-DazJpSkmSJ7pgeCqnw7OMoDPTc_9fCP2LHgkAPU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"desafioId\": \"5d4b324e3038bf15ec205cf7\",\r\n\t\"status\": 1\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/alterar/desafio/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"alterar",
+								"desafio",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Desafio Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNGI3MzFlMDMzNzc1MDI4NDI1Yjc4MCJ9LCJleHAiOjE1NjU4MDMzMjEsImlhdCI6MTU2NTc5OTcyMX0.AdrdPojndN3uEHtWEF9a2Oei08ty86Ze3VJW0CXSviY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"desafioId\": \"5d4daeb8473ed95c543d85d4\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/desafio/cliente",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"desafio",
+								"cliente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Desafio Estab",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkMWI1MWRkNTQyZjZjOGFjOGRlNWE3MiJ9LCJleHAiOjE1NjI5NTAxOTksImlhdCI6MTU2Mjk0NjU5OX0.rOLFYFU7mY47avCosV2PDlNg8ibHwVVijTNU65RGmss",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"desafioId\": \"5cf7b963d8919227d87b3f46\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/desafio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"desafio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Desafios",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTYzOTc2NTc4LCJpYXQiOjE1NjM5NzI5Nzh9._TOaQYRKW2gBdhkhlBHHVgIlKGexM3YY29xcPR0UsTI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/desafios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"desafios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resgatar Recompensa Desafio",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNGI3MzFlMDMzNzc1MDI4NDI1Yjc4MCJ9LCJleHAiOjE1NjU3NDU4MjIsImlhdCI6MTU2NTc0MjIyMn0.Oy_QWZjOwWHaqlUyP-vNi_b07WzyOU1b-blwjKg1p3Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"desafioId\": \"5d52bbf4ec069d3028c53894\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/resgatar/recompensa/desafio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"resgatar",
+								"recompensa",
+								"desafio"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comanda",
+			"item": [
+				{
+					"name": "Cadastrar Comanda",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTYyMTYxOTU1LCJpYXQiOjE1NjIxNTgzNTV9.4sPVyVmxNxXMY6z4pr0iloUDUvwqO-ZbnyrxmQvQ4vg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"clienteId\": \"5d1b4ffc542f6c8ac8de5a6e\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cliente Pagar Comanda",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWQ0YjJmODViOTc5NmUzZTA0ZGZiZDQ5IiwiZW1haWwiOiJlc3RhYjJAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkUXgwZml4bWRtQjRjSVowcmJzandrdWFsTk8uNEJsYmVqYXhSaEV4VEh6L2pFUTU5Q0hzc1ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTY1Mzc4MTg2LCJpYXQiOjE1NjUzNzQ1ODZ9.ljL8G-SYa3ZnbBqyEzjth6MaGacrxq3AfVdQZrMlplw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"clienteId\": \"5d4b731e033775028425b780\",\n\t\"comandaId\": \"5d4dbed184b0ec281ca1d4b8\",\n\t\"valorPago\": 10\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cliente/pagar/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cliente",
+								"pagar",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resposta Membro Grupo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkMTE1YzNmZTMwMjlhMDFlNTk3ZjEyNiJ9LCJleHAiOjE1NjE2ODk3NTUsImlhdCI6MTU2MTY4NjE1NX0.DmjxB1ooQYPylFhlObBPM3vTYJ-WbR7FHlwWmOUZ0xw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comanda\": \"5d09805ee5badd44f8a5ffcc\",\n\t\"aceitou\": false\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/resposta_convite/membro_grupo/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"resposta_convite",
+								"membro_grupo",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Comandas Estab",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkMTE1YzNmZTMwMjlhMDFlNTk3ZjEyNiJ9LCJleHAiOjE1NjE2ODk3NTUsImlhdCI6MTU2MTY4NjE1NX0.DmjxB1ooQYPylFhlObBPM3vTYJ-WbR7FHlwWmOUZ0xw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/comandas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"comandas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Comanda Estab",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWQ0YjJmODViOTc5NmUzZTA0ZGZiZDQ5IiwiZW1haWwiOiJlc3RhYjJAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkUXgwZml4bWRtQjRjSVowcmJzandrdWFsTk8uNEJsYmVqYXhSaEV4VEh6L2pFUTU5Q0hzc1ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTY1MzgyMDc0LCJpYXQiOjE1NjUzNzg0NzR9.1E82DLmYWeIsv_0vI49AKCjOX9NDR3EUvgs1IRK_eBk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comandaId\": \"5d4dac1bc6a74815bcbb6b59\"\n}\n"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/obter/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"obter",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Convites Comanda",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZjdkMzA1Nzc4MzRjYWM5ODQ3MmM2ZSJ9LCJleHAiOjE1NjE0MjUyNzIsImlhdCI6MTU2MTQyMTY3Mn0.wtTzA5S0B254bcptDAd65qGvoyDgy6Ot4_lmUcSNRj8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comandaId\": \"5d09805ee5badd44f8a5ffcc\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/convites/enviados",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"convites",
+								"enviados"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Historico Comanda",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNTczN2UyODRiYjk4MzZmY2I1ZWRiMyJ9LCJleHAiOjE1NjYwNTE2NTUsImlhdCI6MTU2NjA0ODA1NX0.g01BPKiv0a8sDkqr8UZwGlVImv5QOeMvP9Bswj9QuGk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comandaId\": \"5d5738ed84bb9836fcb5edde\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/listar/historico/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"listar",
+								"historico",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Convidar Membro Grupo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTg3MTI5ODQsImlhdCI6MTU1ODcwOTM4NH0.cY6ZBfctHG0B9CfJ6NECWqmY89fbmT41mxSkgluDoDY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"chaveAmigavel\": \"JORHDV\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/convidar/membro_grupo/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"convidar",
+								"membro_grupo",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transferir Lideranca Grupo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkMWI0ZmZjNTQyZjZjOGFjOGRlNWE2ZSJ9LCJleHAiOjE1NjIyODc2MTIsImlhdCI6MTU2MjI4NDAxMn0.h4Synbqo_Ll_YgnXv5SYmS88PpiVFacuw1sKngnwdEY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comandaId\": \"5d1ca5234e86f555ec18d694\",\n\t\"clienteNovoLiderId\": \"5d1b51dd542f6c8ac8de5a72\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/transferir/lideranca/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"transferir",
+								"lideranca",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Membro Grupo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVjZGVmMzk5YmVhNDQxNjFjMDczZGVjYyJ9LCJleHAiOjE1NTg3MTA0OTMsImlhdCI6MTU1ODcwNjg5M30.DDRc6WK37HJwqwPriFTY_3GIBi214G60kfzmrbWd1-A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"chaveAmigavel\": \"JORHDV\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cancelar_convite/membro_grupo/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cancelar_convite",
+								"membro_grupo",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Item Comanda",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTYyODk1MDg5LCJpYXQiOjE1NjI4OTE0ODl9.M4k3aieeSCtLFohuDukP3gqxi739bFPF0X1IbGrf9sk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"comandaId\": \"5d1ca5234e86f555ec18d694\",\n\t\"produto\": \"5cdefeeafbf0ae5ee06168cd\",\n\t\"quantidade\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/cadastrar_item/comanda",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"cadastrar_item",
+								"comanda"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Correio",
+			"item": [
+				{
+					"name": "Marcar Mensagem Como Lida",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkMTE1YzNmZTMwMjlhMDFlNTk3ZjEyNiJ9LCJleHAiOjE1NjE2ODU0NDUsImlhdCI6MTU2MTY4MTg0NX0.vckcw3_tTynnDCEUyDg2LD9rg4IzMJ1aif-AnHa_Pqs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"mensagemId\": \"5d12c5e27cad504e80cc58dd\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/correio/mensagem_lida",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"correio",
+								"mensagem_lida"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

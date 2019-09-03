@@ -3,6 +3,9 @@ const { cadastrarCliente,
         obterCliente,
         obterClienteCompleto,
         obterClienteEmail,
+        obterClienteApelido,
+        obterClienteCPF,
+        obterClienteSocialId,
         obterClienteChaveUnicaPortal,
         alterarCliente,
         listarClientes,
@@ -41,31 +44,36 @@ function obterDinheiroNoEstabelecimento (goldPorEstabelecimento, estabelecimento
 }
 
 //OK
-exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar, deviceId, tokenFirebase, dataNascimento, cpf }) => {
+exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar, deviceId, tokenFirebase, dataNascimento, cpf, tipoLogin, socialId }) => {
     try
     {
         let cliente = {
             email: email,
-            password: password,
             nome: nome,
             apelido: apelido,
             sexo: sexo,
             avatar: avatar,
             dataNascimento: dataNascimento,
-            cpf: cpf
+            cpf: cpf,
+            tipoLogin: tipoLogin
         };
 
-        if (!cliente.email ||
-           !cliente.password ||
-           !cliente.nome ||
+        if (tipoLogin === 'normal')
+            cliente.password = password;
+
+        if (tipoLogin !== 'normal')
+            cliente.socialId = socialId;
+
+        if (!cliente.nome ||
            !cliente.apelido ||
            !cliente.sexo ||
            !cliente.avatar ||
            !cliente.dataNascimento ||
            !cliente.cpf)
-        {
             return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
-        }
+
+        if (tipoLogin === 'normal' && (!cliente.email || !cliente.password))
+            return { status: false , mensagem: Mensagens.DADOS_INVALIDOS };
 
         let clienteEncontrado = await obterClienteParaCadastro(cliente.email, cliente.apelido);
 
@@ -91,7 +99,7 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
         cliente.avatar = novoAvatar._id;
 
         let ultimaChaveAmigavel = await obterUltimaChaveAmigavel();
-
+        console.log(ultimaChaveAmigavel);
         cliente.chaveAmigavel = parseInt(ultimaChaveAmigavel.chaveAmigavel) + 1;
 
         cliente = await cadastrarCliente(cliente);
@@ -156,6 +164,34 @@ exports.LoginCliente = async (user, { deviceId, tokenFirebase }) => {
     }
 };
 
+exports.LoginClienteFacebook = async ({ deviceId, tokenFirebase, socialId }) => {
+    try
+    {
+        let user = await obterClienteSocialId(socialId);
+
+        if (user == null)
+        {
+            return { status: true };
+        }
+
+        if (tokenFirebase)
+        {
+            await deletarTokenFirebase(user._id, deviceId);
+            registrarTokenFirebase(user._id, deviceId, tokenFirebase);
+        }
+
+        // Generate the token
+        let token = criarToken({ _id: user._id });
+
+        return { status: true , objeto: { token, _id: user._id } };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginClienteFacebook:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
 exports.ObterClienteChaveUnica = async chaveAmigavel => {
 
     try{
@@ -167,6 +203,60 @@ exports.ObterClienteChaveUnica = async chaveAmigavel => {
         }
 
         return { status: true, objeto: cliente };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterClienteEmail = async email => {
+
+    try{
+
+        let cliente = await obterClienteEmail(email);
+
+        if (!cliente)
+            return { status: true };
+
+        return { status: false, mensagem: Mensagens.CLIENTE_CADASTRAR_EMAIL };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterClienteApelido = async apelido => {
+
+    try{
+
+        let cliente = await obterClienteApelido(apelido);
+
+        if (!cliente || cliente.length === 0)
+            return { status: true };
+
+        return { status: false, mensagem: Mensagens.CLIENTE_CADASTRAR_APELIDO };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterClienteCPF = async cpf => {
+
+    try{
+
+        let cliente = await obterClienteCPF(cpf);
+
+        if (!cliente)
+            return { status: true };
+
+        return { status: false, mensagem: Mensagens.CLIENTE_CADASTRAR_CPF };
     }
     catch(error)
     {

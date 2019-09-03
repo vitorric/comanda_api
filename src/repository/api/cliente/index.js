@@ -156,6 +156,39 @@ exports.obterClienteEmail = email => {
     }
 };
 
+exports.obterClienteApelido = apelido => {
+    try
+    {
+        return schemaCliente.find({ apelido: { $regex: new RegExp('^' + apelido.toLowerCase(), 'i') }  }).exec();
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteApelido:', error);
+    }
+};
+
+exports.obterClienteCPF = cpf => {
+    try
+    {
+        return schemaCliente.findOne({ cpf: cpf }).exec();
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteCPF:', error);
+    }
+};
+
+exports.obterClienteSocialId = socialId => {
+    try
+    {
+        return schemaCliente.findOne({ socialId: socialId }).exec();
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterClienteSocialId:', error);
+    }
+};
+
 exports.obterUltimaChaveAmigavel = () => {
     try
     {

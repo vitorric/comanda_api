@@ -126,11 +126,13 @@ exports.FBAlterarProdutosComanda = (comanda, valorTotal) => {
                 quantidade: value.quantidade,
                 produto: {
                     _id: value.produto._id.toString(),
-                    nome: value.produto.nome,
-                    icon: value.produto.icon
+                    nome: value.produto.nome
                 },
                 precoTotal: value.precoTotal
             };
+
+            if (value.produto.icon)
+                produto.produto.icon = value.produto.icon;
 
             connFb.database().ref('/comandas/' + comanda._id.toString() + '/produtos/' + value.produto._id.toString()).set(produto);
         });

@@ -4,6 +4,7 @@
 	"CLIENTE_CADASTRAR_ERRO": "Erro ao cadastrar o cliente!",
 	"CLIENTE_CADASTRAR_EMAIL": "Este email já está em uso!",
 	"CLIENTE_CADASTRAR_APELIDO": "Este apelido já está em uso!",
+	"CLIENTE_CADASTRAR_CPF": "Este CPF já está em uso!",
 	"ESTABELECIMENTO_CADASTRAR_ERRO": "Erro ao cadastrar o estabelecimento!",
 	"ESTABELECIMENTO_CADASTRAR_EMAIL": "Email já cadastrado!",
 	"ESTABELECIMENTO_CADASTRAR_CNPJ": "CNPJ já cadastrado!",
@@ -40,41 +41,5 @@
 	"PROBLEMA_ENVIO_IMAGEM": "Ops, ocorreu um problema ao tentar enviar a imagem, tente novamente!",
 	"CLIENTE_NAO_ENCONTRADO_OU_PAGOU": "O cliente não está na comanda ou ele já pagou!",
 	"PAGAMENTO_VALOR_INVALIDO": "O valor a ser pago é menor que o necessário!",
-	"PAGAMENTO_VALOR_MAIOR": "O valor a ser pago é maior que o valor restante da comanda!",
-
-
-
-
-
-
-
-
-
-
-
-	"ESTABELECIMENTO_ABERTO": "Estabelecimento está aberto!",
-	"USER_SUCCESSFULLY": "User successfully registered",
-	"REGISTRATION_ERROR_USER": "There was an error in registering",
-	"REGISTRATION_ERROR_EMAIL": "E-mail already registered",
-	"USER_REMOVE_SUCCESSFULLY": "Register removed successfully ",
-	"NO_FOUND_USER": "No records found",
-	"LIST_ERROR_PARAM": "There was an error in the user search",
-	"find is not defined": "find is not defined",
-	"Cannot read property 'status' of null": "Cannot read property 'status' of null",
-	"obj is not defined": "obj is not defined",
-	"REGISTRATION_ERROR_CPF": "CPF already registered",
-	"REGISTRATION_ERROR_APELIDO": "Apelido already registered",
-	"Cannot read property 'msg' of undefined": "Cannot read property 'msg' of undefined",
-	"resultmsg is not defined": "resultmsg is not defined",
-	"REGISTRO_ALTERADO": "Registro alterado com sucesso!",
-	"cadastrar is not defined": "cadastrar is not defined",
-	"NOVO_CLIENTE_ADICIONADO": "Um novo cliente entrou no estabelecimento!",
-	"Cannot read property 'status' of undefined": "Cannot read property 'status' of undefined",
-	"listarProdutos is not a function": "listarProdutos is not a function",
-	"ITEM_NAO_ENCONTRADO": "O item não foi encontrado!",
-	"ITEM_COMPRADO": "Item comprado com sucesso!",
-	"ITEM_ENTREGUE": "Item marcado como entregue!",
-	"AVATAR_ALTERADO": "Avatar alterado com sucesso",
-	"CLIENTE_SAIU": "Você saiu do estabelecimento!",
-	"CLIENTE_RECUSOU_CONVITE": "Cliente recusou o convite!"
+	"PAGAMENTO_VALOR_MAIOR": "O valor a ser pago é maior que o valor restante da comanda!"
 }

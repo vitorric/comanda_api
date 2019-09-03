@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    app.use('/api', require('./user')());
+    app.use('/api', require('./usuario')());
     app.use('/api', require('./cliente')());
     app.use('/api', require('./estabelecimento')());
     app.use('/api', require('./produto')());
