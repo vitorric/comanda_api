@@ -8,6 +8,9 @@ Esta é a API do projeto **Comanda Gameficada**, esta API é utilizada no aplica
 Antes de iniciar, é necessário instalar o [Node](http://nodejs.org/), o [Git](https://git-scm.com/), o [MongoDB](https://www.mongodb.com/download-center/community) e o [Postman](https://www.getpostman.com/downloads/) localmente.
 **OBS:**: Todos os métodos da API são Post, logo, é necessário o Postman ou outro método que consiga fazer Post em requisições.
 
+* **Versão do NodeJS**: v10.16.0
+* **Versão do MongoDB**: v4.0.11
+
 ## Estrutura de pasta
 
 ``` bash
