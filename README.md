@@ -109,8 +109,8 @@ Mongodb connection dev
 Abra o Postman, e teste a seguinte URL **http://localhost:3000/api/login/cliente**, com os seguintes paramêtros no corpo da requisição:
 ```js
 {
-	"email": "teste@email.com",
-	"password": "1234"
+    "email": "teste@email.com",
+    "password": "1234"
 }
 ```
 
