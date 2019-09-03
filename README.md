@@ -6,6 +6,7 @@ Esta é a API do projeto **Comanda Gameficada**, esta API é utilizada no aplica
 ## Preparação
 
 Antes de iniciar, é necessário instalar o [Node](http://nodejs.org/), o [Git](https://git-scm.com/), o [MongoDB](https://www.mongodb.com/download-center/community) e o [Postman](https://www.getpostman.com/downloads/) localmente.
+
 **OBS:**: Todos os métodos da API são Post, logo, é necessário o Postman ou outro método que consiga fazer Post em requisições.
 
 * **Versão do NodeJS**: v10.16.0
@@ -114,6 +115,24 @@ Abra o Postman, e teste a seguinte URL **http://localhost:3000/api/login/cliente
 ```
 
 Caso o retorno da requisição seja **Unauthorized**, a API esta funcionando.
+
+## Instalação da Documentação
+
+ * Abra o terminal, e digite o seguinte comando:
+```bash
+npm install apidoc -g
+```
+
+ * Acesse a pasta do projeto, abra o terminal e execute o comando:
+```
+npm run gen-doc
+```
+
+Ao fazer isso, será gerado uma pasta chamada **apidoc**, e dentro dela há um arquivo HTML chamado **index**, nele contém toda a documentação das rotas do sistema.
+
+## Configurando ambiente do Postman
+ 
+ Dentro da pasta **docFiles**, contém um arquivo chamado **comanda_postman**, basta importar ele no postman que será criado uma coleção de exemplos de requisições.
 
 ## Conexões
 
