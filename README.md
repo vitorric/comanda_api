@@ -5,8 +5,8 @@ Esta é a API do projeto **Comanda Gameficada**, esta API é utilizada no aplica
 
 ## Preparação
 
-Antes de iniciar, é necessário instalar o [node](http://nodejs.org/), o [git](https://git-scm.com/) e o [MongoDB](https://www.mongodb.com/download-center/community) localmente.
-
+Antes de iniciar, é necessário instalar o [node](http://nodejs.org/), o [git](https://git-scm.com/), o [MongoDB](https://www.mongodb.com/download-center/community)e o [Postman](https://www.getpostman.com/downloads/) localmente.
+**OBS:**: Todos os métodos da API são Post, logo, é necessário o Postman ou outro método que consiga fazer Post em requisições.
 
 ## Estrutura de pasta
 
@@ -73,65 +73,61 @@ O Fluxo da API se inicia com uma requisição em uma rota (URL). Cada rota é im
 Segue abaixo uma imagem representando o fluxo:
 
 <p align="center">
-  <img src="https://uploaddeimagens.com.br/imagens/fluxo_api-png-23e1f9e2-f9bc-46c2-b2d0-9573080a2a67">
+  <img src="https://uploaddeimagens.com.br/images/002/315/407/original/fluxo_api.png?1567468117">
 </p>
 
-## Getting started
+## Instalação
  
- * Go to the folder you installed MongoDB and run the mongod.exe file.
+ * Verifique se o MongoDB esta em execução, caso não esteja, vá até a pasta que você o instalou, e execute o arquivo **mongod.exe**.
 
- * Open CMD and execute:
+ * Faça o clone deste projeto (será criado uma pasta chamada comanda_api)
+ 
+ * Acesse a pasta do projeto, abra o terminal e instale as dependências:
 ```bash
-# clone the project - when cloning the project it will automatically create a folder named crud_nodejs
-git clone https://github.com/vitorric/crud_nodejs.git
-```
- * Access the folder crud_nodejs, open CMD and execute:
-```bash
-# install project dependencies
 npm install
 
-# install nodemon to start project
 npm install -g nodemon
 
-# start project
+```
+
+ * Após isso, basta iniciar a API.
+```bash
 nodemon
 ```
 
-Open your browser and enter the URL [http://localhost:3000](http://localhost:3000)
+Caso tudo tenha sido executado corretamente, será apresentado no terminal as seguintes mensagens:
+```bash
+Server running on port 3000
+Mongodb connection dev
+```
 
-## Connections
+## Testando API
+Abra o Postman, e teste a seguinte URL **http://localhost:3000/api/login/cliente**, com os seguintes paramêtros no corpo da requisição:
+```js
+{
+	"email": "teste@email.com",
+	"password": "1234"
+}
+```
 
-Open the **config/bd/index.js** folder, you will see the following JSON:
+Caso o retorno da requisição seja **Unauthorized**, a API esta funcionando.
+
+## Conexões
+
+As configurações de conexão ao MongoDB fica na pasta **config/bd/index.js**:
 
 ```js
 module.exports = {
     dev: {
-        'MONGO_HOST': '127.0.0.1',
+        'PORT': 3000,
+        'MONGO_HOST': 'localhost',
         'MONGO_PORT': '27017',
         'MONGO_USER': '',
         'MONGO_PWD': '',
-        'MONGO_DB': 'yourDB',
-        'MONGO_AUTH_SOURCE': ''
-    },
-    homolog: {
-        'MONGO_HOST': 'ds341825.mlab.com',
-        'MONGO_PORT': 41825,
-        'MONGO_DB': 'syscompany',
-        'MONGO_USER': 'syscompany',
-        'MONGO_PWD': 'nahXZB7aGZ4.T<eK'
+        'MONGO_DB': 'comanda',
+        'MONGO_AUTH_SOURCE': 'comanda'
     }
     ...
 };
 ```
-
-You can configure multiple environments, and to connect to one, just go to the file **src/connection/index.js** and search for the line:
-
-```js
-let dbPrincipal = 'dev';
-```
-
-If you change the value of dbPrincipal to homolog, you will get data from a database in mLab. The data inserted in mLab is a json called **company.json**, you can get it in root of project.
-
-Or, you can change the value **'dev'** to your new environment.
-
-## Demonstration
+Já a conexão do firebase fica em **src/conn/firebase**. O arquivo index desta pasta aponta para o caminho do banco, já dentro da pasta **src/conn/firebase/data** contém o arquivo que nos da permissão de acesso (esse arquivo é gerado pelo próprio firebase).
