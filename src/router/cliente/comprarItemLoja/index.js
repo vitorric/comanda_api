@@ -46,38 +46,8 @@ module.exports = () => (req, res) => {
         * @apiErrorExample {json} Success-Response:
         *     HTTP/1.1 200 OK
         *       {
-        *           "sucesso": false,
-        *           "mensagem": "É necessário estar no estabelecimento!"
-        *       }
-        * @apiErrorExample {json} Success-Response:
-        *     HTTP/1.1 200 OK
-        *       {
-        *           "sucesso": false,
-        *           "mensagem": "Dinheiro insuficiente!"
-        *       }
-        * @apiErrorExample {json} Success-Response:
-        *     HTTP/1.1 200 OK
-        *       {
-        *           "sucesso": false,
-        *           "mensagem": "Estoque esgotado!"
-        *       }
-        * @apiErrorExample {json} Success-Response:
-        *     HTTP/1.1 200 OK
-        *       {
-        *           "sucesso": false,
-        *           "mensagem": "Tempo expirado! Este item não está mais disponível."
-        *       }
-        * @apiErrorExample {json} Success-Response:
-        *     HTTP/1.1 200 OK
-        *       {
-        *           "sucesso": false,
-        *           "mensagem": "Dados inválidos!"
-        *       }
-        * @apiErrorExample {json} Success-Response:
-        *     HTTP/1.1 200 OK
-        *       {
-        *           "sucesso": false,
-        *           "mensagem": "Solicitação inválida, tente novamente!"
+        *           "sucesso": false,,
+        *           "mensagem": "Mensagem erro"
         *       }
     **/
 

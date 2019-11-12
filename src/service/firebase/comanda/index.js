@@ -50,7 +50,6 @@ exports.FBInserirMembroNoGrupoComanda = (comanda, clienteId, configCliente) => {
     try
     {
         let membro = {};
-
         comanda.grupo.map((value) => {
             membro = {
                 lider: value.lider,

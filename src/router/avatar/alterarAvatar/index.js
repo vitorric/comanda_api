@@ -54,13 +54,7 @@ const { AlterarAvatar } = require('../../../service/api/avatar'),
     *     HTTP/1.1 200 OK
     *       {
     *           "sucesso": false,
-    *           "mensagem": "Dados inválidos!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Solicitação inválida, tente novamente!"
+    *           "mensagem": "Mensagem erro"
     *       }
 **/
 

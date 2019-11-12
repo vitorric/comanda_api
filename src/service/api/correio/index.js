@@ -1,9 +1,10 @@
 const { cadastrarCorreio, obterCorreio, alterarCorreio, marcarMensagemComoLida, marcarAcaoExecutadaMensagem } = require('../../../repository/api/correio'),
-    { FBInserirMensagemNoCorreio } = require('../../firebase/correio');
+    { FBInserirMensagemNoCorreio } = require('../../firebase/correio'),
+    { NotificacaoCorreio } = require('../../firebase/notificacao');
 
 //servico generico que irá ser utilizado em várias rotas
 //ter cuidado ao fazer alguma alteracao nele
-exports.InserirMensagemNoCorreio = async (novaMensagem) =>
+exports.InserirMensagemNoCorreio = async (novaMensagem, tokenFirebase) =>
 {
     try
     {
@@ -45,6 +46,9 @@ exports.InserirMensagemNoCorreio = async (novaMensagem) =>
 
             alterarCorreio(correioCliente);
             FBInserirMensagemNoCorreio(correioCliente);
+
+            if (typeof tokenFirebase !== 'undefined' && tokenFirebase.length > 0)
+                NotificacaoCorreio(tokenFirebase);
         }
     }
     catch (error) {
@@ -96,6 +100,7 @@ exports.MarcarAcaoExecutadaMensagem = async (clienteId, comandaId) =>
     {
         await marcarAcaoExecutadaMensagem(clienteId, comandaId);
         let correioAlterado = await obterCorreio(clienteId);
+        console.log('correioAlterado: ', correioAlterado);
         FBInserirMensagemNoCorreio(correioAlterado);
 
         return { status: true };

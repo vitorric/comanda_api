@@ -47,6 +47,7 @@ exports.listarParaClientes = nome => {
                     descricao: 1,
                     telefone:1,
                     celular: 1,
+                    icon: 1
                 }
             }
         ]).exec();
@@ -303,7 +304,6 @@ exports.obterEstabelecimento = estabelecimentoId => {
                 _id: estabelecimentoId
             },
             {
-                email: 0,
                 password: 0,
                 createdAt: 0,
                 updatedAt: 0,
@@ -359,6 +359,67 @@ exports.alterarStatusEstabOnline = async (estabelecimentoId, status) => {
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarStatusEstabOnline:', error);
         return false;
+    }
+};
+
+exports.alterarEstabelecimentoIcon = async (estabelecimentoId, nomeIcon) => {
+
+    try {
+
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(estabelecimentoId)
+            },
+            {
+                $set: {
+                    icon: nomeIcon
+                }
+
+            }).exec();
+
+        if (!estabelecimentoAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarEstabelecimentoIcon:', error);
+    }
+};
+
+exports.alterarEstabelecimento = async (estabelecimentoId, estabelecimento) => {
+
+    try {
+
+        let estabelecimentoAlterado = await schemaEstabelecimento.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(estabelecimentoId)
+            },
+            {
+                $set: {
+                    tipo: estabelecimento.tipo,
+                    descricao: estabelecimento.descricao,
+                    horarioAtendimentoInicio: estabelecimento.horarioAtendimentoInicio,
+                    horarioAtendimentoFim: estabelecimento.horarioAtendimentoFim,
+                    telefone: estabelecimento.telefone,
+                    celular: estabelecimento.celular,
+                    endereco: estabelecimento.endereco,
+                    coordenadas: estabelecimento.coordenadas
+                }
+
+            }).exec();
+
+        if (!estabelecimentoAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarEstabelecimento:', error);
     }
 };
 

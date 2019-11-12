@@ -13,7 +13,8 @@
 	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO_APP": "É necessário sair do estabelecimento atual!",
 	"ESTABELECIMENTO_FECHADO": "Estabelecimento está fechado!",
 	"USUARIO_NAO_ENCONTRADO": "Usuário não encontrado!",
-	"SENHA_RECUPERADA": "Uma nova senha de acesso foi enviada ao email!",
+	"SENHA_RECUPERADA": "Sua senha foi alterada!",
+	"SOLICITACAO_SENHA_RECUPERADA": "As instruções para alteração foi enviada para seu email!",
 	"CLIENTE_JA_ESTA_NO_ESTABELECIMENTO": "O cliente já está ativo em um estabelecimento",
 	"CLIENTE_JA_TEM_CONVITE": "Este cliente já foi convidado por um estabelecimento!",
 	"QRCODE_INVALIDO": "QRCode inválido!",
@@ -41,5 +42,6 @@
 	"PROBLEMA_ENVIO_IMAGEM": "Ops, ocorreu um problema ao tentar enviar a imagem, tente novamente!",
 	"CLIENTE_NAO_ENCONTRADO_OU_PAGOU": "O cliente não está na comanda ou ele já pagou!",
 	"PAGAMENTO_VALOR_INVALIDO": "O valor a ser pago é menor que o necessário!",
-	"PAGAMENTO_VALOR_MAIOR": "O valor a ser pago é maior que o valor restante da comanda!"
+	"PAGAMENTO_VALOR_MAIOR": "O valor a ser pago é maior que o valor restante da comanda!",
+	"CLIENTE_LONGE_ESTABELECIMENTO": "Você está muito longe do estabelecimento!"
 }

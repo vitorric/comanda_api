@@ -1,5 +1,6 @@
 const { alterarDesafioIcon, obterDesafioStatusFirebase } = require('../../../repository/api/desafio'),
     { alterarProdutoIcon } = require('../../../repository/api/produto'),
+    { alterarEstabelecimentoIcon } = require('../../../repository/api/estabelecimento'),
     { alterarItemLojaIcon, obterItemLojaStatusFirebase } = require('../../../repository/api/itemLoja'),
     { FBAlterarIconDesafio, FBAlterarIconItemLoja } = require('../../../service/firebase/estabelecimento');
 
@@ -81,6 +82,31 @@ exports.UploadIconProduto = async (estabelecimentoId, produtoId, file) => {
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in UploadIconProduto:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.UploadIconEstabelecimento = async (estabelecimentoId, file) => {
+    try
+    {
+        file.name = `${estabelecimentoId}.png`;
+        const path = `files/estabelecimento/icon/${file.name}`;
+        const fullPath = `${__dirname}/../../../../public/${path}`;
+        file.mv(fullPath, function(error) {
+            if (error) {
+                console.log('\x1b[31m%s\x1b[0m', 'Erro in UploadIconEstabelecimento:', error);
+                return { status: false , mensagem: Mensagens.PROBLEMA_ENVIO_IMAGEM };
+            }
+        });
+
+        alterarEstabelecimentoIcon(estabelecimentoId, file.name);
+        //FBAlterarIconEstabelecimento(estabelecimentoId, file.name);
+
+        return { status: true };
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in UploadIconEstabelecimento:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

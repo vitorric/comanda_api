@@ -209,7 +209,7 @@ exports.registrarTokenFirebase = async (clienteId, deviceId, tokenFirebase) => {
     {
         let tokenRegistrado = await schemaCliente.updateOne({
             '_id': ObjectIdCast(clienteId),
-            'fireBaseToken.deviceId': { $ne: deviceId }
+            'tokenFirebase.deviceId': { $ne: deviceId }
         },
         {
             $push: {
@@ -235,8 +235,8 @@ exports.deletarTokenFirebase = async (clienteId, deviceId) => {
     try
     {
         let tokenDeletado = await schemaCliente.updateOne({
-            '_id': { $ne: ObjectIdCast(clienteId) },
-            'fireBaseToken.deviceId': { $eq: deviceId }
+            '_id': ObjectIdCast(clienteId),
+            'tokenFirebase.deviceId': { $eq: deviceId }
         },
         {
             $pull: {
@@ -274,7 +274,8 @@ exports.listarClientesParaDesafios = async clientes =>
                     goldGeral:1,
                     pontos: 1,
                     goldPorEstabelecimento: 1,
-                    avatar: 1
+                    avatar: 1,
+                    tokenFirebase: 1
                 }
             }]).exec();
     } catch (error) {

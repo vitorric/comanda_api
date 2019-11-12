@@ -1,5 +1,15 @@
-const { cadastrarProduto, listarProdutos, obterProduto, obterProdutoCliente, obterProdutoPorCodigo, alterarProduto } = require('../../../repository/api/produto'),
-    { obterEstabelecimento, adicionarProdutoAoEstabelecimento } = require('../../../repository/api/estabelecimento');
+const {
+        cadastrarProduto,
+        listarProdutos,
+        obterProduto,
+        obterProdutoCliente,
+        obterProdutoPorCodigo,
+        alterarProduto
+    } = require('../../../repository/api/produto'),
+    {
+        obterEstabelecimento,
+        adicionarProdutoAoEstabelecimento
+    } = require('../../../repository/api/estabelecimento');
 
 exports.CadastrarProduto = async (estabelecimentoId, produto) => {
 

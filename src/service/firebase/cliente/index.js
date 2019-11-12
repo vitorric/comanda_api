@@ -83,15 +83,17 @@ exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEs
     }
 };
 
-exports.FBSairDoEstabelecimento = async clienteId => {
+exports.FBSairDoEstabelecimento = async clientesId => {
     try
     {
-        let configAtualCliente = {
-            estaEmUmEstabelecimento: false,
-            conviteEstabPendente: false
-        };
+        clientesId.forEach((element) => {
+            let configAtualCliente = {
+                estaEmUmEstabelecimento: false,
+                conviteEstabPendente: false
+            };
 
-        connFb.database().ref('/clientes/' + clienteId.toString() + '/configClienteAtual').set(configAtualCliente);
+            connFb.database().ref('/clientes/' + element.toString() + '/configClienteAtual').set(configAtualCliente);
+        });
     }
     catch(err)
     {

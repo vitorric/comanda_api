@@ -8,7 +8,7 @@ exports.FBInserirMensagemNoCorreio = async (correioCliente) => {
             if (value.status)
             {
                 let mensagem = {
-                    _id: value._id,
+                    _id: value._id.toString(),
                     titulo: value.titulo,
                     mensagem: value.mensagem,
                     mensagemGrande: value.mensagemGrande,
@@ -25,9 +25,9 @@ exports.FBInserirMensagemNoCorreio = async (correioCliente) => {
                     };
 
                     if (typeof value.acao.comanda !== 'undefined')
-                        acao.comanda = value.acao.comanda;
+                        acao.comanda = value.acao.comanda.toString();
                     if (typeof value.acao.cliente !== 'undefined')
-                        acao.cliente = value.acao.cliente;
+                        acao.cliente = value.acao.cliente.toString();
                     if (typeof value.acao.dinheiro !== 'undefined')
                         acao.dinheiro = value.acao.dinheiro;
                     if (typeof value.acao.exp !== 'undefined')

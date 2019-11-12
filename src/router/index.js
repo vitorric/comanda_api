@@ -10,4 +10,5 @@ module.exports = (app) => {
     app.use('/api', require('./correio')());
     app.use('/api', require('./uploadFiles')());
     app.use('/api', require('./downloadFiles')());
+    app.use('/api', require('./gps')());
 };

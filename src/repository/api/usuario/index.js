@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { schemaUser } = require('../../../schema/api/user'),
+const { schemaUser } = require('../../../schema/api/usuario'),
     { responseHandler } = require('../../../utils'),
     JWT = require('jsonwebtoken'),
     {JWT_SECRET} = require('../../../../config');

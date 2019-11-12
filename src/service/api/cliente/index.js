@@ -14,15 +14,16 @@ const { cadastrarCliente,
         alterarSenha,
         alterarGoldsEstabelecimento,
         listarClienteDesafios,
-        listarClienteDesafiosConcluidos,
         listarGoldEstabelecimento,
         obterUltimaChaveAmigavel,
         registrarTokenFirebase,
         deletarTokenFirebase } = require('../../../repository/api/cliente'),
-    {   cadastrarHistoricoCompra, listarHistoricoCompra  } = require('../../../repository/api/historicoCompraLojas'),
-    {   obterItemLojaCliente, alterarItemLojaCompra  } = require('../../../repository/api/itemLoja'),
+    { listarDesafioClienteConcluido, obterDesafioClienteConcluido } = require('../../../repository/api/desafioCliente'),
+    { cadastrarHistoricoCompra, listarHistoricoCompra } = require('../../../repository/api/historicoCompraLojas'),
+    { obterItemLojaCliente, alterarItemLojaCompra } = require('../../../repository/api/itemLoja'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
-    { gerarChaveAmigavel, recuperarSenha } = require('../../../utils'),
+    { obterToken, cadastrarToken, excluirToken } = require('../../../repository/api/token'),
+    { gerarChaveAmigavel, criptografarSenha } = require('../../../utils'),
     { FBCriarCliente,
         FBEntrarNoEstabelecimento,
         FBRecusarSairDoEstabelecimento,
@@ -32,7 +33,9 @@ const { cadastrarCliente,
     { FBAlterarEstoqueItem } = require('../../firebase/estabelecimento'),
     { InserirMensagemNoCorreio } = require('../../../service/api/correio'),
     { CadastrarAvatar } = require('../avatar'),
-    { criarToken } = require('../../passaport/criarToken');
+    { criarToken } = require('../../passaport/criarToken'),
+    { CalcularDistanciaLatLong } = require('../../../utils/GPS'),
+    { EnviarEmailRecuperarSenha } = require('../../../service/email');
 
 
 
@@ -99,33 +102,34 @@ exports.CadastrarCliente = async ({ email, password, nome, apelido, sexo, avatar
         cliente.avatar = novoAvatar._id;
 
         let ultimaChaveAmigavel = await obterUltimaChaveAmigavel();
-        console.log(ultimaChaveAmigavel);
-        cliente.chaveAmigavel = parseInt(ultimaChaveAmigavel.chaveAmigavel) + 1;
 
-        cliente = await cadastrarCliente(cliente);
+        cliente.chaveAmigavel = (typeof ultimaChaveAmigavel === 'undefined') ? 1000 : parseInt(ultimaChaveAmigavel.chaveAmigavel) + 1;
 
-        return await obterCliente(cliente._id).then(async (result) => {
+        let novoCliente = await cadastrarCliente(cliente);
+
+        return await obterCliente(novoCliente._id).then(async (result) => {
             return FBCriarCliente(result).then(() => {
+
+                deletarTokenFirebase(novoCliente._id, deviceId);
 
                 if (tokenFirebase)
                 {
-                    deletarTokenFirebase(cliente._id, deviceId);
-                    registrarTokenFirebase(cliente._id, deviceId, token);
+                    registrarTokenFirebase(novoCliente._id, deviceId, tokenFirebase);
                 }
 
                 // Generate the token
                 let token = criarToken({ _id: result._id });
 
                 InserirMensagemNoCorreio({
-                    cliente: cliente._id,
+                    cliente: novoCliente._id,
                     correio: {
                         titulo: 'Seja bem vindo!',
                         mensagem: 'Bem vindo a comanda gameficada!',
-                        mensagemGrande: 'Olá, ' + cliente.nome + '! Agradecemos o seu cadastro em nosso app!'
+                        mensagemGrande: 'Olá, ' + novoCliente.nome + '! Agradecemos o seu cadastro em nosso app!'
                     }
                 });
 
-                return { status: !result ? false : true , objeto: { token, _id: cliente._id } };
+                return { status: !result ? false : true , objeto: { token, _id: novoCliente._id } };
             });
         });
     }
@@ -146,9 +150,10 @@ exports.LoginCliente = async (user, { deviceId, tokenFirebase }) => {
             return { status: false , mensagem: Mensagens.LOGIN_NAO_ENCONTRADO };
         }
 
+        await deletarTokenFirebase(user, deviceId);
+
         if (tokenFirebase)
         {
-            await deletarTokenFirebase(user, deviceId);
             registrarTokenFirebase(user, deviceId, tokenFirebase);
         }
 
@@ -174,9 +179,10 @@ exports.LoginClienteFacebook = async ({ deviceId, tokenFirebase, socialId }) => 
             return { status: true };
         }
 
+        await deletarTokenFirebase(user._id, deviceId);
+
         if (tokenFirebase)
         {
-            await deletarTokenFirebase(user._id, deviceId);
             registrarTokenFirebase(user._id, deviceId, tokenFirebase);
         }
 
@@ -188,6 +194,21 @@ exports.LoginClienteFacebook = async ({ deviceId, tokenFirebase, socialId }) => 
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in LoginClienteFacebook:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.DeslogarCliente = async (deviceId, clienteId) => {
+    try
+    {
+        console.log('DeslogarCliente: ', clienteId, deviceId);
+        await deletarTokenFirebase(clienteId, deviceId);
+
+        return { status: true };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in DeslogarCliente:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -321,7 +342,7 @@ exports.AlterarClienteConfigApp = async (clienteId, cliente) => {
 };
 
 //OK
-exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
+exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId, coordenadas) => {
 
     try
     {
@@ -329,6 +350,12 @@ exports.EntrarNoEstabelecimento = async (clienteId, estabelecimentoId) => {
 
         if (!estabelecimento)
             return {status: false, mensagem: Mensagens.ESTABELECIMENTO_NAO_ENCONTRADO };
+
+        if (CalcularDistanciaLatLong(estabelecimento.coordenadas.lat, estabelecimento.coordenadas.long, coordenadas.lat, coordenadas.long, 'K'))
+        {
+            console.log(CalcularDistanciaLatLong(estabelecimento.coordenadas.lat, estabelecimento.coordenadas.long, coordenadas.lat, coordenadas.long, 'K'));
+            return {status: false, mensagem: Mensagens.CLIENTE_LONGE_ESTABELECIMENTO };
+        }
 
         if (estabelecimento.configEstabelecimentoAtual.estaAberta)
         {
@@ -403,24 +430,51 @@ exports.SairDoEstabelecimento = async clienteId => {
     }
 };
 
-//OK
-exports.RecuperarSenha = async (email) => {
+exports.SolicitarRecuperarSenha = async email => {
     try
     {
         let cliente = await obterClienteEmail(email);
 
         if (cliente)
         {
-            let senhas = await recuperarSenha();
+            let token = criarToken({ _id: cliente._id });
 
-            let alterado = await alterarSenha(cliente._id, senhas.novaSenhaBanco);
+            cadastrarToken({
+                cliente: cliente._id,
+                nome: cliente.nome,
+                email: cliente.email,
+                token: token,
+                tipo: 'RecuperarSenha'
+            });
 
-            if (alterado)
-            {
-                require('../../../service/email')(cliente.email, cliente.nome, senhas.novaSenha);
-            }
+            EnviarEmailRecuperarSenha(cliente.email, cliente.nome, token);
 
-            return { status: true , mensagem: Mensagens.SENHA_RECUPERADA };
+            return { status: true , mensagem: Mensagens.SOLICITACAO_SENHA_RECUPERADA };
+        }
+
+        return { status: false , mensagem: Mensagens.USUARIO_NAO_ENCONTRADO };
+    }
+    catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in SolicitarRecuperarSenha:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+//OK
+exports.RecuperarSenha = async ({email, novaSenha, token}) => {
+    try
+    {
+        let tokenValido = await obterToken(email, token);
+
+        if (tokenValido)
+        {
+
+            let cripto = await criptografarSenha(novaSenha);
+
+            alterarSenha(tokenValido.cliente, cripto.novaSenhaBanco);
+            excluirToken(email, token, tokenValido.cliente);
+
+            return { status: false , mensagem: Mensagens.SENHA_RECUPERADA };
         }
 
         return { status: false , mensagem: Mensagens.USUARIO_NAO_ENCONTRADO };
@@ -566,28 +620,32 @@ exports.ListarClientes = async () => {
     });
 };
 
-exports.ListarClienteDesafios = async (obj) => {
-    return await listarClienteDesafios(obj).then(result => {
-        let resulObj = result;
-        return { status: !result ? false : true, resulObj };
-    }).catch(err => {
-        console.log('registerUser errr:', err);
-        return { status: false, msg: err };
-    });
-};
-
-
 exports.ListarClienteDesafiosConcluidos = async clienteId => {
 
     try
     {
-        let desafiosConcluidos = await listarClienteDesafiosConcluidos(clienteId);
+        let desafiosConcluidos = await listarDesafioClienteConcluido(clienteId);
 
-        return { status: true, objeto: desafiosConcluidos };
+        return { status: true, objeto: {desafios: desafiosConcluidos} };
     }
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarClienteDesafiosConcluidos:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+exports.ObterClienteDesafioConcluido = async (clienteId, desafioId) => {
+
+    try
+    {
+        let desafiosConcluidos = await obterDesafioClienteConcluido(clienteId, desafioId);
+
+        return { status: true, objeto: desafiosConcluidos};
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterClienteDesafioConcluido:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

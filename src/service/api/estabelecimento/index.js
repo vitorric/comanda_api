@@ -2,10 +2,11 @@ const { cadastrarEstabelecimento,
         obterEstabelecimentoEmail,
         obterParaClientes,
         obterEstabelecimento,
+        alterarEstabelecimento,
         alterarStatusEstabOnline,
         listarParaClientes } = require('../../../repository/api/estabelecimento'),
     { obterCliente, alterarConfigClienteAtual } = require('../../../repository/api/cliente'),
-    { obterHistoricoCompra, alterarStatusEntregaItem } = require('../../../repository/api/historicoCompraLojas'),
+    { alterarStatusEntregaItem, listarComprasParaEntregar, obterHistoricoCompraDataEntrega } = require('../../../repository/api/historicoCompraLojas'),
     { cadastrarRole } = require('../../../repository/api/role'),
     { criarToken } = require('../../passaport/criarToken'),
     { FBAdicionarClienteAoEstabelecimento } = require('../../firebase/estabelecimento');
@@ -211,22 +212,38 @@ exports.AlterarStatusEstabOnline = async (estabelecimentoId, status) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarStatusEstabOnline:', error);
-        return {status: false};
+        return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
     }
 };
 
-exports.AlterarStatusEntregaItem = async (estabelecimentoId, clienteId, chaveUnica, status) => {
+exports.AlterarStatusEntregaItem = async historicoCompraId => {
 
     try
     {
-        let historico = await obterHistoricoCompra(estabelecimentoId, clienteId, chaveUnica);
+        let data = new Date();
 
-        if (!historico)
+        let alterado = await alterarStatusEntregaItem(historicoCompraId, data);
+
+        if (alterado)
         {
-            return { status: false, mensagem: Mensagens.DADOS_INVALIDOS};
+            let dataEntrega = await obterHistoricoCompraDataEntrega(historicoCompraId);
+
+            return { status: true, objeto: dataEntrega };
         }
 
-        let alterado = await alterarStatusEntregaItem(estabelecimentoId, clienteId, status, new Date());
+        return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarStatusEntregaItem:', error);
+        return {status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
+    }
+};
+
+exports.AlterarEstabelecimento = async (estabelecimentoId, estabelecimento) => {
+    try
+    {
+        let alterado = await alterarEstabelecimento(estabelecimentoId, estabelecimento);
 
         if (alterado)
         {
@@ -237,7 +254,21 @@ exports.AlterarStatusEntregaItem = async (estabelecimentoId, clienteId, chaveUni
     }
     catch(error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarStatusEntregaItem:', error);
-        return {status: false};
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarEstabelecimento:', error);
+        return {status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
+    }
+};
+
+exports.ListarComprasParaEntregar = async estabelecimentoId => {
+    try
+    {
+        let produtos = await listarComprasParaEntregar(estabelecimentoId);
+
+        return { status: true, objeto: produtos };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarComprasParaEntregar:', error);
+        return {status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
     }
 };

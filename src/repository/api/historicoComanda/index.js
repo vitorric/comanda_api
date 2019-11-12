@@ -27,6 +27,13 @@ exports.listarHistoricoComanda = comandaId => {
                 }
             },
             {
+                $sort:
+                {
+                    nomeProduto: 1,
+                    createdAt: -1
+                }
+            },
+            {
                 $project:
                 {
                     _id: 0,
@@ -35,12 +42,6 @@ exports.listarHistoricoComanda = comandaId => {
                     quantidade: 1,
                     valorTotal: 1,
                     createdAt: { $dateToString: { format: '%d/%m/%Y %H:%M', date: '$createdAt', timezone: 'America/Sao_Paulo' } }
-                }
-            },
-            {
-                $sort:
-                {
-                    nomeProduto: 1
                 }
             }]).exec();
     } catch (error) {

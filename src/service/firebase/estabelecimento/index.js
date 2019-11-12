@@ -163,6 +163,18 @@ exports.FBAlterarIconItemLoja = (estabelecimentoId, itemLojaId, nomeIcon) => {
     }
 };
 
+exports.FBAlterarIconEstabelecimento = (estabelecimentoId, nomeIcon) => {
+    try
+    {
+        connFb.database().ref('estabelecimentos/' + estabelecimentoId.toString() + '/icon').set(nomeIcon);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
 exports.FBAlterarDesafio = (estabelecimentoId, {_id, nome, descricao, tempoDuracao}) => {
     try
     {

@@ -43,13 +43,7 @@ const { AlterarClienteConfigApp } =  require('../../../service/api/cliente'),
     *     HTTP/1.1 200 OK
     *       {
     *           "sucesso": false,
-    *           "mensagem": "Solicitação inválida, tente novamente!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Dados inválidos!"
+    *           "mensagem": "Mensagem erro"
     *       }
 **/
 module.exports = () => (req, res) => {

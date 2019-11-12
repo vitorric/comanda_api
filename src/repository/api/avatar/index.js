@@ -3,6 +3,7 @@ const { avatarSchema } = require('../../../schema/api/avatar'),
 
 
 exports.cadastrarAvatar = async avatar => {
+
     try
     {
         let novoAvatar = new avatarSchema(avatar);

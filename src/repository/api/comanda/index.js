@@ -332,6 +332,107 @@ exports.listarComandasEstab = async estabelecimentoId => {
     }
 };
 
+
+exports.obterMelhorDesafioClienteGrupoPorComanda = async (comandaId, desafioId) => {
+    try {
+        return await schemaComanda.aggregate([
+            {
+                $match: {
+                    _id: ObjectIdCast(comandaId)
+                }
+            },
+            {
+                $unwind : { 'path': '$grupo' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'desafio',
+                    let: { estabelecimentoId: '$estabelecimento'},
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: [ '$estabelecimento', '$$estabelecimentoId'] },
+                                        { $eq: [ '$emGrupo', true ] },
+                                        { $eq: [ '$status', 1 ]},
+                                        { $eq: [ '$statusFirebase', 1] }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                '_id': 1
+                            }
+                        }
+
+                    ],
+                    as: 'desafio'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafio' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $lookup: {
+                    from: 'desafioCliente',
+                    let: { clienteId: '$grupo.cliente'},
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: [ '$cliente', '$$clienteId'] },
+                                        { $eq: [ '$desafio', ObjectIdCast(desafioId)] }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                'desafio': 1,
+                                'progresso': 1,
+                                'concluido': 1
+                            }
+                        }
+
+                    ],
+                    as: 'desafioCliente'
+                }
+            },
+            {
+                $unwind : { 'path': '$desafioCliente' ,
+                    'preserveNullAndEmptyArrays': true}
+            },
+            {
+                $sort: {
+                    'desafioCliente.concluido': 1,
+                    'desafioCliente.progresso': 1
+                }
+            },
+            {
+                $group: {
+                    '_id': '$_id',
+                    'desafioCliente': {
+                        '$addToSet':'$desafioCliente'
+                    }
+                }
+            },
+            {
+                $project: {
+                    'desafioCliente': {
+                        $arrayElemAt: ['$desafioCliente', 0]
+                    }
+                }
+            }]).exec().then(items => items[0].desafioCliente);
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in obterMelhorDesafioClienteGrupoPorComanda:', error);
+    }
+};
+
 exports.obterComandaEstab = async comandaId => {
 
     try {
@@ -496,8 +597,12 @@ exports.fecharComanda = async (comandaId, dataSaida) => {
             {
                 $set: {
                     aberta: false,
-                    dataSaida: dataSaida
+                    dataSaida: dataSaida,
+                    'grupo.$[elem].jaPagou' : true
                 }
+            },
+            {
+                arrayFilters: [ { 'elem.jaPagou': false } ]
             }).exec();
 
         if (!fecharComanda)

@@ -25,9 +25,13 @@ module.exports = () => {
 
     router.post('/login/cliente', passport.authenticate('cliente', {session: false}), require('./login')());
 
+    router.post('/deslogar/cliente', passportClienteJWT, require('./deslogarCliente')());
+
     router.post('/login/facebook', require('./loginFacebook')());
 
-    router.post('/recuperar_senha/cliente', require('./recuperarSenha')());
+    router.post('/recuperar_senha/cliente', passportClienteJWT, require('./recuperarSenha')());
+
+    router.post('/solicitar/recuperar_senha', require('./solicitarRecuperarSenha')());
 
     router.post('/comprar_item/cliente', passportClienteJWT, require('./comprarItemLoja')());
 
@@ -35,9 +39,9 @@ module.exports = () => {
 
     router.post('/listar/cliente/historico/compra',passportClienteJWT, require('./listarHistoricoCompra')());
 
-    router.post('/listar/cliente/desafios',passportClienteJWT, require('./listarClienteDesafios')());
-
     router.post('/listar/cliente/desafios/concluido',passportClienteJWT, require('./listarClienteDesafiosConcluido')());
+
+    router.post('/obter/cliente/desafios/concluido',passportClienteJWT, require('./obterClienteDesafioCliente')());
 
     router.post('/obter/cliente/chave_unica',passportEstabelecimentoJWT, require('./obterClienteChaveUnica')());
 

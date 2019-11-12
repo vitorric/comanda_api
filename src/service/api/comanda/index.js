@@ -9,11 +9,11 @@ const { cadastrarComanda,
         listarComandasEstab,
         obterComandaEstab,
         alterarClientePagouComanda,
-        fecharComanda } = require('../../../repository/api/comanda'),
+        fecharComanda,
+        obterMelhorDesafioClienteGrupoPorComanda } = require('../../../repository/api/comanda'),
     { obterClienteCompleto,
         obterClienteChaveUnica,
         listarClientesParaDesafios,
-        alterarClienteParaDesafio,
         alterarConfigClienteAtual,
         alterarConfigClienteAtualConvitesComanda,
         alterarConfigClienteAtualComanda,
@@ -23,6 +23,14 @@ const { cadastrarComanda,
     { cadastrarHistoricoComanda } = require('../../../repository/api/historicoComanda'),
     { obterEstabelecimento, alterarClientesNoLocal } = require('../../../repository/api/estabelecimento'),
     { listarDesafiosAtivos } = require('../../../repository/api/desafio'),
+    {
+        cadastrarDesafioCliente,
+        alterarDesafioCliente,
+        alterarDesafioClienteCompleto,
+        obterDesafioCliente,
+        listarDesafioCliente,
+        obterDesafioClienteGrupoNaoConcluido,
+        deletarDesafioClienteGrupoNaoConcluido } = require('../../../repository/api/desafioCliente'),
     { listarHistoricoComanda } = require('../../../repository/api/historicoComanda'),
     {
         InserirMensagemNoCorreio,
@@ -35,8 +43,10 @@ const { cadastrarComanda,
         FBAlterarProdutosComanda,
         FBRemoverComanda } = require('../../firebase/comanda'),
     { FBAlterarConvitesComanda, FBLimparConvites, FBSairDoEstabelecimento } = require('../../firebase/cliente'),
-    { FBAlterarDesafios } = require('../../firebase/desafios'),
-    { AlterarExp } = require('../../api/avatar');
+    { FBAlterarDesafios, FBDeletarDesafios } = require('../../firebase/desafios'),
+    { NotificacaoConviteGrupo, NotificacaoItemAdicionadoComanda, NotificacaoDesafioConcluido, NotificacaoComandaCriada } = require('../../firebase/notificacao'),
+    { AlterarExp } = require('../../api/avatar'),
+    { CalcularDistanciaLatLong } = require('../../../utils/GPS');
 
 function alterarProdutosNaComanda (produtos, produtoId, preco, quantidade)
 {
@@ -117,6 +127,14 @@ exports.CadastrarComanda = async (estabelecimentoId, clienteId) => {
 
         FBCadastrarComanda(comandaCriada, cliente.apelido, cliente._id, cliente.avatar, cliente.sexo, cliente.configClienteAtual);
 
+        let tokensFirebase = [];
+
+        cliente.tokenFirebase.forEach(element => {
+            tokensFirebase.push(element.token);
+        });
+
+        NotificacaoComandaCriada(tokensFirebase, estabelecimento.nome);
+
         return { status: true , objeto: comandaCriada };
     }
     catch (error)
@@ -180,6 +198,12 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
         //altera a lista de convites do cliente no firebase
         FBAlterarConvitesComanda(clienteMembro._id, clienteMembro.configClienteAtual.convitesComanda);
 
+        let tokensFirebase = [];
+
+        clienteMembro.tokenFirebase.forEach(element => {
+            tokensFirebase.push(element.token);
+        });
+
         //insere mensagem no correio
         InserirMensagemNoCorreio({
             cliente: clienteMembro._id,
@@ -193,6 +217,8 @@ exports.EnviarConviteGrupo = async (clienteIdLider,clienteApelidoLider, membro) 
                 }
             }
         });
+
+        NotificacaoConviteGrupo(tokensFirebase, clienteApelidoLider);
 
         return { status: true, mensagem: Mensagens.CONVITE_COMANDA_ENVIADO };
     }
@@ -300,6 +326,14 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
             if (typeof clienteMembro.configClienteAtual.comanda !== 'undefined' && clienteMembro.configClienteAtual.comanda !== null)
                 return { status: false , mensagem: Mensagens.CLIENTE_JA_TEM_COMANDA };
 
+            //obtem o estabelecimento pra conferir a coordenada
+            let estabelecimento = await obterEstabelecimento(clienteMembro.configClienteAtual.estabelecimento);
+
+            if (CalcularDistanciaLatLong(estabelecimento.coordenadas.lat, estabelecimento.coordenadas.long, infoResposta.coordenadas.lat, infoResposta.coordenadas.long, 'K'))
+            {
+                return {status: false, mensagem: Mensagens.CLIENTE_LONGE_ESTABELECIMENTO };
+            }
+
             //atribui a comanda pro membro tambem e zera os convites
             await alterarConfigClienteAtualComanda(clienteMembro._id, comanda._id);
 
@@ -309,7 +343,7 @@ exports.RespostaConviteGrupo = async (clienteId, infoResposta) =>
             });
 
             //altera a comanda
-            let grupoAlterado = alterarGrupoComanda(comanda._id, comanda.grupo);
+            let grupoAlterado = await alterarGrupoComanda(comanda._id, comanda.grupo);
 
             if (!grupoAlterado)
             {
@@ -426,8 +460,6 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
 
         alterarProdutoVendido(produto._id, produto.estoque, produto.quantidadeVendida);
 
-        let desafios = await listarDesafiosAtivos(produto._id, estabelecimentoId, (comanda.grupo.length > 1) ? true : false);
-
         let idsClientes = [];
 
         comanda.grupo.forEach(element => {
@@ -437,63 +469,183 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
         let todosClientesDoGrupo = await listarClientesParaDesafios(idsClientes);
 
         let produtoFirebase = await obterProdutosComanda(comanda._id);
+        let tokensFirebase = [];
+
+        let tokensFirebaseDesafioConcluido = [];
 
         //Alterar o firebase da comanda com o produto novo
         FBAlterarProdutosComanda(produtoFirebase, comanda.valorTotal);
 
         todosClientesDoGrupo.forEach(element => {
             AlterarExp(element._id, element.avatar, 10);
+
+            if (typeof element.tokenFirebase !== 'undefined')
+            {
+                element.tokenFirebase.forEach(tokens => {
+                    tokensFirebase.push(tokens.token);
+                });
+            }
         });
 
-        if (typeof desafios !== 'undefined' && desafios.length > 0)
-        {
-            //para cada desafio
-            desafios.map(desafio => {
+        if (comanda.grupo.length === 1) {
 
-                //varre todos os clientes da comanda
-                todosClientesDoGrupo.map(cliente =>
-                {
-                    let indexDesafio = cliente.desafios.findIndex(x => x.desafio.toString() == desafio._id.toString());
+            let desafiosSozinho = await listarDesafiosAtivos(produto._id, estabelecimentoId, false);
 
-                    //verifica se o desafio ja foi concluido == Fazer isso amanha
+            if (typeof desafiosSozinho !== 'undefined' && desafiosSozinho.length > 0)
+            {
+                //para cada desafio
+                const promiseDesafios = await desafiosSozinho.map(async desafio => {
+
+                    //varre todos os clientes da comanda
+                    const promiseDesafioCliente = todosClientesDoGrupo.map(async cliente =>
+                    {
+                        let desafioCliente = await obterDesafioCliente(cliente._id, desafio._id);
+
+                        //verifica se o desafio ja foi concluido
+                        //encontrou o desafio
+                        if (desafioCliente !== null && desafioCliente.concluido === false)
+                        {
+                            if (desafio.objetivo.tipo === 'Produto')
+                                desafioCliente.progresso += parseInt(produtoComanda.quantidade);
+
+                            if (desafio.objetivo.tipo === 'Dinheiro')
+                                desafioCliente.progresso += parseInt(precoTotalDaCompra);
+                        }
+
+                        if (desafioCliente === null)
+                        {
+                            let novoDesafio = {
+                                cliente: cliente._id,
+                                desafio: desafio._id,
+                                estabelecimento: estabelecimentoId,
+                                progresso: (desafio.objetivo.tipo === 'Produto') ? produtoComanda.quantidade : precoTotalDaCompra,
+                                premio: desafio.premio
+                            };
+
+                            desafioCliente = await cadastrarDesafioCliente(novoDesafio);
+                        }
+
+                        if (desafioCliente.progresso >= desafio.objetivo.quantidade)
+                        {
+                        //desafio concluido
+                            if (typeof desafioCliente.concluido === 'undefined' || desafioCliente.concluido === false)
+                            {
+
+                                cliente.tokenFirebase.forEach(tokens => {
+                                    if (typeof tokensFirebaseDesafioConcluido[tokens.token] === 'undefined' || !tokensFirebaseDesafioConcluido[tokens.token])
+                                        tokensFirebaseDesafioConcluido.push(tokens.token);
+                                });
+
+                                desafioCliente.progresso = parseInt(desafio.objetivo.quantidade);
+                                desafioCliente.concluido = true;
+                                desafioCliente.dataConclusao = new Date();
+
+                                await alterarDesafioClienteCompleto(desafioCliente.cliente, desafioCliente);
+                            }
+                        }
+
+                        if (desafioCliente.progresso < desafio.objetivo.quantidade)
+                            await alterarDesafioCliente(desafioCliente.cliente, desafioCliente);
+                    });
+
+                    await Promise.all(promiseDesafioCliente);
+                });
+
+                await Promise.all(promiseDesafios);
+            }
+        }
+
+        if (comanda.grupo.length > 1){
+
+            let desafiosGrupo = await listarDesafiosAtivos(produto._id, estabelecimentoId, true);
+
+            if (typeof desafiosGrupo !== 'undefined' && desafiosGrupo.length > 0)
+            {
+                //para cada desafio
+                const promiseDesafios = await desafiosGrupo.map(async desafio => {
+
+                    let desafioCliente = await obterMelhorDesafioClienteGrupoPorComanda(comanda._id, desafio._id);
+
+                    if (typeof desafioCliente !== 'undefined' && desafioCliente.concluido) {
+                        return;
+                    }
+
+                    let ganhadorDesafio = null;
+
+                    //verifica se o desafio ja foi concluido
                     //encontrou o desafio
-                    if (indexDesafio > -1 && cliente.desafios[indexDesafio].concluido === false)
+                    if (typeof desafioCliente !== 'undefined' && desafioCliente.concluido === false)
                     {
                         if (desafio.objetivo.tipo === 'Produto')
-                            cliente.desafios[indexDesafio].progresso += parseInt(produtoComanda.quantidade);
+                            desafioCliente.progresso += parseInt(produtoComanda.quantidade);
 
                         if (desafio.objetivo.tipo === 'Dinheiro')
-                            cliente.desafios[indexDesafio].progresso += parseInt(precoTotalDaCompra);
+                            desafioCliente.progresso += parseInt(precoTotalDaCompra);
                     }
 
-                    if (indexDesafio === -1)
+                    //varre todos os clientes da comanda
+                    const promiseDesafioCliente = todosClientesDoGrupo.map(async cliente =>
                     {
-                        let novoDesafio = {
-                            desafio: desafio._id,
-                            estabelecimento: estabelecimentoId,
-                            progresso: (desafio.objetivo.tipo === 'Produto') ? produtoComanda.quantidade : precoTotalDaCompra
-                        };
+                        let novoDesafioCliente = desafioCliente;
 
-                        cliente.desafios.push(novoDesafio);
-                        indexDesafio = cliente.desafios.length - 1;
-                    }
+                        if (typeof novoDesafioCliente === 'undefined') {
+                            let novoDesafio = {
+                                cliente: cliente._id,
+                                desafio: desafio._id,
+                                estabelecimento: estabelecimentoId,
+                                progresso: (desafio.objetivo.tipo === 'Produto') ? produtoComanda.quantidade : precoTotalDaCompra,
+                                premio: desafio.premio
+                            };
 
-                    if (cliente.desafios[indexDesafio].progresso >= desafio.objetivo.quantidade)
-                    {
-                        if (typeof cliente.desafios[indexDesafio].concluido === 'undefined' || cliente.desafios[indexDesafio].concluido === false)
-                        {
-                            cliente.desafios[indexDesafio].progresso = parseInt(desafio.objetivo.quantidade);
-                            cliente.desafios[indexDesafio].concluido = true;
-                            cliente.desafios[indexDesafio].dataConclusao = new Date();
+                            novoDesafioCliente = await cadastrarDesafioCliente(novoDesafio);
                         }
-                    }
+
+                        if (novoDesafioCliente.progresso >= desafio.objetivo.quantidade) {
+                            cliente.tokenFirebase.forEach(tokens => {
+                                if (typeof tokensFirebaseDesafioConcluido[tokens.token] === 'undefined' || !tokensFirebaseDesafioConcluido[tokens.token])
+                                    tokensFirebaseDesafioConcluido.push(tokens.token);
+                            });
+
+                            if (desafio.premio.tipo === 'Produto') {
+                                if (ganhadorDesafio === null) {
+                                    ganhadorDesafio = todosClientesDoGrupo[Math.floor(Math.random() * todosClientesDoGrupo.length)]._id;
+                                }
+
+                                novoDesafioCliente.premio = {
+                                    tipo: desafio.premio.tipo,
+                                    quantidade: desafio.premio.quantidade,
+                                    produto: desafio.premio.produto,
+                                    ganhador: ganhadorDesafio
+                                };
+                            }
+
+                            if (desafio.premio.tipo === 'CPGold') {
+                                novoDesafioCliente.premio = {
+                                    tipo: desafio.premio.tipo,
+                                    quantidade: parseInt(desafio.premio.quantidade / todosClientesDoGrupo.length)
+                                };
+                            }
+
+                            novoDesafioCliente.progresso = parseInt(desafio.objetivo.quantidade);
+                            novoDesafioCliente.concluido = true;
+                            novoDesafioCliente.dataConclusao = new Date();
+
+                            await alterarDesafioClienteCompleto(cliente._id, novoDesafioCliente);
+                        }
+
+                        await alterarDesafioCliente(cliente._id, novoDesafioCliente);
+                    });
+
+                    await Promise.all(promiseDesafioCliente);
                 });
-            });
+
+                await Promise.all(promiseDesafios);
+            }
         }
 
         const promise = todosClientesDoGrupo.map(async cliente => {
-            await alterarClienteParaDesafio(cliente._id, cliente);
-            FBAlterarDesafios(cliente._id, cliente.desafios);
+            let desafiosClientes = await listarDesafioCliente(cliente._id);
+            FBAlterarDesafios(cliente._id, desafiosClientes);
         });
 
         await Promise.all(promise);
@@ -507,11 +659,18 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
             valorTotal: precoTotalDaCompra
         });
 
+        if (tokensFirebase.length > 0)
+            NotificacaoItemAdicionadoComanda(tokensFirebase, produtoComanda.quantidade, produto.nome);
+
+        if (tokensFirebaseDesafioConcluido.length > 0)
+            NotificacaoDesafioConcluido(tokensFirebaseDesafioConcluido);
+
         return { status: true, objeto: { valorTotal: comanda.valorTotal, produtosComanda: produtoFirebase } };
     }
     catch (error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in CadastrarItemComanda:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
 
@@ -577,7 +736,7 @@ exports.ClientePagarComanda = async (estabelecimentoId, {clienteId, comandaId, v
         let pessoasNaoPagaramNoGrupo = comanda.grupo.filter(integrante => {
             return !integrante.jaPagou;
         });
-
+        console.log('valorPagoTotal: ', valorPagoTotal);
         let valorRestanteAPagar = (comanda.valorTotal - valorPagoTotal);
 
         //verifica se o valor que o cliente ira pagar eh menor que o restante e se tem somente 1 no grupo
@@ -587,8 +746,11 @@ exports.ClientePagarComanda = async (estabelecimentoId, {clienteId, comandaId, v
         if (valorPago > valorRestanteAPagar)
             return { status: false , mensagem: Mensagens.PAGAMENTO_VALOR_MAIOR };
 
-        //verifica se o cliente que esta pagando eh o lider do grupo, caso seja, a lideranca eh transferida para o proximo membro do grupo que ainda nao pagou
-        if (clienteComanda.lider && pessoasNaoPagaramNoGrupo.length > 1)
+        let valorTotalAPagar = (valorRestanteAPagar - valorPago);
+
+        //verifica se o cliente que esta pagando eh o lider do grupo, caso seja, a lideranca eh transferida para o proximo membro do grupo que ainda nao pagou,
+        //se o cliente atual pagar tudo, nao transfere a lideranca
+        if (clienteComanda.lider && pessoasNaoPagaramNoGrupo.length > 1 && valorTotalAPagar > 0)
         {
             let novoLider = pessoasNaoPagaramNoGrupo.filter(integrante => {
                 return integrante.cliente.toString() !== clienteId;
@@ -599,34 +761,64 @@ exports.ClientePagarComanda = async (estabelecimentoId, {clienteId, comandaId, v
         }
 
         //altera a comanda informando que o cliente pagou
-        alterarClientePagouComanda(comandaId, clienteId, valorPago);
+        await alterarClientePagouComanda(comandaId, clienteId, valorPago);
 
         let grupoAlterado = await obterGrupoComanda(comandaId);
+        let fechar = (pessoasNaoPagaramNoGrupo.length === 1 || valorTotalAPagar === 0) ? true : false;
 
-        let fechar = (pessoasNaoPagaramNoGrupo.length === 1) ? true : false;
+        let clientesId = [];
 
         //se tiver apenas o cliente pagante no grupo, fecha a comanda
         if (fechar)
         {
+            pessoasNaoPagaramNoGrupo.forEach((cliente) => {
+                clientesId.push(cliente.cliente);
+            });
             fecharComanda(comandaId, new Date());
             FBRemoverComanda(comandaId);
         }
 
         if (!fechar)
         {
+            clientesId.push(cliente._id);
             FBAlterarGrupoComanda(grupoAlterado);
         }
 
         //retira a comanda do cliente e remove ele do estabelecimento
-        removerClienteEstabelecimento(clienteId);
+        removerClienteEstabelecimento(clientesId);
         //remove do firebase
-        FBSairDoEstabelecimento(clienteId);
+        FBSairDoEstabelecimento(clientesId);
+
+        //busca os desafios em grupo do cliente que nao foram concluidos
+        let desafiosGrupoNaoConcluidos = await obterDesafioClienteGrupoNaoConcluido(clientesId);
+
+        //remove os desafios em grupo não concluido
+        if (desafiosGrupoNaoConcluidos.length > 0) {
+
+            let desafioIds = [];
+            let desafioClienteIds = [];
+            desafiosGrupoNaoConcluidos.forEach(element => {
+                desafioClienteIds.push(element._id);
+                desafioIds.push(element.desafio._id);
+            });
+            //remove todos os desafios em grupo nao concluido
+            deletarDesafioClienteGrupoNaoConcluido(desafioClienteIds);
+            //remove os desafios do firebase
+            FBDeletarDesafios(clientesId, desafioIds);
+        }
 
         //remove o cliente do estabelecimento
-        let clientesAtuaisNoEstab = estabelecimento.configEstabelecimentoAtual.clientesNoLocal.filter(cliente => {
-            return cliente.toString() !== clienteId.toString();
-        });
+        let clientesAtuaisNoEstab = [];
 
+        clientesId.forEach(x => clientesAtuaisNoEstab.push(x.toString()));
+
+        clientesAtuaisNoEstab = estabelecimento.
+            configEstabelecimentoAtual.
+            clientesNoLocal.filter(item => !clientesAtuaisNoEstab.includes(item.toString()));
+
+        // let clientesAtuaisNoEstab = estabelecimento.configEstabelecimentoAtual.clientesNoLocal.filter(cliente => {
+        //     return cliente.toString() !== clienteId.toString();
+        // });
         alterarClientesNoLocal(estabelecimentoId, clientesAtuaisNoEstab);
 
         return { status: true };
