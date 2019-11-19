@@ -616,3 +616,37 @@ exports.fecharComanda = async (comandaId, dataSaida) => {
         return false;
     }
 };
+
+exports.quantClientesUnicoEstab = async estabelecimentoId => {
+
+    try{
+        return await schemaComanda.aggregate([{
+            $match:
+            {
+                estabelecimento: ObjectIdCast(estabelecimentoId)
+            }
+        },
+        {
+            $unwind : { 'path': '$grupo' ,
+                'preserveNullAndEmptyArrays': true}
+        },
+        {
+            $group: {
+                '_id': null,
+                'cliente':  {$addToSet: '$grupo.cliente'}
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                total: {$size:'$cliente'}
+            }
+        }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in quantClientesUnicoEstab:', error);
+        return false;
+    }
+};

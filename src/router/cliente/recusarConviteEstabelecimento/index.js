@@ -39,7 +39,7 @@ const { RecusarConviteEstabelecimento } = require('../../../service/api/cliente'
    *     HTTP/1.1 200 OK
    *       {
    *           "sucesso": false,
-   *           "mensagem": "Solicitação inválida, tente novamente!"
+   *           "mensagem": "Mensagem de erro"
    *       }
     **/
 module.exports = () => (req, res) => {

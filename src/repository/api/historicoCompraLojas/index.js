@@ -265,3 +265,39 @@ exports.listarComprasParaEntregar = estabelecimentoId =>
         return false;
     }
 };
+
+exports.quantProdutosLojaVendidos = async estabelecimentoId => {
+
+    try{
+        return await schemaHistoricoCompraLojas.aggregate([
+            {
+                $match:
+                {
+                    estabelecimento: ObjectIdCast(estabelecimentoId),
+                    modoObtido: 'Compra'
+                }
+            },
+            {
+                $group:
+                {
+                    _id: null,
+                    count:
+                    {
+                        $sum: 1
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    total: '$count'
+                }
+            }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in quantProdutosLojaVendidos:', error);
+        return false;
+    }
+};

@@ -35,13 +35,11 @@ module.exports = () => {
 
     router.post('/comprar_item/cliente', passportClienteJWT, require('./comprarItemLoja')());
 
-    router.get('/listar/cliente',passportClienteJWT, require('./listarClientes')());
-
     router.post('/listar/cliente/historico/compra',passportClienteJWT, require('./listarHistoricoCompra')());
 
     router.post('/listar/cliente/desafios/concluido',passportClienteJWT, require('./listarClienteDesafiosConcluido')());
 
-    router.post('/obter/cliente/desafios/concluido',passportClienteJWT, require('./obterClienteDesafioCliente')());
+    router.post('/obter/cliente/desafios/concluido',passportClienteJWT, require('./obterClienteDesafioConcluido')());
 
     router.post('/obter/cliente/chave_unica',passportEstabelecimentoJWT, require('./obterClienteChaveUnica')());
 

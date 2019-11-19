@@ -1,5 +1,4 @@
 module.exports = (app) => {
-    app.use('/api', require('./usuario')());
     app.use('/api', require('./cliente')());
     app.use('/api', require('./estabelecimento')());
     app.use('/api', require('./produto')());
@@ -9,6 +8,5 @@ module.exports = (app) => {
     app.use('/api', require('./avatar')());
     app.use('/api', require('./correio')());
     app.use('/api', require('./uploadFiles')());
-    app.use('/api', require('./downloadFiles')());
     app.use('/api', require('./gps')());
 };

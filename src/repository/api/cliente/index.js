@@ -528,17 +528,6 @@ exports.alterarSenha = async(clienteId, password) => {
     }
 };
 
-exports.listarClientes = async () => {
-    try
-    {
-        return await schemaCliente.find().exec();
-    }
-    catch (error)
-    {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in listarClientes:', error);
-    }
-};
-
 exports.alterarConfigClienteAtual = async (clienteId, configClienteAtual) => {
 
     try{

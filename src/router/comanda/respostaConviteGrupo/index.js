@@ -22,6 +22,9 @@ module.exports = () => (req, res) => {
     *
     * @apiParam {string} comanda ObjectId da comanda
     * @apiParam {Boolean} aceitou Convite foi aceitou ou não
+    * @apiParam {Object} coordenadas  Objeto das coordenadas atual do cliente
+    * @apiParam {string} coordenadas.lat   Referente a latitude de onde o cliente se encontra
+	* @apiParam {string} coordenadas.long  Referente a longitude de onde o cliente se encontra
     *
     * @apiSuccess {Boolean} sucesso <code>true</code>
     *
@@ -44,25 +47,7 @@ module.exports = () => (req, res) => {
     *     HTTP/1.1 200 OK
     *       {
     *           "sucesso": false,
-    *           "mensagem": "É necessário estar no estabelecimento!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "É necessário estar no mesmo estabelecimento!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "O cliente já tem uma comanda!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Solicitação inválida, tente novamente!"
+    *           "mensagem": "Mensagem de erro"
     *       }
 **/
     RespostaConviteGrupo(req.user.clienteId, req.body).then((result) => resJsonP(res, 200, result.status, result.objeto, result.mensagem))

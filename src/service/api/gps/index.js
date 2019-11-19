@@ -10,7 +10,6 @@ exports.ValidarClientePertoEstabelecimento = async (estabelecimentoId, coordenad
         if (CalcularDistanciaLatLong(estabelecimento.coordenadas.lat, estabelecimento.coordenadas.long, coordenadas.lat, coordenadas.long, 'K'))
         {
             return {status: true};
-            //return {status: false, mensagem: Mensagens.CLIENTE_LONGE_ESTABELECIMENTO };
         }
 
         return {status: true};

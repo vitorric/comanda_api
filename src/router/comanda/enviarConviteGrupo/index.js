@@ -32,8 +32,8 @@ module.exports = () => (req, res) => {
     * @apiSuccessExample {json} Success-Response:
     *     HTTP/1.1 200 OK
     *       {
-    *           "sucesso": true
-    *           "mensagem": "O Convite foi enviado!"
+    *           "sucesso": true,
+    *           "mensagem": "Mensagem de sucesso"
     *       }
     *
     * @apiErrorExample {json} Senha inválida:
@@ -45,37 +45,7 @@ module.exports = () => (req, res) => {
     *     HTTP/1.1 200 OK
     *       {
     *           "sucesso": false,
-    *           "mensagem": "É necessário ser o lider do grupo para convidar um novo membro!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "É necessário estar no estabelecimento!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "O membro não foi encontrado!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "O cliente já tem uma comanda!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Um convite já foi enviado para ele/ela!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Solicitação inválida, tente novamente!"
+    *           "mensagem": "Mensagem de erro"
     *       }
 **/
     EnviarConviteGrupo(req.user.clienteId, req.user.apelido, req.body).then((result) => resJsonP(res, 200, result.status, result.objeto, result.mensagem))

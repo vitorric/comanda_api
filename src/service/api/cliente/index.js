@@ -8,12 +8,10 @@ const { cadastrarCliente,
         obterClienteSocialId,
         obterClienteChaveUnicaPortal,
         alterarCliente,
-        listarClientes,
         alterarClienteConfigApp,
         alterarConfigClienteAtual,
         alterarSenha,
         alterarGoldsEstabelecimento,
-        listarClienteDesafios,
         listarGoldEstabelecimento,
         obterUltimaChaveAmigavel,
         registrarTokenFirebase,
@@ -608,16 +606,6 @@ exports.ListarHistoricoCompra = async (clienteId) => {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarHistoricoCompra:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
-};
-
-exports.ListarClientes = async () => {
-
-    return await listarClientes().then((result) => {
-        return { status: !result ? false : true, objeto: result };
-    }).catch((error) => {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarClientes:', error);
-        return { status: false , mensagem: Mensagens.ERRO_GENERITICO };
-    });
 };
 
 exports.ListarClienteDesafiosConcluidos = async clienteId => {

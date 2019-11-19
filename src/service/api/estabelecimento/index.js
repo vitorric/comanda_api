@@ -6,7 +6,10 @@ const { cadastrarEstabelecimento,
         alterarStatusEstabOnline,
         listarParaClientes } = require('../../../repository/api/estabelecimento'),
     { obterCliente, alterarConfigClienteAtual } = require('../../../repository/api/cliente'),
-    { alterarStatusEntregaItem, listarComprasParaEntregar, obterHistoricoCompraDataEntrega } = require('../../../repository/api/historicoCompraLojas'),
+    { alterarStatusEntregaItem, listarComprasParaEntregar, obterHistoricoCompraDataEntrega, quantProdutosLojaVendidos } = require('../../../repository/api/historicoCompraLojas'),
+    { quantDesafiosConcluidos } = require('../../../repository/api/desafioCliente'),
+    { quantClientesUnicoEstab } = require('../../../repository/api/comanda'),
+    { quantProdutosFisicosVendidos } = require('../../../repository/api/historicoComanda'),
     { cadastrarRole } = require('../../../repository/api/role'),
     { criarToken } = require('../../passaport/criarToken'),
     { FBAdicionarClienteAoEstabelecimento } = require('../../firebase/estabelecimento');
@@ -269,6 +272,28 @@ exports.ListarComprasParaEntregar = async estabelecimentoId => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in ListarComprasParaEntregar:', error);
+        return {status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
+    }
+};
+
+exports.ObterHistoricoDashboard = async estabelecimentoId => {
+    try
+    {
+        let totalClientes = await quantClientesUnicoEstab(estabelecimentoId);
+        let totalDesafiosConcluidos = await quantDesafiosConcluidos(estabelecimentoId);
+        let totalProdutosFisicos = await quantProdutosFisicosVendidos(estabelecimentoId);
+        let totalProdutosLoja = await quantProdutosLojaVendidos(estabelecimentoId);
+
+        return { status: true, objeto: {
+            totalClientes: totalClientes.total,
+            totalDesafiosConcluidos: totalDesafiosConcluidos.total,
+            totalProdutosFisicos: totalProdutosFisicos.total,
+            totalProdutosLoja: totalProdutosLoja.total
+        }};
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterHistoricoDashboard:', error);
         return {status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA};
     }
 };

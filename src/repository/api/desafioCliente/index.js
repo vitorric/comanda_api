@@ -545,3 +545,40 @@ exports.deletarDesafioClienteGrupoNaoConcluido = async desafiosId => {
         return false;
     }
 };
+
+exports.quantDesafiosConcluidos = async estabelecimentoId => {
+
+    try{
+        return await schemaDesafioCliente.aggregate([
+            {
+                $match:
+                {
+                    estabelecimento: ObjectIdCast(estabelecimentoId),
+                    concluido: true
+                }
+            },
+            {
+                $group:
+                {
+                    _id: null,
+                    count:
+                    {
+                        $sum: 1
+
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    total: '$count'
+                }
+            }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in quantDesafiosConcluidos:', error);
+        return false;
+    }
+};

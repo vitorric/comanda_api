@@ -5,11 +5,7 @@ const passport = require('passport'),
 
 module.exports = () => {
 
-    router.post('/cadastrar/comanda', passportEstabelecimentoJWT, require('./cadastrarComanda')());
-
-    router.post('/listar/comandas', passportEstabelecimentoJWT, require('./listarComandaEstab')());
-
-    router.post('/obter/comanda', passportEstabelecimentoJWT, require('./obterComandaEstab')());
+    //Cliente Token
 
     router.post('/convidar/membro_grupo/comanda', passportClienteJWT, require('./enviarConviteGrupo')());
 
@@ -17,13 +13,20 @@ module.exports = () => {
 
     router.post('/resposta_convite/membro_grupo/comanda', passportClienteJWT, require('./respostaConviteGrupo')());
 
-    router.post('/cadastrar_item/comanda', passportEstabelecimentoJWT, require('./cadastrarItemComanda')());
-
     router.post('/listar/convites/enviados',passportClienteJWT, require('./listarConvitesComandaEnviados')());
 
     router.post('/listar/historico/comanda',passportClienteJWT, require('./listarHistoricoComanda')());
 
     router.post('/transferir/lideranca/comanda',passportClienteJWT, require('./transferirLiderancaGrupo')());
+
+    //Estabelecimento Token
+    router.post('/cadastrar/comanda', passportEstabelecimentoJWT, require('./cadastrarComanda')());
+
+    router.post('/listar/comandas', passportEstabelecimentoJWT, require('./listarComandaEstab')());
+
+    router.post('/obter/comanda', passportEstabelecimentoJWT, require('./obterComandaEstab')());
+
+    router.post('/cadastrar_item/comanda', passportEstabelecimentoJWT, require('./cadastrarItemComanda')());
 
     router.post('/cliente/pagar/comanda', passportEstabelecimentoJWT, require('./clientePagarComanda')());
 

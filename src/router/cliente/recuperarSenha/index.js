@@ -11,12 +11,16 @@ const { RecuperarSenha } = require('../../../service/api/cliente'),
    *
    * @apiDescription Rota para recuperar a senha do cliente
    *
+   * @apiHeader Authorization Bearer Authentication token.
    * @apiHeaderExample {json} Header-Example:
    *     {
-   *       content-type: 'application/json'
+   *       content-type: 'application/json',
+   *       Authorization: 'Bearer authentication'
    *     }
    *
    * @apiParam {string} email Email do cliente
+   * @apiParam {string} novaSenha Nova senha do cliente
+   * @apiParam {string} token Token para validar o acesso
    *
    * @apiSuccess {Boolean} sucesso <code>true</code>
    * @apiSuccess {string} mensagem <code>true</code>
@@ -29,7 +33,7 @@ const { RecuperarSenha } = require('../../../service/api/cliente'),
    *     HTTP/1.1 200 OK
    *       {
    *           "sucesso": true,
-   *           "mensagem": "Uma nova senha de acesso foi enviada ao email!"
+   *           "mensagem": "Mensagem de sucesso"
    *       }
    *
    * @apiErrorExample {json} Senha inválida:
@@ -41,13 +45,7 @@ const { RecuperarSenha } = require('../../../service/api/cliente'),
    *     HTTP/1.1 200 OK
    *       {
    *           "sucesso": false,
-   *           "mensagem": "Usuário não encontrado!"
-   *       }
-   * @apiErrorExample {json} Success-Response:
-   *     HTTP/1.1 200 OK
-   *       {
-   *           "sucesso": false,
-   *           "mensagem": "Solicitação inválida, tente novamente!"
+   *           "mensagem": "Mensagem de erro"
    *       }
 **/
 module.exports = () => (req, res) => {

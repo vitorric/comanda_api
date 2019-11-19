@@ -19,7 +19,6 @@ const { DeslogarCliente } = require('../../../service/api/cliente'),
     *     }
     *
     * @apiParam {string} deviceId hash de identificação do aparelho mobile
-    * @apiParam {string} clienteId ObjectId do cliente
     *
     * @apiSuccess {Boolean} sucesso <code>true</code>
     *

@@ -48,3 +48,38 @@ exports.listarHistoricoComanda = comandaId => {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in listarHistoricoComanda:', error);
     }
 };
+
+exports.quantProdutosFisicosVendidos = async estabelecimentoId => {
+
+    try{
+        return await schemaHistoricoComanda.aggregate([
+            {
+                $match:
+                {
+                    estabelecimento: ObjectIdCast(estabelecimentoId)
+                }
+            },
+            {
+                $group:
+                {
+                    _id: null,
+                    count:
+                    {
+                        $sum: '$quantidade'
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    total: '$count'
+                }
+            }
+        ]).exec().then(items => items[0]);
+    }
+    catch (error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in quantProdutosFisicosVendidos:', error);
+        return false;
+    }
+};

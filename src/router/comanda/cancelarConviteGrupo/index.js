@@ -41,28 +41,10 @@ module.exports = () => (req, res) => {
     *     }
     * @apiErrorExample {json} Success-Response:
     *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "É necessário ser o lider do grupo para convidar um novo membro!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "O membro não foi encontrado!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Convite não encontrado!"
-    *       }
-    * @apiErrorExample {json} Success-Response:
-    *     HTTP/1.1 200 OK
-    *       {
-    *           "sucesso": false,
-    *           "mensagem": "Solicitação inválida, tente novamente!"
-    *       }
+    *    {
+    *        "sucesso": false,
+    *        "mensagem": "Mensagem de erro"
+    *    }
 **/
     CancelarConviteGrupo(req.user.clienteId, req.body).then((result) => resJsonP(res, 200, result.status, result.objeto, result.mensagem))
         .catch((error) => {
