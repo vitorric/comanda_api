@@ -54,6 +54,22 @@ const ClienteSchema = new Schema(
             type:Number,
             default:0
         },
+        concluiuTutorialGeral: {
+            type: Boolean,
+            default: false
+        },
+        concluiuTutorialProfile: {
+            type: Boolean,
+            default: false
+        },
+        concluiuTutorialCorreio: {
+            type: Boolean,
+            default: false
+        },
+        concluiuTutorialDesafios: {
+            type: Boolean,
+            default: false
+        },
         goldPorEstabelecimento:[{
             estabelecimento:{
                 type: Schema.Types.ObjectId,
@@ -154,13 +170,15 @@ const ClienteSchema = new Schema(
 );
 
 ClienteSchema.pre('save', async function(next){
-    try{
-        // Generate a salt
-        const salt = await bcrypt.genSalt(10);
-        // Gerenate a password hash (salt + hash)
-        const passwordHash = await bcrypt.hash(this.password, salt);
-        //Re-assign hashed version over original, plain text password
-        this.password = passwordHash;
+    try {
+        if (this.tipoLogin === 'normal') {
+            // Generate a salt
+            const salt = await bcrypt.genSalt(10);
+            // Gerenate a password hash (salt + hash)
+            const passwordHash = await bcrypt.hash(this.password, salt);
+            //Re-assign hashed version over original, plain text password
+            this.password = passwordHash;
+        }
         next();
     }catch(error){
         next(error);

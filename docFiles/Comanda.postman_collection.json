@@ -404,7 +404,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWRhNDZjZGE1NDBmMmMzY2Q0NmNmZGIzIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkckxBMXUyeWJHT1c2MWFaWFhMMXJ6dUhYaUJjU3c4YmQvN0g4MS92OE92aU8xWW5ObXhwU0ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTczNjg3Njk2LCJpYXQiOjE1NzM2ODQwOTZ9.HH1C8WkcDmSAz1xX5T4MAvXCfI_nrsmzLiIUogYwPls",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWRhNDZjZGE1NDBmMmMzY2Q0NmNmZGIzIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkckxBMXUyeWJHT1c2MWFaWFhMMXJ6dUhYaUJjU3c4YmQvN0g4MS92OE92aU8xWW5ObXhwU0ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTc0MTM0MDM3LCJpYXQiOjE1NzQxMzA0Mzd9.VF5a7rO4mLP-Sk5gcIAyUZ5Kjm3KT1dJ69OH9xu9CX8",
 									"type": "string"
 								}
 							]
@@ -423,7 +423,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/obter/estabelecimento",
+							"raw": "http://localhost:3000/api/obter/estabelecimento/dashboard",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -432,7 +432,8 @@
 							"path": [
 								"api",
 								"obter",
-								"estabelecimento"
+								"estabelecimento",
+								"dashboard"
 							]
 						}
 					},
@@ -590,7 +591,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"teste42@email.com\",\r\n  \"password\": \"81dc9bdb52d04dc20036dbd8313ed055\",\r\n  \"nome\": \"teste42\",\r\n  \"apelido\": \"teste42\",\r\n  \"sexo\": \"Masculino\",\r\n  \"cpf\": \"552.245.666-99\",\r\n  \"dataNascimento\": \"22/12/1994\",\r\n  \"avatar\": {\r\n\t\"corpo\" : \"corpo_01\",\r\n\t\"cabeca\" : \"cabeca_01\",\r\n\t\"nariz\" : \"nariz_01\",\r\n\t\"olhos\" : \"olhos_06\",\r\n\t\"boca\" : \"boca_04\",\r\n\t\"roupa\" : \"roupa_04\",\r\n\t\"cabeloTraseiro\" : \"cabeloTraseiro_01\",\r\n\t\"cabeloFrontal\" : \"cabeloFrontal_02\",\r\n\t\"barba\" : \"barba_01\",\r\n\t\"sombrancelhas\" : \"sombrancelhas_06\",\r\n\t\"orelha\" : \"orelha_01\",\r\n\t\"corPele\" : \"cor_pele\",\r\n\t\"corCabelo\" : \"amarelo\",\r\n\t\"corBarba\" : \"marron\"\r\n  }\r\n}"
+							"raw": "{\r\n  \"email\": \"teste42@email.com\",\r\n  \"password\": \"81dc9bdb52d04dc20036dbd8313ed055\",\r\n  \"nome\": \"teste42\",\r\n  \"apelido\": \"teste42\",\r\n  \"sexo\": \"Masculino\",\r\n  \"cpf\": \"552.245.666-99\",\r\n  \"dataNascimento\": \"22/12/1994\",\r\n  \"deviceId\": \"123456\",\r\n  \"tokenFirebase\": \"xxxxxx\",\r\n  \"avatar\": {\r\n\t\"corpo\" : \"corpo_01\",\r\n\t\"cabeca\" : \"cabeca_01\",\r\n\t\"nariz\" : \"nariz_01\",\r\n\t\"olhos\" : \"olhos_06\",\r\n\t\"boca\" : \"boca_04\",\r\n\t\"roupa\" : \"roupa_04\",\r\n\t\"cabeloTraseiro\" : \"cabeloTraseiro_01\",\r\n\t\"cabeloFrontal\" : \"cabeloFrontal_02\",\r\n\t\"barba\" : \"barba_01\",\r\n\t\"sombrancelhas\" : \"sombrancelhas_06\",\r\n\t\"orelha\" : \"orelha_01\",\r\n\t\"corPele\" : \"cor_pele\",\r\n\t\"corCabelo\" : \"amarelo\",\r\n\t\"corBarba\" : \"marron\"\r\n  }\r\n}"
 						},
 						"url": {
 							"raw": "http://localhost:3000/api/cadastrar/cliente",
@@ -826,7 +827,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\": \"vitor@email.com\",\n\t\"password\": \"e10adc3949ba59abbe56e057f20f883e\"\n}"
+							"raw": "{\n\t\"email\": \"teste03@email.com\",\n\t\"password\": \"e10adc3949ba59abbe56e057f20f883e\",\n\t\"deviceId\": \"123456\",\n\t\"tokenFirebase\": \"xxxxxx\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:3000/api/login/cliente",
@@ -858,7 +859,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"socialId\": \"1114921035558801\"\n}"
+							"raw": "{\n\t\"socialId\": \"1114921035558801\",\n\t\"deviceId\": \"123456\",\n\t\"tokenFirebase\": \"xxxxxx\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:3000/api/login/facebook",
@@ -1461,7 +1462,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWNkY2MwODg1ZDQ3YzQzNzkwOTE5ZTdjIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkNTVFRXhodGo4ejFJWi9EQWRtUTNNZUk0Q09ZNGFHdEJvZjc2QmZvcmpZYWhXYWZUS1FrenUiLCJub21lIjoiUmF2aWNpbmkifSwiZXhwIjoxNTYzNDk0OTA3LCJpYXQiOjE1NjM0OTEzMDd9.7w5wXSZey77PDd-E-JezpVKDzPzD60QKeiw1KEKi_Nc",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWRhNDZjZGE1NDBmMmMzY2Q0NmNmZGIzIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkckxBMXUyeWJHT1c2MWFaWFhMMXJ6dUhYaUJjU3c4YmQvN0g4MS92OE92aU8xWW5ObXhwU0ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTczNjk0MjY2LCJpYXQiOjE1NzM2OTA2NjZ9.wW-fHVYEpW_yAIsfcbKBfHPr7bpv8yBTpzYkJyZQXOg",
 									"type": "string"
 								}
 							]
@@ -1550,7 +1551,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkNGI3MzFlMDMzNzc1MDI4NDI1Yjc4MCJ9LCJleHAiOjE1NjU3MjEzODQsImlhdCI6MTU2NTcxNzc4NH0.d-AJGfJvpcHsKOPIBK1bC-hupFuuV0bD7y47uu_TLr0",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7Il9pZCI6IjVkYjllYzA5OTQ1MjA4MGZlNGZkZThmYiJ9LCJleHAiOjE1NzM2OTQ3MjUsImlhdCI6MTU3MzY5MTEyNX0.Hc2f1Mu_6e43oZtoSmc9ImqqLEKOPSxsOvTGy0S5yts",
 									"type": "string"
 								}
 							]
@@ -1566,7 +1567,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"produtoId\": \"5d4dad4dc6a74815bcbb6b5b\"\n}"
+							"raw": "{\n\t\"produtoId\": \"5dc050d94b245a7cfd18b425\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:3000/api/obter/produto/cliente",
@@ -1725,7 +1726,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWRhNDZjZGE1NDBmMmMzY2Q0NmNmZGIzIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkckxBMXUyeWJHT1c2MWFaWFhMMXJ6dUhYaUJjU3c4YmQvN0g4MS92OE92aU8xWW5ObXhwU0ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTczNjg3Njk2LCJpYXQiOjE1NzM2ODQwOTZ9.HH1C8WkcDmSAz1xX5T4MAvXCfI_nrsmzLiIUogYwPls",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjp7InN0YXR1cyI6dHJ1ZSwiX2lkIjoiNWRhNDZjZGE1NDBmMmMzY2Q0NmNmZGIzIiwiZW1haWwiOiJlc3RhYjFAZW1haWwuY29tIiwicGFzc3dvcmQiOiIkMmEkMTAkckxBMXUyeWJHT1c2MWFaWFhMMXJ6dUhYaUJjU3c4YmQvN0g4MS92OE92aU8xWW5ObXhwU0ciLCJub21lIjoiVG9ycmVtb3MifSwiZXhwIjoxNTczNjkxNzQwLCJpYXQiOjE1NzM2ODgxNDB9.26R8U8-_rGE0ZO8sU7-PUl8rHWPwJYxvyfMA-6Pp_5U",
 									"type": "string"
 								}
 							]

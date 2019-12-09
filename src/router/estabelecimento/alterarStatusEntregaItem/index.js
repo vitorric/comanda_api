@@ -2,8 +2,8 @@ const { AlterarStatusEntregaItem } = require('../../../service/api/estabelecimen
     { resJsonP } = require('../../../utils');
 
 /**
-    * @api {post} http://93.188.164.122:3000/api/estabelecimento/entrega/item Entregar Item
-    * @apiSampleRequest http://93.188.164.122:3000/api/estabelecimento/entrega/item
+    * @api {post} http://93.188.164.122:3000/api/alterar/estabelecimento/entrega/item Entregar Item
+    * @apiSampleRequest http://93.188.164.122:3000/api/alterar/estabelecimento/entrega/item
     * @apiName estabelecimento_entregar_item
     * @apiGroup Estabelecimento_Estabelecimento
     *

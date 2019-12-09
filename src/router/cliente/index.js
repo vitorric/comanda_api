@@ -23,6 +23,8 @@ module.exports = () => {
 
     router.post('/alterar/cliente', passportClienteJWT, require('./alterarCliente')());
 
+    router.post('/alterar/concluiu/tutorial', passportClienteJWT, require('./concluiuTutorial')());
+
     router.post('/login/cliente', passport.authenticate('cliente', {session: false}), require('./login')());
 
     router.post('/deslogar/cliente', passportClienteJWT, require('./deslogarCliente')());

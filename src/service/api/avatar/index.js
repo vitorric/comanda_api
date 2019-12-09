@@ -105,7 +105,7 @@ exports.AlterarExp = async (clienteId, avatarId, expParaAdicionar) => {
         }
 
         avatar.info.expProximoLevel = await CalcularExpProLvl(avatar.info.level);
-
+        console.log(avatar.info.exp, avatar.info.expProximoLevel, avatar.info.level);
         await alterarExp(avatarId, avatar.info.exp, avatar.info.expProximoLevel, avatar.info.level);
 
         FBAlterarAvatarExp(clienteId.toString(), avatar.info.exp, avatar.info.expProximoLevel, avatar.info.level);

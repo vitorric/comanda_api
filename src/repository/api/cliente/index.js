@@ -94,7 +94,8 @@ exports.obterCliente = clienteId => {
                     dataNascimento: { $dateToString: { format: '%Y-%m-%d', date: '$dataNascimento', timezone: 'America/Sao_Paulo' } },
                     avatar: 1,
                     configApp: 1,
-                    configClienteAtual: 1
+                    configClienteAtual: 1,
+                    concluiuTutorial: 1
                 }
             }
         ]).exec().then(items => items[0]);
@@ -497,6 +498,35 @@ exports.alterarCliente = async (clienteId, cliente) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarAvatar:', error);
+    }
+};
+
+exports.alterarClienteConcluiuTutorial = async (clienteId, {concluiuTutorialGeral, concluiuTutorialProfile, concluiuTutorialCorreio, concluiuTutorialDesafios})=> {
+
+    try {
+
+        let clienteAlterado = await schemaCliente.findOneAndUpdate(
+            {
+                _id: ObjectIdCast(clienteId)
+            },
+            {
+                $set: {
+                    concluiuTutorialGeral: concluiuTutorialGeral,
+                    concluiuTutorialProfile: concluiuTutorialProfile,
+                    concluiuTutorialCorreio: concluiuTutorialCorreio,
+                    concluiuTutorialDesafios: concluiuTutorialDesafios
+                }
+            }).exec();
+
+        if (!clienteAlterado){
+            return false;
+        }
+
+        return true;
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in alterarClienteConcluiuTutorial:', error);
     }
 };
 

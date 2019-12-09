@@ -39,6 +39,8 @@ const { CadastrarCliente } = require('../../../service/api/cliente'),
     * @apiParam {string} avatar.corPele Referente ao nome da imagem da cor da pele
     * @apiParam {string} avatar.corCabelo   Referente ao nome da imagem da cor do cabelo
     * @apiParam {string} avatar.corBarba    Referente ao nome da imagem da cor da barba
+    * @apiParam {String} deviceId  Id do aparelho
+    * @apiParam {String} tokenFirebase  Token do firebase
     *
     * @apiSuccess {Boolean} sucesso <code>true</code>
     * @apiSuccess {Object} retorno Objeto que contém as informações do cliente

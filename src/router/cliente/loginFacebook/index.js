@@ -17,6 +17,8 @@ const { LoginClienteFacebook } = require('../../../service/api/cliente'),
     *     }
     *
     * @apiParam {String} socialId  Id do facebook
+    * @apiParam {String} deviceId  Id do aparelho
+    * @apiParam {String} tokenFirebase  Token do firebase
     *
     * @apiSuccess {Boolean} sucesso <code>true</code>
     * @apiSuccess {Object} retorno Objeto que contém as informações do cliente

@@ -15,7 +15,8 @@ const { cadastrarCliente,
         listarGoldEstabelecimento,
         obterUltimaChaveAmigavel,
         registrarTokenFirebase,
-        deletarTokenFirebase } = require('../../../repository/api/cliente'),
+        deletarTokenFirebase,
+        alterarClienteConcluiuTutorial } = require('../../../repository/api/cliente'),
     { listarDesafioClienteConcluido, obterDesafioClienteConcluido } = require('../../../repository/api/desafioCliente'),
     { cadastrarHistoricoCompra, listarHistoricoCompra } = require('../../../repository/api/historicoCompraLojas'),
     { obterItemLojaCliente, alterarItemLojaCompra } = require('../../../repository/api/itemLoja'),
@@ -26,11 +27,12 @@ const { cadastrarCliente,
         FBEntrarNoEstabelecimento,
         FBRecusarSairDoEstabelecimento,
         FBAlterarCliente,
+        FBAlterarClienteConcluiuTutorial,
         FBAlterarConfigApp,
         FBAlterarGoldEstabelecimento } = require('../../../service/firebase/cliente'),
     { FBAlterarEstoqueItem } = require('../../firebase/estabelecimento'),
     { InserirMensagemNoCorreio } = require('../../../service/api/correio'),
-    { CadastrarAvatar } = require('../avatar'),
+    { CadastrarAvatar, AlterarExp } = require('../avatar'),
     { criarToken } = require('../../passaport/criarToken'),
     { CalcularDistanciaLatLong } = require('../../../utils/GPS'),
     { EnviarEmailRecuperarSenha } = require('../../../service/email');
@@ -225,7 +227,7 @@ exports.ObterClienteChaveUnica = async chaveAmigavel => {
     }
     catch(error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterClienteChaveUnica:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -243,7 +245,7 @@ exports.ObterClienteEmail = async email => {
     }
     catch(error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterClienteEmail:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -261,7 +263,7 @@ exports.ObterClienteApelido = async apelido => {
     }
     catch(error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterClienteApelido:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -279,7 +281,7 @@ exports.ObterClienteCPF = async cpf => {
     }
     catch(error)
     {
-        console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ObterClienteCPF:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };
@@ -307,6 +309,41 @@ exports.AlterarCliente = async (clienteId, { nome, cpf, dataNascimento } ) => {
     catch(error)
     {
         console.log('\x1b[31m%s\x1b[0m', 'Erro in AlterarCliente:', error);
+        return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
+    }
+};
+
+//OK
+exports.ClienteConcluiuTutorial = async (tipoTutorial, clienteId, avatarId) => {
+
+    try{
+
+        let cliente = await obterClienteCompleto(clienteId);
+
+        if (tipoTutorial === 'concluiuTutorialGeral')
+            cliente.concluiuTutorialGeral = true;
+        if (tipoTutorial === 'concluiuTutorialProfile')
+            cliente.concluiuTutorialProfile = true;
+        if (tipoTutorial === 'concluiuTutorialCorreio')
+            cliente.concluiuTutorialCorreio = true;
+        if (tipoTutorial === 'concluiuTutorialDesafios')
+            cliente.concluiuTutorialDesafios = true;
+
+        let clienteAlterado = await alterarClienteConcluiuTutorial(clienteId, cliente);
+
+        if (!clienteAlterado){
+            return { status: false, mensagem: Mensagens.SOLICITACAO_INVALIDA  };
+        }
+
+        FBAlterarClienteConcluiuTutorial(clienteId, cliente);
+
+        AlterarExp(clienteId, avatarId, 25);
+
+        return { status: true };
+    }
+    catch(error)
+    {
+        console.log('\x1b[31m%s\x1b[0m', 'Erro in ClienteConcluiuTutorial:', error);
         return { status: false , mensagem: Mensagens.SOLICITACAO_INVALIDA };
     }
 };

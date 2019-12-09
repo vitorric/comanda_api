@@ -18,6 +18,8 @@ const { LoginCliente } = require('../../../service/api/cliente'),
     *
     * @apiParam {String} email  Email do cliente
     * @apiParam {String} password  Password do cliente
+    * @apiParam {String} deviceId  Id do aparelho
+    * @apiParam {String} tokenFirebase  Token do firebase
     *
     * @apiSuccess {Boolean} sucesso <code>true</code>
     * @apiSuccess {Object} retorno Objeto que contém as informações do cliente

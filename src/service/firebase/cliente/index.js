@@ -29,6 +29,24 @@ exports.FBAlterarCliente = async (clienteId, cliente) => {
     }
 };
 
+exports.FBAlterarClienteConcluiuTutorial = async (clienteId, {concluiuTutorialGeral, concluiuTutorialProfile, concluiuTutorialCorreio, concluiuTutorialDesafios}) => {
+    try
+    {
+        var updates = {};
+        updates['/clientes/' + clienteId + '/concluiuTutorialGeral'] = concluiuTutorialGeral;
+        updates['/clientes/' + clienteId + '/concluiuTutorialProfile'] = concluiuTutorialProfile;
+        updates['/clientes/' + clienteId + '/concluiuTutorialCorreio'] = concluiuTutorialCorreio;
+        updates['/clientes/' + clienteId + '/concluiuTutorialDesafios'] = concluiuTutorialDesafios;
+
+        connFb.database().ref().update(updates);
+    }
+    catch(err)
+    {
+        console.log(err);
+        throw err;
+    }
+};
+
 exports.FBEntrarNoEstabelecimento = async (clienteId, _idEstabelecimento, nomeEstabelecimento, comandaId) => {
     try
     {

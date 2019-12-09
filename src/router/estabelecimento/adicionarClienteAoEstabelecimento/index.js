@@ -9,7 +9,7 @@ const { AdicionarClienteAoEstabelecimento } = require('../../../service/api/esta
     *
     * @apiVersion 1.0.0
     *
-    * @apiDescription Rota para informar que o cliente resgatou a recompensa
+    * @apiDescription Rota para adicionar um cliente ao estabelecimento
     *
     * @apiHeader Authorization Bearer Authentication token.
     * @apiHeaderExample {json} Header-Example:
