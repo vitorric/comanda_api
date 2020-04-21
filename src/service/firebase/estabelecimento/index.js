@@ -64,8 +64,8 @@ exports.FBAlterarItemEstabelecimento = (estabelecimentoId, {_id, descricao, hotS
             hotSale,
             nome,
             preco,
-            quantidadeDisponivel,
-            quantidadeVendida,
+            quantidadeDisponivel: parseInt(quantidadeDisponivel),
+            quantidadeVendida: parseInt(quantidadeVendida),
             tempoDisponivel
         };
 
@@ -81,8 +81,8 @@ exports.FBAlterarEstoqueItem = (estabelecimentoId, {_id, quantidadeDisponivel, q
     {
         let item = {
             _id,
-            quantidadeDisponivel,
-            quantidadeVendida
+            quantidadeDisponivel: parseInt(quantidadeDisponivel),
+            quantidadeVendida: parseInt(quantidadeVendida)
         };
 
         connFb.database().ref('estabelecimentos/' + estabelecimentoId.toString() +'/itensLoja/' + item._id.toString()).update(item);

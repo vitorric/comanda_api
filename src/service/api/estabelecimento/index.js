@@ -285,10 +285,10 @@ exports.ObterHistoricoDashboard = async estabelecimentoId => {
         let totalProdutosLoja = await quantProdutosLojaVendidos(estabelecimentoId);
 
         return { status: true, objeto: {
-            totalClientes: totalClientes.total,
-            totalDesafiosConcluidos: totalDesafiosConcluidos.total,
-            totalProdutosFisicos: totalProdutosFisicos.total,
-            totalProdutosLoja: totalProdutosLoja.total
+            totalClientes: (totalClientes) ? totalClientes.total : 0,
+            totalDesafiosConcluidos: (totalClientes) ? totalDesafiosConcluidos.total : 0,
+            totalProdutosFisicos: (totalClientes) ? totalProdutosFisicos.total : 0,
+            totalProdutosLoja: (totalClientes) ? totalProdutosLoja.total : 0
         }};
     }
     catch(error)

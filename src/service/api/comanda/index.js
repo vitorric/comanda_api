@@ -527,7 +527,7 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
 
                         if (desafioCliente.progresso >= desafio.objetivo.quantidade)
                         {
-                        //desafio concluido
+                            //desafio concluido
                             if (typeof desafioCliente.concluido === 'undefined' || desafioCliente.concluido === false)
                             {
 
@@ -539,6 +539,14 @@ exports.CadastrarItemComanda = async (estabelecimentoId, produtoComanda) => {
                                 desafioCliente.progresso = parseInt(desafio.objetivo.quantidade);
                                 desafioCliente.concluido = true;
                                 desafioCliente.dataConclusao = new Date();
+
+                                if (desafio.premio.tipo === 'Produto')
+                                    desafioCliente.premio = {
+                                        tipo: desafio.premio.tipo,
+                                        quantidade: desafio.premio.quantidade,
+                                        produto: desafio.premio.produto,
+                                        ganhador: cliente._id
+                                    };
 
                                 await alterarDesafioClienteCompleto(desafioCliente.cliente, desafioCliente);
                             }

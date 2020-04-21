@@ -1,5 +1,6 @@
 module.exports = (app) => {
     app.use('/api', require('./cliente')());
+    app.use('/api', require('./clienteEstabelecimento')());
     app.use('/api', require('./estabelecimento')());
     app.use('/api', require('./produto')());
     app.use('/api', require('./itemLoja')());
