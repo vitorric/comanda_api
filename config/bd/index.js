@@ -1,7 +1,7 @@
 module.exports = {
     dev: {
         'PORT': 3000,
-        'MONGO_HOST': '93.188.164.122',
+        'MONGO_HOST': '127.0.0.1',
         'MONGO_PORT': '27017',
         'MONGO_USER': 'comandauser',
         'MONGO_PWD': 'comandauser123',
