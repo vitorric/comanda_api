@@ -5,7 +5,7 @@ module.exports = (() => {
 
     firebase.initializeApp({
         credential: firebase.credential.cert(serviceAccount),
-        databaseURL: 'https://comanda-3c059.firebaseio.com'
+        databaseURL: 'URL_DO_FIREBASE'
     });
 
     return firebase;
